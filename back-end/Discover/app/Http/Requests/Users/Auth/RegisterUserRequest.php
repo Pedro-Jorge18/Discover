@@ -34,4 +34,14 @@ class RegisterUserRequest extends FormRequest
             'about' => 'nullable|string|mas:500',
         ];
     }
+
+    protected function prepareForValidationRegisterUser(): void
+    {
+        $this->merge([
+            'email' => strtolower(trim($this->email)),
+            'name' => trim($this->name),
+            'last_name' => trim($this->last_name),
+            'phone' => preg_replace('/[^0-9]', '',$this->phone),
+        ]);
+    }
 }
