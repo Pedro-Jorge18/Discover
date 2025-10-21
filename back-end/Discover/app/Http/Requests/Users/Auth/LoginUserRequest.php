@@ -11,7 +11,7 @@ class LoginUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class LoginUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'remember_me' => 'sometimes|boolean',
         ];
+    }
+
+    protected function prepareForValidationLoginUser(): void
+    {
+        $this->merge([
+            'email' => strtolower(trim($this->email)),
+            'remember_me' => $this->boolean('remember_me'),
+        ]);
     }
 }
