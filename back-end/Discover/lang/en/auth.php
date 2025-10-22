@@ -16,4 +16,8 @@ return [
         'phone_exists' => 'This phone number is already in use.',
         'birthday_invalid' => 'Invalid birth date.',
     ],
+    'logout' => [
+        'success' => 'Logout successful.',
+        'failed' => 'Logout failed.',
+    ],
 ];
