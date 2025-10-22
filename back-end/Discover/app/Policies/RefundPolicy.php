@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Payment;
+use App\Models\Refund;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class PaymentPolicy
+class RefundPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,14 +19,9 @@ class PaymentPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Payment $payment): bool
+    public function view(User $user, Refund $refund): bool
     {
-        return $payment->user_id === $user->id || $user->is_admin;
-    }
-
-    public function refund(User $user, Payment $payment): bool
-    {
-        return $user->is_admin || $payment->user_id === $user->id;
+        return false;
     }
 
     /**
@@ -40,7 +35,7 @@ class PaymentPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Payment $payment): bool
+    public function update(User $user, Refund $refund): bool
     {
         return false;
     }
@@ -48,7 +43,7 @@ class PaymentPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Payment $payment): bool
+    public function delete(User $user, Refund $refund): bool
     {
         return false;
     }
@@ -56,7 +51,7 @@ class PaymentPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Payment $payment): bool
+    public function restore(User $user, Refund $refund): bool
     {
         return false;
     }
@@ -64,7 +59,7 @@ class PaymentPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Payment $payment): bool
+    public function forceDelete(User $user, Refund $refund): bool
     {
         return false;
     }
