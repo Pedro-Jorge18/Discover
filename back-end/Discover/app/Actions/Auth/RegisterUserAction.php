@@ -2,18 +2,27 @@
 
 namespace App\Actions\Users\Auth;
 
-use App\DTOs\Auth\RegisterUserData;
+use App\DTOs\Auth\RegisterUserDto;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class RegisterUserAction
 {
-    public function executeRegisterUserAction(RegistereUserData $data): User {
-        return DB::transaction(function () use ($data) {
+
+    public function __construct(
+        protected UserRepository $userRepository,
+        protected AuthService $authService
+    ) {}
+
+    public function execute(RegisterUserDto $data): array {
+
+        return DB::transaction(function() use ($data) {
             //create user
-            $user = User::create([
+            $user = $this->$userRepository->create([
                 'name' => $data->name,
                 'last_name' => $data->last_name,
                 'phone' => $data->phone,
@@ -32,16 +41,18 @@ class RegisterUserAction
             $this->handleImageUpload($user, $data->image);
             }
 
-            return $user->fresh();
+            $token = $this->authService->generateToken($user);
+
+            return [
+                'user' => $user->fresh(),
+                'token' => $token,
+            ];
         });
     }
 
     protected function handleImageUpload(User $user, UploadedFile $image): void
     {
-        $path = $image->store('users/' . $user->id, 'public');
-
-        $user->update([
-            'image' => $path
-        ]);
+        $path = $image->store("users/{$user->id}", 'public');
+        $this->userRepository->update($user->id, ['image' => $path]);
     }
 }

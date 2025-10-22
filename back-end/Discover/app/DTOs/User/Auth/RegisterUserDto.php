@@ -4,7 +4,7 @@ namespace App\DTOs\Auth;
 
 use Illuminate\Http\UploadedFile;
 
-class RegisterUserData
+class RegisterUserDto
 {
     public function __construct(
         public string $name,
