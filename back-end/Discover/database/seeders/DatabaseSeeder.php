@@ -2,31 +2,34 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call([
+            UserSeeder::class,
             RoleSeeder::class,
-            ListingTypeSeeder::class,
-            PropertyTypeSeeder::class,
-            ReservationStatusSeeder::class,
-            AmenityCategorySeeder::class,
-            AmenitySeeder::class,
-            PropertyCategorySeeder::class,
             CountrySeeder::class,
             StateSeeder::class,
             CitySeeder::class,
-
+            PropertyTypeSeeder::class,
+            ListingTypeSeeder::class,
+            PropertyCategorySeeder::class,
+            AmenityCategorySeeder::class,
+            AmenitySeeder::class,
+            ReservationStatusSeeder::class,
+            PropertySeeder::class,
+            PropertyImageSeeder::class,
+            PaymentMethodSeeder::class,
+            ReservationSeeder::class,
+            PaymentSeeder::class,
+            ConversationSeeder::class,
+            ConversationMessageSeeder::class,
+            FavoriteSeeder::class,
+            MessageSeeder::class,
+            ReviewSeeder::class,
         ]);
     }
 }
