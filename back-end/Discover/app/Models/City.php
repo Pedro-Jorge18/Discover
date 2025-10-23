@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class City extends Model
 {
@@ -24,7 +26,7 @@ class City extends Model
         'longitude' => 'decimal:8',
     ];
 
-    public function state()
+    public function state(): belongsTo
     {
         return $this->belongsTo(State::class);
     }
@@ -34,7 +36,7 @@ class City extends Model
      //   return $this->belongsTo(Country::class, 'state_id');
     //}
 
-    public function properties()
+    public function properties(): HasMany
     {
         return $this->hasMany(Property::class);
     }

@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Property extends Model
@@ -63,79 +67,89 @@ class Property extends Model
     ];
 
     // RELACIONAMENTOS
-    public function host()
+    public function host(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'host_id');
+        return $this->BelongsTo(User::class, 'host_id');
     }
 
-    public function propertyType()
+    public function propertyType():  BelongsTo
     {
-        return $this->belongsTo(PropertyType::class);
+        return $this->BelongsTo(PropertyType::class);
     }
 
-    public function listingType()
+    public function listingType(): BelongsTo
     {
-        return $this->belongsTo(ListingType::class);
+        return $this->BelongsTo(ListingType::class);
     }
 
-    public function city()
+    public function city(): BelongsTo
     {
-        return $this->belongsTo(City::class);
+        return $this->BelongsTo(City::class);
     }
 
-    public function state()
+   /*
+    *  public function state(): HasOneThrough
     {
-        return $this->hasOneThrough(State::class, City::class, 'id', 'id', 'city_id', 'state_id');
+        return $this->hasOneThrough(
+            State::class,
+            City::class,
+            'id',
+            'id',
+            'city_id',
+            'state_id'
+        );
     }
-
-    public function country()
+    public function country(): hasOneThrough
     {
-        return $this->hasOneThrough(Country::class, City::class, 'id', 'id', 'city_id', 'state_id')
-            ->through('state');
+        return $this->hasOneThrough(
+            Country::class,
+            State::class,
+            'id',
+            'country_id',
+            'state_id',
+            'country_id'
+        );
+    }*/
+
+    public function categories(): BelongsToMany
+    {
+        return $this->BelongsToMany(PropertyCategory::class, 'property_category_pivot');
     }
-
-    public function categories()
+    public function amenities():  BelongsToMany
     {
-        return $this->belongsToMany(PropertyCategory::class, 'property_category_pivot');
-    }
-
-
-    public function amenities()
-    {
-        return $this->belongsToMany(Amenity::class, 'property_amenities')
+        return $this->BelongsToMany(Amenity::class, 'property_amenities')
             ->withPivot(['value_boolean', 'value_numeric', 'value_text'])
             ->withTimestamps();
     }
 
-    public function images()
+    public function images(): HasMany
     {
         return $this->hasMany(PropertyImage::class);
     }
 
-    public function reservations()
+    public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }
 
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    public function favorites()
+    public function favorites(): HasMany
     {
-        return $this->hasMany(User::class, 'favorites');
+        return $this->hasMany(Favorite::class, 'property_id');
     }
-
-    public function favoritedByUsers()
+    public function favoritedByUsers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'favorites');
+        return $this->BelongsToMany(User::class, 'favorites', 'property_id', 'user_id');
     }
 
     // SCOPES
     public function scopePublished($query)
     {
-        return $query->where('published', true)->where('active', true);
+        return $query->where('published', true);
     }
 
     public function scopeActive($query)
@@ -181,18 +195,18 @@ class Property extends Model
     }
 
     // MÉTODOS DE PREÇO
-    public function getTotalPrice($nights)
+    public function getTotalPrice(int $nights): float
     {
         return ($this->price_per_night * $nights) + $this->cleaning_fee + $this->service_fee;
     }
 
-    public function getPriceWithoutFees($nights)
+    public function getPriceWithoutFees(int $nights): float
     {
         return $this->price_per_night * $nights;
     }
 
     // MÉTODOS DE AVALIAÇÃO
-    public function updateRating()
+    public function updateRating(): void
     {
         $this->update([
             'rating' => $this->reviews()->avg('rating') ?? 0,
@@ -201,7 +215,7 @@ class Property extends Model
     }
 
     // MÉTODOS DE LOCALIZAÇÃO
-    public function getFullAddress()
+    public function getFullAddress(): string
     {
         $parts = [
             $this->address,
@@ -215,7 +229,7 @@ class Property extends Model
     }
 
     // MÉTODOS DE STATUS
-    public function publish()
+    public function publish(): void
     {
         $this->update([
             'published' => true,
@@ -223,7 +237,7 @@ class Property extends Model
         ]);
     }
 
-    public function unpublish()
+    public function unpublish(): void
     {
         $this->update([
             'published' => false,
@@ -231,19 +245,19 @@ class Property extends Model
         ]);
     }
 
-    public function isAvailableForDates($checkIn, $checkOut)
+    public function isAvailableForDates(string $checkIn,string $checkOut): bool
     {
         // Lógica para verificar disponibilidade (será implementada depois)
         return true;
     }
 
     // MÉTRICAS
-    public function incrementViews()
+    public function incrementViews(): void
     {
         $this->increment('views');
     }
 
-    public function getDailyRevenue()
+    public function getDailyRevenue(): float
     {
         return $this->price_per_night;
     }

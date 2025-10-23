@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 class Reservation extends Model
 {
     use HasFactory, SoftDeletes;
@@ -56,44 +61,42 @@ class Reservation extends Model
     ];
 
     //  RELACIONAMENTOS
-    public function property()
+
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function status()
+    public function status(): BelongsTo
     {
         return $this->belongsTo(ReservationStatus::class, 'status_id');
     }
 
-    public function reviews()
+    public function review(): HasOne
     {
         return $this->hasOne(Review::class);
     }
 
-    public function messages()
-    {
-        return $this->hasMany(ReservationMessage::class);
-    }
-
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
 
-    public function successfulPayment()
+    public function successfulPayment(): HasOne
     {
         return $this->hasOne(Payment::class)->where('status', 'completed');
     }
 
-    public function conversations()
+    public function conversations(): Builder
+
     {
-        return $this->hasMany(Conversation::class, 'property_id', 'property_id')
+        return Conversation::query()
+            ->where('property_id',$this->property_id)
             ->where('user_id', $this->user_id);
     }
 
@@ -153,7 +156,7 @@ class Reservation extends Model
     }
 
     //  MÉTODOS DE PREÇO
-    public function calculateTotal()
+    public function calculateTotal(): void
     {
         $subtotal = $this->price_per_night * $this->nights;
         $total = $subtotal + $this->cleaning_fee + $this->service_fee;
@@ -164,35 +167,36 @@ class Reservation extends Model
         ]);
     }
 
-    public function getRemainingBalance()
+    public function getRemainingBalance(): float
     {
         return $this->total_amount - $this->amount_paid;
     }
 
     //  MÉTODOS DE DATA
-    public function isUpcoming()
+    public function isUpcoming(): bool
     {
         return $this->check_in > now();
     }
 
-    public function isCurrent()
+    public function isCurrent(): bool
     {
         return $this->check_in <= now() && $this->check_out >= now();
     }
 
-    public function isPast()
+    public function isPast(): bool
     {
         return $this->check_out < now();
     }
 
-    public function isCancellable()
+    public function isCancellable(): bool
     {
+
         return $this->check_in > now()->addDays(1) &&
-            $this->status->name !== 'Cancelada';
+            ($this->status->name ?? '') !== 'Cancelada';
     }
 
-    // ✅ MÉTODOS DE STATUS
-    public function confirm()
+    // MÉTODOS DE STATUS
+    public function confirm(): void
     {
         $this->update([
             'status_id' => ReservationStatus::where('name', 'Confirmada')->first()->id,
@@ -200,7 +204,7 @@ class Reservation extends Model
         ]);
     }
 
-    public function cancel($reason = null)
+    public function cancel($reason = null): void
     {
         $this->update([
             'status_id' => ReservationStatus::where('name', 'Cancelada')->first()->id,
@@ -209,7 +213,7 @@ class Reservation extends Model
         ]);
     }
 
-    public function markAsPaid()
+    public function markAsPaid(): void
     {
         $this->update([
             'payment_status' => 'paid',
@@ -219,10 +223,10 @@ class Reservation extends Model
     }
 
     // MÉTODOS ÚTEIS
-    public static function generateReservationCode()
+    public static function generateReservationCode(): string
     {
         do {
-            $code = 'RSV' . strtoupper(\Str::random(8));
+            $code = 'RSV' . strtoupper(Str::random(8));
         } while (self::where('reservation_code', $code)->exists());
 
         return $code;

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PropertyCategory extends Model
 {
@@ -21,7 +23,7 @@ class PropertyCategory extends Model
         'active' => 'boolean',
     ];
 
-    public function properties()
+    public function properties(): BelongsToMany
     {
         return $this->belongsToMany(Property::class, 'property_category_pivot');
     }

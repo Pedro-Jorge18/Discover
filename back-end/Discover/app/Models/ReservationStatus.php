@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReservationStatus extends Model
 {
@@ -21,7 +22,7 @@ class ReservationStatus extends Model
         'active' => 'boolean',
     ];
 
-    public function reservations()
+    public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class, 'status_id');
     }
