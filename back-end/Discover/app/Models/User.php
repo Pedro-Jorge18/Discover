@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,40 +9,108 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
+        'last_name',
+        'phone',
+        'birthday',
         'email',
         'password',
+        'image',
+        'gender',
+        'language',
+        'about',
+        'verified',
+        'active',
+        'last_login_date',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'birthday' => 'date',
+        'verified' => 'boolean',
+        'active' => 'boolean',
+        'last_login_date' => 'datetime',
+    ];
+
+    // RELAÇÕES
+    public function properties()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Property::class, 'host_id');
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function paymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function conversationsAsUser()
+    {
+        return $this->hasMany(Conversation::class, 'user_id');
+    }
+
+    public function conversationsAsHost()
+    {
+        return $this->hasMany(Conversation::class, 'host_id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    // SCOPES
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
+    }
+
+    public function scopeVerified($query)
+    {
+        return $query->where('verified', true);
+    }
+
+    // MÉTODOS
+    public function isHost()
+    {
+        return $this->properties()->exists();
+    }
+
+    public function hasRole($roleName)
+    {
+        return $this->roles()->where('name', $roleName)->exists();
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->name . ' ' . $this->last_name;
     }
 }
