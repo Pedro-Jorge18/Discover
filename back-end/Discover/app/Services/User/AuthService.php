@@ -6,8 +6,6 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Laravel\Sanctum\NewAccessToken;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable;
 
 class AuthService
@@ -33,21 +31,33 @@ class AuthService
             'user' => $user,
             'token' => $token,
             'token_type' => 'Bearer',
+            'remember_me' => $remember,
         ];
     }
 
 
     //create a new token sanctum for user
-    public function generateToken(User $user): string
+    public function generateToken(User $user, string $name = 'auth-token', array $abilities = ['*']): string
     {
-        $token = $user->createToken('auth-token', ['*'], now()->addWeek());
+        try {
 
-        Log::info('New token sanctum created.', [
-            'user_id' => $user->id,
-            'token_id' => $token->accessToken->id ?? null,
-        ]);
+            $token = $user->createToken($name, $abilities);
 
-        return $token->plainTextToken;
+            Log::info('New Sanctum token created.', [
+                'user_id' => $user->id,
+                'token_name' => $name,
+                'token_id' => $token->accessToken->id,
+            ]);
+
+            return $token->plainTextToken;
+
+        } catch (Throwable $e) {
+            Log::error('Failed to generate token', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
     }
 
     //revoke actual token
@@ -57,20 +67,22 @@ class AuthService
             $token = $user->currentAccessToken();
 
             if (!$token) {
+                Log::warning('No current access token found for user', ['user_id' => $user->id]);
                 return false;
             }
 
+            $tokenId = $token->id;
             $token->delete();
 
-            Log::info('Token atual revogado', [
+            Log::info('Current token revoked', [
                 'user_id' => $user->id,
-                'token_id' => $token->id,
+                'token_id' => $tokenId,
             ]);
 
             return true;
 
         } catch (Throwable $e) {
-            Log::error('Falha ao revogar token atual', [
+            Log::error('Failed to revoke current token', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
@@ -85,14 +97,14 @@ class AuthService
         try {
             $count = $user->tokens()->delete();
 
-            Log::info('Todos os tokens revogados', [
+            Log::info('All user tokens revoked', [
                 'user_id' => $user->id,
                 'count' => $count,
             ]);
 
             return $count;
         } catch (Throwable $e) {
-            Log::error('Falha ao revogar todos os tokens', [
+            Log::error('Failed to revoke all tokens', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
@@ -109,9 +121,16 @@ class AuthService
 
     public function updateLastLogin(User $user): void
     {
-        $user->update([
-            'last_login_date' => now(),
-        ]);
+        try {
+            $this->userRepository->update($user->id, [
+                'last_login_date' => now(),
+            ]);
+        } catch (Throwable $e) {
+            Log::error('Failed to update last login', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function logout(): bool
@@ -119,6 +138,7 @@ class AuthService
         $user = Auth::user();
 
         if (!$user) {
+            Log::warning('Logout attempt with no authenticated user');
             return false;
         }
 
@@ -129,7 +149,28 @@ class AuthService
     {
         $user = Auth::user();
 
-        return $user !== null && $user->currentAccessToken() !== null;
+        if (!$user) {
+            return false;
+        }
+
+        try {
+
+            if (method_exists($user, 'currentAccessToken')) {
+                $currentToken = $user->currentAccessToken();
+                if ($currentToken !== null) {
+                    return true;
+                }
+            }
+
+            return $this->hasValidTokens($user);
+
+        } catch (Throwable $e) {
+            Log::warning('Error checking authentication', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
     }
 
 }

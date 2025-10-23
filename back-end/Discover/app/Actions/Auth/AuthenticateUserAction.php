@@ -2,13 +2,12 @@
 
 namespace App\Actions\Users\Auth;
 
-use App\DTOs\Auth\AuthenticateUserDto;
-use App\Models\User;
+
+use App\Services\AuthService;
+use Illuminate\Support\Facades\DB;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\DTOs\Auth\AuthenticateUserDto;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\NewAccessToken;
 
 class AuthenticateUserAction
 {
