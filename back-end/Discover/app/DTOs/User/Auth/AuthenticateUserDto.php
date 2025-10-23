@@ -1,15 +1,15 @@
 <?php
 
-namespace App\DTOs\Auth;
+namespace App\DTOs\User\Auth;
 
 use App\Http\Requests\Users\Auth\LoginUserRequest;
 
 class AuthenticateUserDto
 {
     public function __construct(
-        public string $email,
-        public string $password,
-        public bool $remember_me = false,
+        public readonly string $email,
+        public readonly string $password,
+        public readonly bool $remember_me = false,
     ) {}
 
     public static function fromRequest(LoginUserRequest $request):self
@@ -21,7 +21,7 @@ class AuthenticateUserDto
         );
     }
 
-    public function fromArray(array $data): self
+    public static function fromArray(array $data): self
     {
         return new self(
             email: $data['email'],

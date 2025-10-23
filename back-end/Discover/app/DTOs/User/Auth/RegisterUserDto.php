@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTOs\Auth;
+namespace App\DTOs\User\Auth;
 
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
@@ -9,31 +9,33 @@ use App\Http\Requests\Users\Auth\RegisterUserRequest;
 class RegisterUserDto
 {
     public function __construct(
-        public string $name,
-        public string $last_name,
-        public string $phone,
-        public Carbon $birthday,
-        public string $email,
-        public string $password,
-        public ?string $gender = null,
-        public string $language = 'en',
-        public ?string $about = null,
-        public ?UploadedFile $image = null
+        public readonly string $name,
+        public readonly string $last_name,
+        public readonly string $phone,
+        public readonly Carbon $birthday,
+        public readonly string $email,
+        public readonly string $password,
+        public readonly ?string $gender = null,
+        public readonly string $language = 'en',
+        public readonly ?string $about = null,
+        public readonly ?UploadedFile $image = null
     ) {}
 
     public static function fromRequest(RegisterUserRequest $request): self
     {
+        $data = $request->validated();
+
         return new self(
-            name: $request['name'],
-            last_name: $request['last_name'],
-            phone: $request['phone'],
-            birthday: Carbon::parse($request->validated('birthday')),
-            email: $request['email'],
-            password: $request['password'],
-            gender: $request['gender'] ?? null,
-            language: $request['language'] ?? 'en',
-            about: $request['about'] ?? null,
-            image: $request->file('image')
+            name: $data['name'],
+            last_name: $data['last_name'],
+            phone: $data['phone'],
+            birthday: Carbon::parse($data->validated('birthday')),
+            email: $data['email'],
+            password: $data['password'],
+            gender: $data['gender'] ?? null,
+            language: $data['language'] ?? 'en',
+            about: $data['about'] ?? null,
+            image: $data->file('image')
         );
     }
 
@@ -69,6 +71,11 @@ class RegisterUserDto
             'about' => $this->about,
             'image' => $this->image,
         ];
+    }
+
+    public function hasImage(): bool
+    {
+        return $this->image instanceof UploadedFile;
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Users\Auth;
+namespace App\Actions\Auth;
 
 use Throwable;
 use App\Models\User;
@@ -24,19 +24,19 @@ class LogoutUserAction
                 return false;
             }
 
-            if($user && !$this->validateUserOwnerShip($user)){
+            if($targetUser && !$this->validateUserOwnerShip($targetUser)){
                 Log::warning('LogoutUserAction: Attempt to revoke another users token', [
-                    'requested_user_id' => $user->id,
+                    'requested_user_id' => $targetUser->id,
                     'authenticated_user_id' => Auth::id(),
                 ]);
                 return false;
             }
 
             // use the authService for revoke the actual token
-            return $this->authService->revokeCurrentToken($user);
+            return $this->authService->revokeCurrentToken($targetUser);
         } catch (Throwable $e) {
             Log::error('LogoutUserAction: failed to revoke token', [
-                'user_id' => $user->id ?? null,
+                'user_id' => $targetUser->id ?? null,
                 'exception' => $e->getMessage(),
             ]);
 
@@ -44,7 +44,7 @@ class LogoutUserAction
         }
     }
 
-    public function validateUserOwnership(User $requestedUser): bool{
+    public function validateUserOwnerShip(User $requestedUser): bool{
         $authenticatedUser = Auth::user();
 
         //permited if the same user or admin

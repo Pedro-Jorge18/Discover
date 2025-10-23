@@ -5,7 +5,7 @@ return [
         'invalid_credentials' => 'Invalid email or password.',
         'success' => 'Login successful.',
         'failed' => 'Login failed.',
-        'user_not_authenticated' => 'User not authenticated.',
+
     ],
     'register' => [
         'success' => 'Registration successful.',
@@ -20,4 +20,13 @@ return [
         'success' => 'Logout successful.',
         'failed' => 'Logout failed.',
     ],
+    'auth' => [
+        'success' => 'Authentication successful.',
+        'failed' => 'Authentication failed.',
+        'user_not_authenticated' => 'User not authenticated.',
+    ],
+    'token' => [
+        'success' => 'Success to generate token',
+        'failed' => 'Failed to generate token.',
+    ]
 ];

@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\DTOs\Auth\RegisterUserDto;
+use App\DTOs\User\Auth\RegisterUserDto;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
-use App\DTOs\Auth\AuthenticateUserDto;
-use App\Actions\Users\Auth\LogoutUserAction;
-use App\Actions\Users\Auth\RegisterUserAction;
-use App\Actions\Users\Auth\AuthenticateUserAction;
+use App\DTOs\User\Auth\AuthenticateUserDto;
+use App\Actions\Auth\LogoutUserAction;
+use App\Actions\Auth\RegisterUserAction;
+use App\Actions\Auth\AuthenticateUserAction;
 use App\Http\Requests\Users\Auth\LoginUserRequest;
 use App\Http\Requests\Users\Auth\RegisterUserRequest;
-use App\Actions\Users\Auth\GetAuthenticatedUserAction;
+use App\Actions\Auth\GetAuthenticatedUserAction;
 
 class AuthController extends Controller
 {
@@ -44,7 +44,7 @@ class AuthController extends Controller
     //login and return token
     public function login(LoginUserRequest $request): JsonResponse
     {
-        $dto = AuthenticateUserDto::fromArray($request->validated());
+        $dto = AuthenticateUserDto::fromRequest($request->validated());
 
         $result = $this->authenticateUserAction->execute($dto);
 

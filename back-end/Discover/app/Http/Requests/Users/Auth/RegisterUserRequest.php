@@ -33,7 +33,7 @@ class RegisterUserRequest extends FormRequest
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'gender' => 'nullable|in:M,F,O',
             'language' => 'sometimes|in:pt,en,es',
-            'about' => 'nullable|string|mas:500',
+            'about' => 'nullable|string|max:500',
         ];
     }
 

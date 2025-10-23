@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Actions\Users\Auth;
+namespace App\Actions\Auth;
 
 
+use Throwable;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Repositories\UserRepository;
-use App\DTOs\Auth\AuthenticateUserDto;
+use App\DTOs\User\Auth\AuthenticateUserDto;
+use App\Models\User;
 use Illuminate\Validation\ValidationException;
 
 class AuthenticateUserAction
@@ -16,38 +19,56 @@ class AuthenticateUserAction
         protected AuthService $authService,
     ) {}
 
-    public function execute(AuthenticateUserDto $data): array
+    public function execute(AuthenticateUserDto $dto): array
     {
-        return DB::transaction(function() use ($data){
-            //auth user
-            $user = $this->authService->authenticate($data->email, $data->password);
+        return DB::transaction(function() use ($dto){
+            try {
 
-            if(!$user){
-                $this->handleFailedAuthentication();
+                $user = $this->authService->authenticate(
+                    $dto->email,
+                    $dto->password,
+                    $dto->remember_me
+                );
+
+                if (!$user) {
+                    Log::warning('Authentication failed', [
+                        'email' => $dto->email,
+                        'ip' => request()->ip()
+                    ]);
+                    return null;
+                }
+
+
+                $token = $this->authService->generateToken($user);
+
+
+                $user = $this->updateUserAfterAuthentication($user);
+
+                Log::info('User authenticated successfully', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+
+                return [
+                    'user' => $user,
+                    'token' => $token,
+                    'token_type' => 'Bearer',
+                    'remember_me' => $dto->remember_me,
+                ];
+
+            } catch (Throwable $e) {
+                Log::error('Authentication action failed', [
+                    'email' => $dto->email,
+                    'error' => $e->getMessage(),
+                ]);
+                throw $e;
             }
-
-            //last login update
-            $this->userRepository->update($user->id, [
-                'last_login_date' => now(),
-            ]);
-
-            //token sanctum
-            $token = $this->authService->generateToken($user);
-
-            return [
-                'user' => $user->fresh(),
-                'token' => $token,
-                'token_type' => 'Bearer',
-            ];
         });
     }
 
-    public function handleFailedAuthentication(): void
+    public function updateUserAfterAuthentication(User $user): User
     {
-        throw ValidationException::withMessages([
-            'email' => [__('auth.login.invalid_credentials')],
-            'password' => [__('auth.login.invalid_credentials')],
-        ]);
+        return $user->load(['roles', 'profile']);
     }
 
 

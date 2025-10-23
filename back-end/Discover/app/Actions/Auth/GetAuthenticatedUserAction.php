@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Actions\Users\Auth;
+namespace App\Actions\Auth;
 
 use App\Models\User;
-use App\Services\AuthService;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -12,14 +11,12 @@ class GetAuthenticatedUserAction
 {
     public function __construct(
         protected UserRepository $userRepository,
-        protected AuthService $authService,
     ) {}
 
-    public function execute(array $relations = []): array
+    public function execute(User $user, array $relations = []): array
     {
-        $user = $this->authService->getAuthenticatedUser();
 
-        if(!$user){
+        if (!$user) {
             throw new ModelNotFoundException(__('auth.user_not_authenticated'));
         }
 
@@ -49,7 +46,7 @@ class GetAuthenticatedUserAction
 
     protected function getUserStatistics(User $user): array
     {
-         return Cache::remember("user_stats_{$user->id}", 300, function() use ($user) {
+        return Cache::remember("user:{$user->id}:stats", 300, function () use ($user) {
             return [
                 'posts_count' => $user->posts()->count(),
                 'comments_count' => $user->comments()->count(),
@@ -75,33 +72,26 @@ class GetAuthenticatedUserAction
 
     protected function calculateLoginStreak(User $user): int
     {
+        // If the user has never logged in, streak is 0
         if (!$user->last_login_date) {
             return 0;
         }
 
-        $lastLogin = $user->last_login_date;
+        $lastLogin = $user->last_login_date->startOfDay();
         $today = now()->startOfDay();
 
-        // If you logged in today, check if it is a consecutive streak
-        if ($lastLogin->isToday()) {
-            // if have a streak in DB, use
-            if (isset($user->login_streak)) {
-                return $user->login_streak;
-            }
-
-            // if you logged in yesterday too
-            if ($user->previous_login_date && $user->previous_login_date->isYesterday()) {
-                return 2;
-            }
-
-            return 1;
+        // if user loged in ttoday
+        if ($lastLogin->equalTo($today)) {
+            // Keeps current streak (or initializes if none exists)
+            return $user->login_streak ?? 1;
         }
 
-        // If the last time you logged in was yesterday, but not today
-        if ($lastLogin->isYesterday()) {
-            return 0; // not log in today
+        // if the last login was yesterday -> add streak
+        if ($lastLogin->equalTo($today->copy()->subDay())) {
+            return ($user->login_streak ?? 0) + 1;
         }
 
-        return 0; // not logged in recently
+        // if pass more one day without login -> zero streak
+        return 1;
     }
 }

@@ -15,7 +15,7 @@ class AuthService
     ){}
 
     //auth user and create a sanctum token
-    public function authenticate(string $email, string $password, bool $remember = false): ?array
+    public function authenticate(string $email, string $password, bool $remember = false): ?User
     {
         $user = $this->userRepository->findByEmail($email);
 
@@ -23,9 +23,20 @@ class AuthService
             return null;
         }
 
-        $token = $this->generateToken($user);
-
         $this->updateLastLogin($user);
+
+        return $user;
+    }
+
+    public function authenticateWithToken(string $email, string $password, bool $remember = false): ?array
+    {
+        $user = $this->authenticate($email, $password, $remember);
+
+        if(!$user){
+            return null;
+        }
+
+        $token = $this->generateToken($user);
 
         return [
             'user' => $user,
@@ -43,7 +54,7 @@ class AuthService
 
             $token = $user->createToken($name, $abilities);
 
-            Log::info('New Sanctum token created.', [
+            Log::info('token.success', [
                 'user_id' => $user->id,
                 'token_name' => $name,
                 'token_id' => $token->accessToken->id,
@@ -52,10 +63,7 @@ class AuthService
             return $token->plainTextToken;
 
         } catch (Throwable $e) {
-            Log::error('Failed to generate token', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
+            Log::channel('security')->info('token.success', ['user_id' => $user->id]);
             throw $e;
         }
     }
@@ -171,6 +179,13 @@ class AuthService
             ]);
             return false;
         }
+    }
+
+    protected function hasValidTokens(User $user): bool
+    {
+        return $user->tokens()
+        ->where('expires_at', '>', now())
+        ->exists();
     }
 
 }
