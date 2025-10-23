@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Support\Facades\Log;
 
 class LogoutUserAction
