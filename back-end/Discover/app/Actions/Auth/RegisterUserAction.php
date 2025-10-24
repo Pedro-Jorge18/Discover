@@ -8,6 +8,7 @@ use App\DTOs\User\Auth\RegisterUserDto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Repositories\UserRepository;
+use App\Services\Mail\UserMailService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,6 +18,7 @@ class RegisterUserAction
 
     public function __construct(
         protected UserRepository $userRepository,
+        protected UserMailService $userMailService,
     ) {}
 
     public function execute(RegisterUserDto $dto): array
@@ -53,7 +55,9 @@ class RegisterUserAction
                 'has_image' => $dto->hasImage(),
             ]);
 
-            return $user->load('roles');
+            $user = $user->load('roles');
+
+            
         });
     }
 

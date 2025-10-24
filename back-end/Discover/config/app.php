@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'providers' => [
+        App\Services\Mail\Providers\MailServiceProvider::class,
+    ],
+
 ];

@@ -28,7 +28,7 @@ class AuthController extends Controller
     //register new user
     public function register(RegisterUserRequest $request): JsonResponse
     {
-        $dto = RegisterUserDto::fromRequest($request->validated());
+        $dto = RegisterUserDto::fromRequest($request);
 
         $user = $this->registerUserAction->execute($dto);
 
