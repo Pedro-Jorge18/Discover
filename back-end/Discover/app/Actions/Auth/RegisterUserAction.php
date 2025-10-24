@@ -1,47 +1,97 @@
 <?php
 
-namespace App\Actions\Users\Auth;
+namespace App\Actions\Auth;
 
-use App\DTOs\Auth\RegisterUserData;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use App\DTOs\User\Auth\RegisterUserDto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
+
 class RegisterUserAction
 {
-    public function executeRegisterUserAction(RegistereUserData $data): User {
-        return DB::transaction(function () use ($data) {
+
+    public function __construct(
+        protected UserRepository $userRepository,
+    ) {}
+
+    public function execute(RegisterUserDto $dto): array
+    {
+
+        return DB::transaction(function () use ($dto) {
             //create user
-            $user = User::create([
-                'name' => $data->name,
-                'last_name' => $data->last_name,
-                'phone' => $data->phone,
-                'birthday' => $data->birthday,
-                'email' => $data->email,
-                'password' => Hash::make($data->password),
-                'gender' => $data->gender,
-                'language' => $data->language,
-                'about' => $data->about,
+            $user = $this->userRepository->create([
+                'name' => $dto->name,
+                'last_name' => $dto->last_name,
+                'phone' => $dto->phone,
+                'birthday' => $dto->birthday,
+                'email' => $dto->email,
+                'password' => Hash::make($dto->password),
+                'gender' => $dto->gender,
+                'language' => $dto->language,
+                'about' => $dto->about,
                 'verified' => false,
                 'active' => true,
             ]);
 
-            //handle image upload of provid
-            if ($data->image){
-            $this->handleImageUpload($user, $data->image);
+            //upload image (if exists)
+            if ($dto->hasImage()) {
+                $this->handleImageUpload($user, $dto->image);
             }
 
-            return $user->fresh();
+            //add role
+            $this->assignDefaultRole($user);
+
+            //register log
+            Log::info('New user registered', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'has_image' => $dto->hasImage(),
+            ]);
+
+            return $user->load('roles');
         });
     }
 
-    protected function handleImageUpload(User $user, UploadedFile $image): void
+    protected function handleImageUpload(User $user, ?UploadedFile $image): void
     {
-        $path = $image->store('users/' . $user->id, 'public');
+        if (!$image) {
+            return;
+        }
 
-        $user->update([
-            'image' => $path
-        ]);
+        try {
+            $path = Storage::disk('public')->putFile("users/{$user->id}", $image);
+
+            $this->userRepository->update($user->id, [
+                'image' => $path,
+            ]);
+
+            Log::info('User image uploaded', [
+                'user_id' => $user->id,
+                'path' => $path,
+                'file_size' => $image->getSize(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to upload user image', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    protected function assignDefaultRole(User $user): void
+    {
+        try {
+            $user->assignRole('user'); // ou 'guest' para seu Airbnb clone
+        } catch (\Exception $e) {
+            Log::warning('Failed to assign default role', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
