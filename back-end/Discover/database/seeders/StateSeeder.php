@@ -12,6 +12,7 @@ class StateSeeder extends Seeder
     {
         $brazil = Country::where('code', 'BRA')->first();
         $usa = Country::where('code', 'USA')->first();
+        $portugal = Country::where('code', 'PRT')->first();
 
         $states = [
 
@@ -24,8 +25,8 @@ class StateSeeder extends Seeder
             ['country_id' => $usa->id, 'name' => 'Nova York', 'code' => 'NY', 'timezone' => 'America/New_York'],
             ['country_id' => $usa->id, 'name' => 'Flórida', 'code' => 'FL', 'timezone' => 'America/New_York'],
 
-            ['country_id' => $usa->id, 'name' => 'Porto', 'code' => 'OPO', 'timezone' => 'Europe/Porto'],
-            ['country_id' => $usa->id, 'name' => 'Lisbon', 'code' => 'Lis', 'timezone' => 'America/Lisbon'],
+            ['country_id' => $portugal->id, 'name' => 'Porto', 'code' => 'POR', 'timezone' => 'Europe/Porto'],
+            ['country_id' => $portugal->id, 'name' => 'Lisbon', 'code' => 'Lis', 'timezone' => 'America/Lisbon'],
         ];
 
         foreach ($states as $state) {

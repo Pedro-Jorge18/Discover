@@ -11,7 +11,7 @@ class CitySeeder extends Seeder
     public function run(): void
     {
         $pe = State::where('code', 'PE')->first();
-        $opo = State::where('code', 'OPO')->first();
+        $porto = State::where('code', 'POR')->first();
 
 
         $cities = [
@@ -19,8 +19,7 @@ class CitySeeder extends Seeder
             ['state_id' => $pe->id, 'name' => 'Recife', 'postal_code' => '01001-000', 'latitude' => -8.05428, 'longitude' => -34.8813],
 
 
-            ['state_id' => $opo->id, 'name' => 'Porto', 'postal_code' => '20010-000', 'latitude' => 41.15, 'longitude' => -8.61024],
-
+            ['state_id' => $porto->id, 'name' => 'Porto', 'postal_code' => '4000-000', 'latitude' => 41.1579, 'longitude' => -8.6291],
         ];
 
         foreach ($cities as $city) {

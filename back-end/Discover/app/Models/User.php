@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -20,7 +22,6 @@ class User extends Authenticatable
         'password',
         'image',
         'gender',
-        'language',
         'about',
         'verified',
         'active',
@@ -33,75 +34,59 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
         'birthday' => 'date',
+        'language' => 'string',
+        'email_verified_at' => 'datetime',
+        'last_login_date' => 'datetime',
         'verified' => 'boolean',
         'active' => 'boolean',
-        'last_login_date' => 'datetime',
     ];
 
-    // RELAÇÕES
-    public function properties()
-    {
-        return $this->hasMany(Property::class, 'host_id');
-    }
 
-    public function reservations()
-    {
-        return $this->hasMany(Reservation::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
-    }
-
-    public function paymentMethods()
-    {
-        return $this->hasMany(PaymentMethod::class);
-    }
-
-    public function favorites()
-    {
-        return $this->hasMany(Favorite::class);
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    public function conversationsAsUser()
-    {
-        return $this->hasMany(Conversation::class, 'user_id');
-    }
-
-    public function conversationsAsHost()
-    {
-        return $this->hasMany(Conversation::class, 'host_id');
-    }
-
-    public function roles()
+    public function roles():  BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles');
     }
 
-    // SCOPES
-    public function scopeActive($query)
+    public function favorites(): HasMany
     {
-        return $query->where('active', true);
+        return $this->hasMany(Favorite::class);
     }
 
-    public function scopeVerified($query)
+    public function favoriteProperties(): BelongsToMany
     {
-        return $query->where('verified', true);
+        return $this->belongsToMany(Property::class, 'favorites');
     }
 
-    // MÉTODOS
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    //Identificao de Usuario anfittiao, cliente ou admin
+    public function isClient()
+    {
+        return $this->roles()->where('name', 'client')->exists();
+    }
+
     public function isHost()
     {
-        return $this->properties()->exists();
+        return $this->roles()->where('name', 'host')->exists();
+    }
+
+    public function isAdmin()
+    {
+        return $this->roles()->where('name', 'admin')->exists();
     }
 
     public function hasRole($roleName)
@@ -109,8 +94,39 @@ class User extends Authenticatable
         return $this->roles()->where('name', $roleName)->exists();
     }
 
+    public function hasAnyRole(array $roleNames)
+    {
+        return $this->roles()->whereIn('name', $roleNames)->exists();
+    }
+
+
+    public function assignRole($roleName)
+    {
+        $role = Role::where('name', $roleName)->first();
+
+        if ($role && !$this->hasRole($roleName)) {
+            $this->roles()->attach($role);
+        }
+    }
+
+
+    public function removeRole($roleName)
+    {
+        $role = Role::where('name', $roleName)->first();
+
+        if ($role) {
+            $this->roles()->detach($role);
+        }
+    }
+
+
     public function getFullNameAttribute()
     {
-        return $this->name . ' ' . $this->last_name;
+        return "{$this->name} {$this->last_name}";
+    }
+
+    public function getInitialsAttribute()
+    {
+        return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
     }
 }
