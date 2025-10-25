@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\User;
@@ -12,14 +13,14 @@ class AuthService
 {
     public function __construct(
         protected UserRepository $userRepository,
-    ){}
+    ) {}
 
     //auth user and create a sanctum token
     public function authenticate(string $email, string $password, bool $remember = false): ?User
     {
         $user = $this->userRepository->findByEmail($email);
 
-        if(!$user || !Hash::check($password, $user->password)){
+        if (!$user || !Hash::check($password, $user->password)) {
             return null;
         }
 
@@ -32,7 +33,7 @@ class AuthService
     {
         $user = $this->authenticate($email, $password, $remember);
 
-        if(!$user){
+        if (!$user) {
             return null;
         }
 
@@ -53,15 +54,15 @@ class AuthService
         try {
 
             $token = $user->createToken($name, $abilities);
+            $accessId = $token->accessToken?->id;
 
             Log::info('token.success', [
                 'user_id' => $user->id,
                 'token_name' => $name,
-                'token_id' => $token->accessToken->id,
+                'token_id' => $accessId,
             ]);
 
             return $token->plainTextToken;
-
         } catch (Throwable $e) {
             Log::channel('security')->info('token.success', ['user_id' => $user->id]);
             throw $e;
@@ -88,7 +89,6 @@ class AuthService
             ]);
 
             return true;
-
         } catch (Throwable $e) {
             Log::error('Failed to revoke current token', [
                 'user_id' => $user->id,
@@ -171,7 +171,6 @@ class AuthService
             }
 
             return $this->hasValidTokens($user);
-
         } catch (Throwable $e) {
             Log::warning('Error checking authentication', [
                 'user_id' => $user->id,
@@ -184,8 +183,7 @@ class AuthService
     protected function hasValidTokens(User $user): bool
     {
         return $user->tokens()
-        ->where('expires_at', '>', now())
-        ->exists();
+            ->where('expires_at', '>', now())
+            ->exists();
     }
-
 }

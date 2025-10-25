@@ -33,8 +33,13 @@ class GetAuthenticatedUserAction
     protected function loadRelations(User $user, array $relations = []): User
     {
         $allowedRelations = [
-            'profile', 'roles', 'permissions', 'posts',
-            'comments', 'settings', 'notifications',
+            'profile',
+            'roles',
+            'permissions',
+            'posts',
+            'comments',
+            'settings',
+            'notifications',
         ];
 
         $validRelations = $relations
@@ -62,7 +67,7 @@ class GetAuthenticatedUserAction
     //permissions and roles user
     protected function getUserPermissions(User $user): array
     {
-        return Cache::remember("user_perms_{$user->id}", 600, function() use ($user) {
+        return Cache::remember("user_perms_{$user->id}", 600, function () use ($user) {
             return [
                 'roles' => $user->roles->pluck('name')->toArray(),
                 'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
@@ -91,7 +96,7 @@ class GetAuthenticatedUserAction
             return ($user->login_streak ?? 0) + 1;
         }
 
-        // if pass more one day without login -> zero streak
-        return 1;
+        // if pass more one day without login
+        return 0;
     }
 }

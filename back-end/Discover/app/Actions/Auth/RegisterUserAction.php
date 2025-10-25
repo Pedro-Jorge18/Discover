@@ -21,7 +21,7 @@ class RegisterUserAction
         protected UserMailService $userMailService,
     ) {}
 
-    public function execute(RegisterUserDto $dto): array
+    public function execute(RegisterUserDto $dto): User
     {
 
         return DB::transaction(function () use ($dto) {
@@ -55,9 +55,7 @@ class RegisterUserAction
                 'has_image' => $dto->hasImage(),
             ]);
 
-            $user = $user->load('roles');
-
-            
+            return $user->load('roles');
         });
     }
 

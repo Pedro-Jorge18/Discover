@@ -29,13 +29,13 @@ class RegisterUserDto
             name: $data['name'],
             last_name: $data['last_name'],
             phone: $data['phone'],
-            birthday: Carbon::parse($data->validated('birthday')),
+            birthday: Carbon::parse($data['birthday']),
             email: $data['email'],
             password: $data['password'],
             gender: $data['gender'] ?? null,
             language: $data['language'] ?? 'en',
             about: $data['about'] ?? null,
-            image: $data->file('image')
+            image: $request->hasFile('image') ? $request->file('image') : null
         );
     }
 
@@ -77,5 +77,4 @@ class RegisterUserDto
     {
         return $this->image instanceof UploadedFile;
     }
-
 }

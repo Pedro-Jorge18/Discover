@@ -22,7 +22,7 @@ class UserResource extends JsonResource
         return [
             'meta' => [
                 'api_version' => '1.0',
-                'timestamp'   => now()->toISOString(),
+                'timestamp'   => now()->toIso8601String(),
             ],
         ];
     }
