@@ -25,7 +25,7 @@ class StorePropertyRequest extends FormRequest
             //informações iniciais ( OBRIGATORIAS )
 
             'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
+            'description' => 'required|string|max:10000',
             'summary' => 'required|string|max:255',
             'price_per_night' => 'required|numeric|min:1',
 
@@ -46,13 +46,13 @@ class StorePropertyRequest extends FormRequest
             'bathrooms' => 'required|integer|min:0',
 
             //CONFIGURAÇÃO
-            'cleaning_fee' => 'sometimes|numeric|min:0',
-            'service_fee' => 'sometimes|numeric|min:0',
-            'security_deposit' => 'sometimes|numeric|min:0',
-            'area' => 'sometimes|numeric|min:0',
-            'floor' => 'sometimes|numeric|min:0',
-            'min_nights' => 'sometimes|numeric|min:1',
-            'max_nights' => 'sometimes|numeric|min:1',
+            'cleaning_fee' => 'sometimes|nullable|numeric|min:0',
+            'service_fee' => 'sometimes|nullable|numeric|min:0',
+            'security_deposit' => 'sometimes|nullable|numeric|min:0',
+            'area' => 'sometimes|nullable|numeric|min:0',
+            'floor' => 'sometimes|nullable|numeric|min:0',
+            'min_nights' => 'sometimes|nullable|numeric|min:1',
+            'max_nights' => 'sometimes|nullable|numeric|min:1',
 
         ];
     }
@@ -60,7 +60,7 @@ class StorePropertyRequest extends FormRequest
     public function messages(): array
     {
         return [
-              //messagens de obrigação
+               //messagens de obrigação
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',
