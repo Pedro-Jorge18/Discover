@@ -13,13 +13,13 @@ class UserObserver
         protected UserMailService $userMailService,
     ) {}
 
-    //Event triggered after user creation
+    //Event triggerd after user creation
     public function created(User $user): void
     {
 
         //send welcome email
         try {
-            $this->userMailService($user);
+            $this->userMailService->sendWelcome($user);
 
             Log::info('UserObserver: welcome email sent.', [
                 'user_id' => $user->id,

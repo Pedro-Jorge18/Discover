@@ -19,13 +19,13 @@ class LogoutUserAction
         try {
             $targetUser = $user ?? Auth::user();
 
-            if(!$targetUser){
-                Log::warning('LogoutUserAction: No authenticated users found');
+            if (!$targetUser) {
+                Log::warning('LogoutUserAction: No authenticated user found');
                 return false;
             }
 
-            if($targetUser && !$this->validateUserOwnerShip($targetUser)){
-                Log::warning('LogoutUserAction: Attempt to revoke another users token', [
+            if ($targetUser && !$this->validateUserOwnerShip($targetUser)) {
+                Log::warning('LogoutUserAction: Attempt to revoke another user token', [
                     'requested_user_id' => $targetUser->id,
                     'authenticated_user_id' => Auth::id(),
                 ]);
@@ -44,7 +44,8 @@ class LogoutUserAction
         }
     }
 
-    public function validateUserOwnerShip(User $requestedUser): bool{
+    public function validateUserOwnerShip(User $requestedUser): bool
+    {
         $authenticatedUser = Auth::user();
 
         //permited if the same user or admin

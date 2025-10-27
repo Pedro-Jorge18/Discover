@@ -22,7 +22,9 @@ class UserMailService
     public function sendWelcome(User $user): bool
     {
         return $this->sendWithRetry(
-            fn() => Mail::to($user->email)->send(new WelcomeUserMail($user)), "welcome_user", $user
+            fn() => Mail::to($user->email)->send(new WelcomeUserMail($user)),
+            "welcome_user",
+            $user
         );
     }
 
@@ -40,11 +42,13 @@ class UserMailService
     public function sendPasswordReset(string $email, string $resetUrl): bool
     {
         return $this->sendWithRetry(
-            fn() => Mail::to($user->email)->send(new PasswordResetEmail($user, $resetUrl)), "password_reset"
-        )
+            fn() => Mail::to($email)->send(new PasswordResetMail($resetUrl)),
+            "password_reset",
+            $email // just for logging
+        );
     }
 
-    //send accountt baned email
+    //send account baned email
     public function sendAccountBanned(User $user, ?string $reason = null): bool
     {
         return $this->sendWithRetry(
@@ -55,31 +59,29 @@ class UserMailService
     }
 
 
-    protected function sendWithRetry(callable $callback, string $type, User $user): bool
+    protected function sendWithRetry(callable $callback, string $type, string|User $target): bool
     {
         $attempts = 0;
+        $identifier = $target instanceof User ? $target->email : $target;
 
         do {
             try {
                 $callback();
-                Log::info("E-mail enviado com sucesso ({$type})", [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
+                Log::info("Email sent successfully ({$type})", [
+                    'target' => $identifier,
                     'attempts' => $attempts + 1,
                 ]);
                 return true;
             } catch (Throwable $e) {
                 $attempts++;
-                Log::warning("Falha ao enviar e-mail ({$type}), tentativa {$attempts}", [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
+                Log::warning("Failed to send email ({$type}), attempt {$attempts}", [
+                    'target' => $identifier,
                     'error' => $e->getMessage(),
                 ]);
 
                 if ($attempts >= $this->maxAttempts) {
-                    Log::error("E-mail ({$type}) falhou após {$attempts} tentativas.", [
-                        'user_id' => $user->id,
-                        'email' => $user->email,
+                    Log::error("Email ({$type}) failed after {$attempts} attempts.", [
+                        'target' => $identifier,
                     ]);
                     return false;
                 }

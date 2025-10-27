@@ -26,7 +26,7 @@ return [
         'user_not_authenticated' => 'User not authenticated.',
     ],
     'token' => [
-        'success' => 'Success to generate token',
+        'success' => 'Token generated successfully',
         'failed' => 'Failed to generate token.',
     ]
 ];

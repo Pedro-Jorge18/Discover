@@ -88,7 +88,7 @@ class RegisterUserAction
     protected function assignDefaultRole(User $user): void
     {
         try {
-            $user->assignRole('user'); // ou 'guest' para seu Airbnb clone
+            $user->assignRole('user');
         } catch (\Exception $e) {
             Log::warning('Failed to assign default role', [
                 'user_id' => $user->id,

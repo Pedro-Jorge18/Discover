@@ -64,7 +64,7 @@ class AuthService
 
             return $token->plainTextToken;
         } catch (Throwable $e) {
-            Log::channel('security')->info('token.success', ['user_id' => $user->id]);
+            Log::channel('security')->info('token.failed', ['user_id' => $user->id]);
             throw $e;
         }
     }
