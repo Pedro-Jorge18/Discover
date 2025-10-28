@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
+use App\Jobs\SendEmailWithRetryJob;
 
 class UserMailService
 {
@@ -61,35 +62,23 @@ class UserMailService
 
     protected function sendWithRetry(callable $callback, string $type, string|User $target): bool
     {
-        $attempts = 0;
         $identifier = $target instanceof User ? $target->email : $target;
 
-        do {
-            try {
-                $callback();
-                Log::info("Email sent successfully ({$type})", [
-                    'target' => $identifier,
-                    'attempts' => $attempts + 1,
-                ]);
-                return true;
-            } catch (Throwable $e) {
-                $attempts++;
-                Log::warning("Failed to send email ({$type}), attempt {$attempts}", [
-                    'target' => $identifier,
-                    'error' => $e->getMessage(),
-                ]);
+        try {
+            SendEmailWithRetryJob::dispatch($type, $identifier, $callback);
 
-                if ($attempts >= $this->maxAttempts) {
-                    Log::error("Email ({$type}) failed after {$attempts} attempts.", [
-                        'target' => $identifier,
-                    ]);
-                    return false;
-                }
+            Log::info("Email queued for sending ({$type})", [
+                'target' => $identifier,
+            ]);
 
-                sleep($this->retryDelaySeconds);
-            }
-        } while ($attempts < $this->maxAttempts);
+            return true;
+        } catch (Throwable $e) {
+            Log::error("Failed to queue email ({$type})", [
+                'target' => $identifier,
+                'error' => $e->getMessage(),
+            ]);
 
-        return false;
+            return false;
+        }
     }
 }

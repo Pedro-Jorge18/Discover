@@ -1,5 +1,6 @@
 <?php
 
+
 return [
 
     /*
@@ -124,7 +125,7 @@ return [
     ],
 
     'providers' => [
-        App\Services\Mail\Providers\MailServiceProvider::class,
-    ],
+        App\Providers\MailServiceProvider::class,
+    ]
 
 ];

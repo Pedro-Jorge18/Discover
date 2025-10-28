@@ -15,6 +15,7 @@ use App\Actions\Auth\AuthenticateUserAction;
 use App\Http\Requests\Users\Auth\LoginUserRequest;
 use App\Http\Requests\Users\Auth\RegisterUserRequest;
 use App\Actions\Auth\GetAuthenticatedUserAction;
+use Illuminate\Auth\Middleware\Authenticate;
 
 class AuthController extends Controller
 {
@@ -25,20 +26,27 @@ class AuthController extends Controller
         protected GetAuthenticatedUserAction $getAuthenticatedUserAction,
     ) {}
 
-    //register new user
+    /**
+     * Register a new user and return authentication token
+     *
+     * @param RegisterUserRequest $request
+     * @return JsonResponse
+     */
     public function register(RegisterUserRequest $request): JsonResponse
     {
         $dto = RegisterUserDto::fromRequest($request);
 
         $user = $this->registerUserAction->execute($dto);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        $authDto = new AuthenticateUserDto($user->email, $request->input('password'));
+
+        $resultt = $this->authenticateUserAction->execute($authDto);
 
         return response()->json([
-            'user' => new UserResource($user),
-            'token' => $token,
-            'token_type' => 'Bearer',
-        ], 201);
+            'user' => new UserResource($result['user']),
+            'token' => $result['token'],
+            'token_type' => $result['token_type'],
+        ])
     }
 
     //login and return token
@@ -50,7 +58,7 @@ class AuthController extends Controller
 
         if (!$result) {
             return response()->json([
-                'message' => 'Invalid credentials'
+                'message' => 'auth.login.invalid_credentials'
             ], 401);
         }
 
@@ -58,7 +66,7 @@ class AuthController extends Controller
             'user' => new UserResource($result['user']),
             'token' => $result['token'],
             'token_type' => $result['token_type'],
-            'message' => 'Login successfully'
+            'message' => 'auth.login.success'
         ], 200);
     }
 

@@ -16,6 +16,8 @@ class LogoutUserAction
 
     public function execute(?User $user = null): bool
     {
+        $targetUser = null;
+
         try {
             $targetUser = $user ?? Auth::user();
 
@@ -24,7 +26,7 @@ class LogoutUserAction
                 return false;
             }
 
-            if ($targetUser && !$this->validateUserOwnerShip($targetUser)) {
+            if (!$this->validateUserOwnerShip($targetUser)) {
                 Log::warning('LogoutUserAction: Attempt to revoke another user token', [
                     'requested_user_id' => $targetUser->id,
                     'authenticated_user_id' => Auth::id(),
@@ -49,6 +51,6 @@ class LogoutUserAction
         $authenticatedUser = Auth::user();
 
         //permitted if the same user or admin
-        return $authenticatedUser && ($requestedUser->id === $authenticatedUser->id || $authenticatedUser->is_admin);
+        return $authenticatedUser && ($requestedUser->id === $authenticatedUser->id || $authenticatedUser->hasRole('admin'));
     }
 }

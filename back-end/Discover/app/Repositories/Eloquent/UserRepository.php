@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Eloquent;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserRepository
 {

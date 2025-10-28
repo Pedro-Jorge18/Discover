@@ -3,13 +3,14 @@
 namespace App\Actions\Auth;
 
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Http\UploadedFile;
-use App\DTOs\User\Auth\RegisterUserDto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Repositories\UserRepository;
-use App\Services\Mail\UserMailService;
+use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\Facades\Hash;
+use App\Services\Mail\UserMailService;
+use App\DTOs\User\Auth\RegisterUserDto;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -87,9 +88,23 @@ class RegisterUserAction
 
     protected function assignDefaultRole(User $user): void
     {
+        DB::beginTransaction();
+
         try {
-            $user->assignRole('user');
+            $role = UserRole::where('name', UserRole::GUEST)->first();
+
+            if (! $role) {
+                throw new \RuntimeException("Default role 'user' not found. Run RoleSeeder first.");
+            }
+
+            if (! $user->roles()->where('role_id', $role->id)->exists()) {
+                $user->roles()->attach($role->id);
+            }
+
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
+
             Log::warning('Failed to assign default role', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),

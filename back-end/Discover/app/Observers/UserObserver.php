@@ -34,7 +34,7 @@ class UserObserver
     }
 
     //event triggered after user update
-    public function update(User $user): void
+    public function updated(User $user): void
     {
         Log::info('User updated', [
             'user_id' => $user->id,

@@ -3,9 +3,8 @@
 namespace App\Actions\Auth;
 
 use App\Models\User;
-use App\Repositories\UserRepository;
+use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class GetAuthenticatedUserAction
 {
@@ -16,9 +15,6 @@ class GetAuthenticatedUserAction
     public function execute(User $user, array $relations = []): array
     {
 
-        if (!$user) {
-            throw new ModelNotFoundException(__('auth.user_not_authenticated'));
-        }
 
         //load relations
         $user = $this->loadRelations($user, $relations);
@@ -67,7 +63,7 @@ class GetAuthenticatedUserAction
     //permissions and roles user
     protected function getUserPermissions(User $user): array
     {
-        return Cache::remember("user_perms_{$user->id}", 600, function () use ($user) {
+        return Cache::remember("user:{$user->id}:perms", 600, function () use ($user) {
             return [
                 'roles' => $user->roles->pluck('name')->toArray(),
                 'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),

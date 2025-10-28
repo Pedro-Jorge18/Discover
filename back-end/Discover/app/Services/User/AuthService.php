@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\User;
 
+use Throwable;
 use App\Models\User;
-use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Throwable;
+use App\Repositories\Eloquent\UserRepository;
 
 class AuthService
 {
@@ -182,8 +182,6 @@ class AuthService
 
     protected function hasValidTokens(User $user): bool
     {
-        return $user->tokens()
-            ->where('expires_at', '>', now())
-            ->exists();
+        return $user->tokens()->exists();
     }
 }

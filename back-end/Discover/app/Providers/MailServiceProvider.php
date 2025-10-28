@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Mail\Providers;
+namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\Mail\UserMailService;
