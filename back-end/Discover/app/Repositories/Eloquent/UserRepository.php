@@ -19,7 +19,7 @@ class UserRepository
         return User::create($data);
     }
 
-    //update data of exists user
+    //update data of existing user
     public function update(int $id, array $data): User
     {
         $user = User::findOrFail($id);

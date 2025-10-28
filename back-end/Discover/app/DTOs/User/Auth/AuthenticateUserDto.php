@@ -12,12 +12,12 @@ class AuthenticateUserDto
         public readonly bool $remember_me = false,
     ) {}
 
-    public static function fromRequest(LoginUserRequest $request):self
+    public static function fromRequest(LoginUserRequest $request): self
     {
         return new self(
-            email:$request['email'],
+            email: $request['email'],
             password: $request['password'],
-            remember_me:(bool) ($request['remember_me'] ?? false)
+            remember_me: (bool) ($request['remember_me'] ?? false)
         );
     }
 

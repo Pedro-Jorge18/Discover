@@ -12,7 +12,7 @@ class UserPolicy
     //Allows only admins to perform any action
     public function before(User $user, string $ability): bool|null
     {
-        if($user->hasRole('admin')){
+        if ($user->hasRole('admin')) {
             return true;
         }
 
@@ -44,9 +44,8 @@ class UserPolicy
     }
 
     //check if the user can create new users
-    public function create(User $user):bool
+    public function create(User $user): bool
     {
         return $user->hasPermissionTo('create-users');
     }
-
 }

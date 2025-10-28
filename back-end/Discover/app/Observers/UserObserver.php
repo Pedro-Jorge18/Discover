@@ -13,7 +13,7 @@ class UserObserver
         protected UserMailService $userMailService,
     ) {}
 
-    //Event triggerd after user creation
+    //Event triggered after user creation
     public function created(User $user): void
     {
 

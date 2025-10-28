@@ -85,7 +85,7 @@ class GetAuthenticatedUserAction
         $lastLogin = $user->last_login_date->startOfDay();
         $today = now()->startOfDay();
 
-        // if user loged in today
+        // if user logged in today
         if ($lastLogin->equalTo($today)) {
             // Keeps current streak (or initializes if none exists)
             return $user->login_streak ?? 1;

@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         $result = $this->authenticateUserAction->execute($dto);
 
-        if (!$result || $result === null) {
+        if (!$result) {
             return response()->json([
                 'message' => 'Invalid credentials'
             ], 401);
@@ -81,6 +81,10 @@ class AuthController extends Controller
     {
         $result = $this->getAuthenticatedUserAction->execute($request->user());
 
-        return response()->json(['user' => new UserResource($result['user']), 'statistics' => $result['statistics'], 'permissions' => $result['permissions'],], 200);
+        return response()->json([
+            'user' => new UserResource($result['user']),
+            'statistics' => $result['statistics'],
+            'permissions' => $result['permissions'],
+        ], 200);
     }
 }

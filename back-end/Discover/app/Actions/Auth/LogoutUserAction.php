@@ -48,7 +48,7 @@ class LogoutUserAction
     {
         $authenticatedUser = Auth::user();
 
-        //permited if the same user or admin
+        //permitted if the same user or admin
         return $authenticatedUser && ($requestedUser->id === $authenticatedUser->id || $authenticatedUser->is_admin);
     }
 }

@@ -48,7 +48,7 @@ class UserMailService
         );
     }
 
-    //send account baned email
+    //send account banned email
     public function sendAccountBanned(User $user, ?string $reason = null): bool
     {
         return $this->sendWithRetry(
