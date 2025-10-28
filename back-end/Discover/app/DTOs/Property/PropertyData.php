@@ -67,6 +67,7 @@ class PropertyData
             min_nights: $data['min_nights'] ?? null,
             max_nights: $data['max_nights'] ?? null
 
+
         );
     }
 
