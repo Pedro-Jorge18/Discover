@@ -117,7 +117,7 @@ export default function Login() {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 focus:outline-none cursor-pointer transition ease-in duration-500"
+              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 focus:outline-none cursor-pointer transition ease-in duration-500"
             >
               Entrar
             </button>
