@@ -4,7 +4,7 @@ namespace App\Actions\Auth;
 
 use Throwable;
 use App\Models\User;
-use App\Services\AuthService;
+use App\Services\User\AuthService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 

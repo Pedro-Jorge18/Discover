@@ -12,7 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
-use App\Jobs\SendEmailWithRetryJob;
+use App\Jobs\Mail\SendEmailWithRetryJob;
 
 class UserMailService
 {

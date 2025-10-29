@@ -4,9 +4,9 @@ namespace App\Actions\Auth;
 
 
 use Throwable;
-use App\Services\AuthService;
+use App\Services\User\AuthService;
 use Illuminate\Support\Facades\Log;
-use App\Repositories\UserRepository;
+use App\Repositories\Eloquent\UserRepository;
 use App\DTOs\User\Auth\AuthenticateUserDto;
 use App\Models\User;
 

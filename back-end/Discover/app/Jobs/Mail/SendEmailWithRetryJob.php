@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,7 +38,7 @@ class SendEmailWithRetryJob implements ShouldQueue
                 'attempt' => $this->attempts(),
             ]);
 
-            throw $e; // Faz o Laravel re-tentar automaticamente
+            throw $e; // Causes Laravel to automatically retry
         }
     }
 

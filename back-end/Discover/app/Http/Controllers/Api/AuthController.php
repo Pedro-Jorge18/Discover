@@ -40,13 +40,13 @@ class AuthController extends Controller
 
         $authDto = new AuthenticateUserDto($user->email, $request->input('password'));
 
-        $resultt = $this->authenticateUserAction->execute($authDto);
+        $result = $this->authenticateUserAction->execute($authDto);
 
         return response()->json([
             'user' => new UserResource($result['user']),
             'token' => $result['token'],
             'token_type' => $result['token_type'],
-        ])
+        ]);
     }
 
     //login and return token
