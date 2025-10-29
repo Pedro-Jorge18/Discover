@@ -6,6 +6,7 @@ use http\Exception\InvalidArgumentException;
 
 class PropertyData
 {
+    //envio de arquivos para o api
     public function __construct(
         public string $title,
         public string $description,
@@ -66,6 +67,8 @@ class PropertyData
             floor: $data['floor'] ?? null,
             min_nights: $data['min_nights'] ?? null,
             max_nights: $data['max_nights'] ?? null
+
+
 
 
         );
