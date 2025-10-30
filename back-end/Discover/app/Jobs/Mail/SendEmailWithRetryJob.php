@@ -20,7 +20,7 @@ class SendEmailWithRetryJob implements ShouldQueue
     public function __construct(
         private string $type,
         private string $target,
-        private callable $callback
+        private array $mailData = []
     ) {}
 
     public function handle(): void
