@@ -59,6 +59,10 @@ class AuthenticateUserAction
 
     public function updateUserAfterAuthentication(User $user): User
     {
+<<<<<<< HEAD
         return $user->load(['roles']);
+=======
+        return $user->load(['roles', 'profile']);
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
     }
 }

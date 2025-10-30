@@ -9,6 +9,7 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+<<<<<<< HEAD
 
         if (!$this->resource) {
             return [];
@@ -34,6 +35,12 @@ class UserResource extends JsonResource
                 ] : null;
             }),
 
+=======
+        return [
+            'id'         => $this->id,
+            'name'       => $this->name,
+            'email'      => $this->email,
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];

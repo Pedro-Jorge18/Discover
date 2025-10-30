@@ -29,4 +29,8 @@ return [
         'success' => 'Token generated successfully',
         'failed' => 'Failed to generate token.',
     ]
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a

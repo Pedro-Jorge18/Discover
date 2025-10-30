@@ -3,12 +3,17 @@
 namespace App\Actions\Auth;
 
 use App\Models\User;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Auth\AuthenticationException;
 use App\Repositories\Eloquent\UserRepository;
 
+=======
+use App\Repositories\Eloquent\UserRepository;
+use Illuminate\Support\Facades\Cache;
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
 
 class GetAuthenticatedUserAction
 {
@@ -16,6 +21,7 @@ class GetAuthenticatedUserAction
         protected UserRepository $userRepository,
     ) {}
 
+<<<<<<< HEAD
     public function execute(): array
     {
         try {
@@ -49,10 +55,25 @@ class GetAuthenticatedUserAction
             ]);
             throw $e;
         }
+=======
+    public function execute(User $user, array $relations = []): array
+    {
+
+
+        //load relations
+        $user = $this->loadRelations($user, $relations);
+
+        return [
+            'user' => $user,
+            'statistics' => $this->getUserStatistics($user),
+            'permissions' => $this->getUserPermissions($user),
+        ];
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
     }
 
     protected function loadRelations(User $user, array $relations = []): User
     {
+<<<<<<< HEAD
         $relations = ['roles']; // relações básicas
 
         return $user->load($relations);
@@ -60,10 +81,30 @@ class GetAuthenticatedUserAction
 
 
 
+=======
+        $allowedRelations = [
+            'profile',
+            'roles',
+            'permissions',
+            'posts',
+            'comments',
+            'settings',
+            'notifications',
+        ];
+
+        $validRelations = $relations
+            ? array_intersect($relations, $allowedRelations)
+            : ['profile', 'roles', 'permissions']; //basic pattern
+
+        return $user->load($validRelations);
+    }
+
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
     protected function getUserStatistics(User $user): array
     {
         return Cache::remember("user:{$user->id}:stats", 300, function () use ($user) {
             return [
+<<<<<<< HEAD
                 //'posts_count' => $user->posts()->count(),
                 //'comments_count' => $user->comments()->count(),
                 'login_streak' => $this->calculateLoginStreak($user),
@@ -72,26 +113,45 @@ class GetAuthenticatedUserAction
                 //'bookings_count' => $user->bookings()->count(),
                 //'reviews_count' => $user->reviews()->count(),
                 'roles_count' => $user->roles()->count(),
+=======
+                'posts_count' => $user->posts()->count(),
+                'comments_count' => $user->comments()->count(),
+                'login_streak' => $this->calculateLoginStreak($user),
+                'account_age_days' => $user->created_at->diffInDays(now()),
+                'properties_count' => $user->properties()->count(),
+                'bookings_count' => $user->bookings()->count(),
+                'reviews_count' => $user->reviews()->count(),
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
             ];
         });
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
     //permissions and roles user
     protected function getUserPermissions(User $user): array
     {
         return Cache::remember("user:{$user->id}:perms", 600, function () use ($user) {
             return [
                 'roles' => $user->roles->pluck('name')->toArray(),
+<<<<<<< HEAD
                 //'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+=======
+                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
             ];
         });
     }
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
     protected function calculateLoginStreak(User $user): int
     {
         // If the user has never logged in, streak is 0

@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\DTOs\User\Auth\RegisterUserDto;
 use App\Http\Controllers\Controller;
+<<<<<<< HEAD
 use App\Http\Resources\User\UserResource;
+=======
+use App\Http\Resources\UserResource;
+>>>>>>> 99123030711e99cc5ec61294065f35c9aa1bf95a
 use Illuminate\Support\Facades\Auth;
 use App\DTOs\User\Auth\AuthenticateUserDto;
 use App\Actions\Auth\LogoutUserAction;
