@@ -42,7 +42,7 @@ class UserObserver
         ]);
     }
 
-    //event triggerd before delete user
+    //event triggered before delete user
     public function deleting(User $user): void
     {
         $user->profile()->delete();

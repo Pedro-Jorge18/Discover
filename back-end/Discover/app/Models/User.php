@@ -74,7 +74,7 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
-    //Identificao de Usuario anfittiao, cliente ou admin
+
     public function isClient()
     {
         return $this->roles()->where('name', 'client')->exists();
