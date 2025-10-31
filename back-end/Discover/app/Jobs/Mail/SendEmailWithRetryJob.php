@@ -2,13 +2,14 @@
 
 namespace App\Jobs\Mail;
 
+use Throwable;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class SendEmailWithRetryJob implements ShouldQueue
 {
@@ -26,7 +27,14 @@ class SendEmailWithRetryJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            ($this->callback)();
+
+            $mailableClass = "App\\Mail\\{$this->type}";
+
+            if (!class_exists($mailableClass)) {
+                throw new \Exception("Mailable class {$mailableClass} not found");
+            }
+
+            Mail::to($this->target)->send(new $mailableClass($this->mailData));
 
             Log::info("Email sent successfully ({$this->type})", [
                 'target' => $this->target,

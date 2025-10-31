@@ -23,11 +23,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'auth.sanctum' => \Illuminate\Auth\Middleware\Authenticate::class,
         ]);
-
-        // REMOVA ESTAS LINHAS - NÃO aplique auth globalmente!
-        // $middleware->appendToGroup('api', [
-        //     'auth.sanctum',
-        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

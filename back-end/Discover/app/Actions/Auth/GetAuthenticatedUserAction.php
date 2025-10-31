@@ -51,7 +51,7 @@ class GetAuthenticatedUserAction
         }
     }
 
-    protected function loadRelations(User $user, array $relations = []): User
+    protected function loadRelations(User $user): User
     {
         $relations = ['roles']; // relações básicas
 
