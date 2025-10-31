@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -43,9 +44,9 @@ class User extends Authenticatable
     ];
 
 
-    public function roles():  BelongsToMany
+    public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'user_roles');
+        return $this->belongsToMany(UserRole::class, 'user_roles', 'user_id', 'role_id');
     }
 
     public function favorites(): HasMany
@@ -102,7 +103,7 @@ class User extends Authenticatable
 
     public function assignRole($roleName)
     {
-        $role = Role::where('name', $roleName)->first();
+        $role = UserRole::where('name', $roleName)->first();
 
         if ($role && !$this->hasRole($roleName)) {
             $this->roles()->attach($role);
@@ -112,7 +113,7 @@ class User extends Authenticatable
 
     public function removeRole($roleName)
     {
-        $role = Role::where('name', $roleName)->first();
+        $role = UserRole::where('name', $roleName)->first();
 
         if ($role) {
             $this->roles()->detach($role);
