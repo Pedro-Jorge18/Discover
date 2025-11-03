@@ -46,7 +46,7 @@ class PropertyData
 
     )
     {
-        if($this->$price_per_night < 1){
+        if($this->price_per_night < 1){
             throw new InvalidArgumentException('price per night must be greater than 0');
         }
     }

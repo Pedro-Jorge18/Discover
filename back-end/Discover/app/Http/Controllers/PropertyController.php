@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Property\Resources\PropertyResource;
+use App\Http\Resources\Property\PropertyResource;
+use App\Http\Resources\Property\PropertyCollection;
 use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Services\Property\PropertyService;
@@ -12,17 +13,15 @@ use App\Repositories\Contracts\PropertyRepositoryInterface;
 
 class PropertyController extends Controller
 {
-    private PropertyService $propertyService;
 
     public function __construct(
-        private PropertyRepositoryInterface $propertyRepository,
+        private PropertyService $propertyService
     ){}
 
     public function index()
     {
-       // $properties = $this->propertyService->listAll();
+       $properties = $this->propertyService->listAll();
 
-        $properties = Property::all();
         return PropertyResource::collection($properties);
     }
 
@@ -37,7 +36,7 @@ class PropertyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePropertyRequest $request):jsonResponse
+    public function store(StorePropertyRequest $request):JsonResponse
     {
         $property = $this->propertyService->create($request->validated());
 
@@ -61,7 +60,7 @@ class PropertyController extends Controller
         ]);
 
         */
-        $property = $this->propertyRepository->findById($id);
+        $property = $this->propertyService->find($id);
         if (!$property) {
             return response()->json(['error' => 'Property not found'], 404);
         }

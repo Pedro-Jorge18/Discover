@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Models\Property;
+use illuminate\Database\Eloquent\Collection;
 
 class EloquentPropertyRepository implements PropertyRepositoryInterface
 {
@@ -28,7 +29,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
         return Property::find($id);
     }
 
-    public function getAll()
+    public function getAll():Collection
     {
         return Property::all();
     }

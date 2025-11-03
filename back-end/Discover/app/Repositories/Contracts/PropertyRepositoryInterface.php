@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Property;
+use Illuminate\Database\Eloquent\Collection;
 
 
 /*
@@ -17,8 +18,8 @@ interface PropertyRepositoryInterface
 
     public function create(array $data): Property;
 
-    // vai buscara propiedade pelo id, se nao esncotrar volta nulo
+    // "vai buscar a propriedade pelo id, se não encontrar volta nulo"
     public function findById(int $id): ?Property;
 
-    public function getAll();
+    public function getAll():Collection;
 }
