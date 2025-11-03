@@ -157,7 +157,7 @@ return [
 
 
         App\Providers\MailServiceProvider::class,
-
-    ]
+        App\Providers\PropertyServiceProvider::class
+    ],
 
 ];
