@@ -54,7 +54,7 @@ export default function Login() {
                     <input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter password"
+                    placeholder="Insere a palavra-passe"
                     className="py-2.5 sm:py-3 ps-4 pe-10 block w-full border border-gray-600 bg-gray-800 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
 
@@ -138,7 +138,7 @@ export default function Login() {
         {/* Border */}
         <div className="flex items-center justify-center px-6 py-4">
             <div className="flex-grow border-t border-gray-700"></div>
-                <span className="mx-3 text-gray-400 text-sm font-medium">Ou utilize uma destas opções</span>
+                <span className="mx-3 text-gray-400 text-sm font-medium">ou</span>
             <div className="flex-grow border-t border-gray-700"></div>
         </div>
                 
