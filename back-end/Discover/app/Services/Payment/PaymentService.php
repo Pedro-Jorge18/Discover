@@ -3,4 +3,7 @@
 namespace App\Services\Payment;
 
 
-class PaymentService 
+class PaymentService
+{
+    public
+}
