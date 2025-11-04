@@ -3,13 +3,13 @@
 use App\Models\Payment;
 use App\DTOs\Payment\PaymentDTO;
 use Illuminate\Support\Facades\DB;
-use App\Services\Payment\PaymentService;
+use App\Services\Payment\PaymentServiceInterface;
 
 class CreatePaymentAction
 {
 
     public function __construct(
-        protected PaymentService $paymentService
+        protected PaymentServiceInterface $paymentService
     ) {}
 
     public function execute(PaymentDTO $dto): array

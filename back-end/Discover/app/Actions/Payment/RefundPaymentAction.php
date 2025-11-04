@@ -7,11 +7,11 @@ use Throwable;
 use Carbon\Carbon;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
-use App\Services\Payment\PaymentService;
+use App\Services\Payment\PaymentServiceInterface;
 
 class RefundPaymentAction
 {
-    public function __construct(protected PaymentService $paymentService) {}
+    public function __construct(protected PaymentServiceInterface $paymentService) {}
 
     public function execute(Payment $payment): void
     {

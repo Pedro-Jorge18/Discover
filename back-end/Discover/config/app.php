@@ -154,9 +154,8 @@ return [
 
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-
-
         App\Providers\MailServiceProvider::class,
+        App\Providers\PaymentServiceProvider::class,
 
     ]
 

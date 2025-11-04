@@ -2,19 +2,20 @@
 
 namespace App\Providers;
 
-use App\Actions\Payment\ConfirmPaymentAction;
-use App\Actions\Payment\FailPaymentAction;
-use App\Actions\Payment\RefundPaymentAction;
 use CreatePaymentAction;
 use Illuminate\Support\ServiceProvider;
-use App\Services\Payment\PaymentService;
+use App\Actions\Payment\FailPaymentAction;
+use App\Actions\Payment\RefundPaymentAction;
+use App\Actions\Payment\ConfirmPaymentAction;
+use App\Services\Payment\StripePaymentService;
+use App\Services\Payment\PaymentServiceInterface;
 
 class PaymentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->bind(CreatePaymentAction::class, function ($app) {
-            return new CreatePaymentAction($app->make(PaymentService::class));
+            return new CreatePaymentAction($app->make(PaymentServiceInterface::class));
         });
 
         $this->app->bind(ConfirmPaymentAction::class, fn() => new ConfirmPaymentAction());
@@ -23,6 +24,8 @@ class PaymentServiceProvider extends ServiceProvider
         $this->app->bind(RefundPaymentAction::class, function ($app) {
             return new RefundPaymentAction($app->make(RefundPaymentAction::class));
         });
+
+        $this->app->bind(PaymentServiceInterface::class, StripePaymentService::class);
     }
 
     public function boot(): void
