@@ -3,6 +3,7 @@ import { useState } from "react";
 export default function ResetPassword() {
   const [emailSent, setEmailSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   {/* Function to change the screen to the confirmation screen */}
   const handleSubmit = (e) => {
@@ -94,7 +95,7 @@ export default function ResetPassword() {
                     </label>
                     <div className="relative">
                         <input
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword2 ? "text" : "password"}
                         id="newPassword"
                         placeholder="Insira a sua nova palavra-passe"
                         className="py-2.5 sm:py-3 ps-4 pe-10 block w-full border border-gray-600 bg-gray-800 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -102,11 +103,11 @@ export default function ResetPassword() {
 
                         <button
                             type="button"
-                            onClick={() => setShowPassword(!showPassword)}
+                            onClick={() => setShowPassword2(!showPassword2)}
                             className="absolute inset-y-0 end-0 flex items-center z-20 px-3 cursor-pointer text-gray-400 rounded-e-md focus:outline-none focus:text-indigo-400"
                             >
                             {/*Condition if is show password show password else dont show */}
-                            {showPassword ? (
+                            {showPassword2 ? (
                                 <svg
                                 className="size-4"
                                 xmlns="http://www.w3.org/2000/svg"
