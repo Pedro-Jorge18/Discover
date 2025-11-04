@@ -8,7 +8,6 @@ use CreatePaymentAction;
 use App\DTOs\Payment\PaymentDTO;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\UpdatePaymentRequest;
 use App\Actions\Payment\RefundPaymentAction;
 use Illuminate\Auth\Access\AuthorizationException;
 use App\Http\Requests\Payment\CreatePaymentRequest;
