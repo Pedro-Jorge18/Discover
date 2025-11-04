@@ -2,6 +2,8 @@
 
 namespace App\DTOs\Payment;
 
+use App\Http\Requests\Payment\CreatePaymentRequest;
+
 class PaymentDTO
 {
     public function __construct(
@@ -16,7 +18,7 @@ class PaymentDTO
     ) {}
 
 
-    public static function fromRequest(PaymentRequest $request): self
+    public static function fromRequest(CreatePaymentRequest $request): self
     {
         $data = $request->validated();
 
@@ -48,7 +50,7 @@ class PaymentDTO
     }
 
 
-    public function toArray(array $data): array
+    public function toArray(): array
     {
         return [
             'reservation_id' => $this->reservation_id,
