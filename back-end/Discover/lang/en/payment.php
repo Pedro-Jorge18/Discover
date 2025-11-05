@@ -4,7 +4,7 @@ return [
 
     'reservation' => [
         'id_required' => 'The reservation is required.',
-        'id_exists' => 'The reservation does not exists.',
+        'id_exists' => 'The reservation does not exist.',
     ],
 
     'amount' => [
