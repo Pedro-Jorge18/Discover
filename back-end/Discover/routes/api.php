@@ -40,4 +40,4 @@ Route::prefix('payments')->middleware(['auth:sanctum'])->group(function () {
 });
 
 //webhook
-ROute::post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
+Route::post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
