@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class PropertyResource extends JsonResource
 {
 
-    /* 6º etapa -> Recources - o que vai paracer para o user
+    /*  6ª etapa -> Resources - o que vai parecer para o usuário
 
         7º etapa -> serviceProvider
      *
@@ -25,11 +25,11 @@ class PropertyResource extends JsonResource
 
             // definção dos preços
             'price' => [
-                'per_night' => (float) $this->price_per_night,
-                'cleaning_fee' => (float) $this->cleaning_fee,
-                'service_fee' => (float) $this->service_fee,
-                'total_per_night' => (float) $this->price_per_night + $this->cleaning_fee + $this->service_fee,
-                'currency' => 'BRL'
+                'per_night' => number_format($this->price_per_night,2,'.',''),
+                'cleaning_fee' => number_format($this->cleaning_fee,2,'.',''),
+                'service_fee' => number_format($this->service_fee,2,'.',''),
+                'total_per_night' =>(float)$this->price_per_night + $this->cleaning_fee + $this->service_fee,
+                'currency' => 'EUR',
             ],
             // defenir o endereço
             'location' => [

@@ -9,7 +9,7 @@ class PropertySummaryResource extends JsonResource
 {
 
     /*
-     *  6ºetapa -> recource - REsposta resumidas do que vai para o cliente
+     *  6ºetapa -> recource - Resposta resumida do que vai para o cliente
      *
      *  7º etapa -> serviceProvider
      *

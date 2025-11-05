@@ -29,6 +29,10 @@ class StorePropertyRequest extends FormRequest
             'summary' => 'required|string|max:255',
             'price_per_night' => 'required|numeric|min:1',
 
+            'host_id' => 'required|integer|exists:users,id',
+            'check_in_time' => 'required|date_format:H:i',
+            'check_out_time' => 'required|date_format:H:i',
+
             // lOCALIZÇÃO
             'address' => 'required|string|max:255',
             'neighborhood' => 'required|string|max:255',
@@ -67,6 +71,9 @@ class StorePropertyRequest extends FormRequest
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',
               'price_per_night.required' => 'The minimum allowed is one nigh.',
+              'host_id.required' => 'It has to have a host.',
+              'check_in_time.required' => 'It has to have a Check In Time.',
+              'check_out_time.required' => 'It has to have a Check Out Time.',
               'address.required' => 'Address is required',
               'neighborhood.required' => 'Neighborhood is required',
               'postal_code.required' => 'Postal code is required',
@@ -75,7 +82,7 @@ class StorePropertyRequest extends FormRequest
               'listing_type_id.required' => 'Listing Type is required',
               'max_guests.required' => 'Maximum number of guests is required',
               'bedrooms.required' => 'Number of bedrooms is required',
-              'beds.required' => 'Number of bedrooms is required',
+              'beds.required' => 'Number of beds is required',
               'bathrooms.required' => 'Number of bathrooms is required',
         ];
     }

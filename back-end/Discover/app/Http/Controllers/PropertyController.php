@@ -18,11 +18,14 @@ class PropertyController extends Controller
         private PropertyService $propertyService
     ){}
 
+    /**
+     * @throws \Throwable
+     */
     public function index()
     {
-       $properties = $this->propertyService->listAll();
+        $properties = $this->propertyService->listPaginated(15);
 
-        return PropertyResource::collection($properties);
+        return new PropertyCollection($properties);
     }
 
     /**
@@ -36,22 +39,26 @@ class PropertyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePropertyRequest $request):JsonResponse
+    public function store(StorePropertyRequest $request): JsonResponse
     {
         $property = $this->propertyService->create($request->validated());
 
-        return response()->json($property, 201);
+        return new PropertyResource($property);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(int $id) :JsonResponse
     {
         /*
          * apos as atualizacoes essa que vai valer.
-         *
-        $property = $this->propertyService->find($id)->load([
+         */
+        $property = $this->propertyService->find($id);
+        if (!$property) {
+            return response()->json(['error' => 'Property not found'], 404);
+        }
+        $property->load([
             'host',
             'propertyType',
             'listingType',
@@ -59,11 +66,6 @@ class PropertyController extends Controller
             'images'
         ]);
 
-        */
-        $property = $this->propertyService->find($id);
-        if (!$property) {
-            return response()->json(['error' => 'Property not found'], 404);
-        }
         return new PropertyResource($property);
     }
 

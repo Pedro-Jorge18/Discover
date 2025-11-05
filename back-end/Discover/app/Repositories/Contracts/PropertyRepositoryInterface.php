@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Http\Requests\StorePropertyRequest;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -22,4 +23,7 @@ interface PropertyRepositoryInterface
     public function findById(int $id): ?Property;
 
     public function getAll():Collection;
+
+    public function getPaginated(int $perPage = 15);
+
 }

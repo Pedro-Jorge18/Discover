@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
+
 use App\Repositories\Contracts\PropertyRepositoryInterface;
-use App\Repositories\Eloquent\EloquentPropertyRepository;
+use App\Repositories\Eloquent\PropertyRepository;
 use Illuminate\Support\ServiceProvider;
 
 class PropertyServiceProvider extends ServiceProvider
@@ -17,7 +18,7 @@ class PropertyServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             PropertyRepositoryInterface::class,
-            EloquentPropertyRepository::class);
+            PropertyRepository::class);
 
         $this->app->singleton(\App\Actions\Property\CreatePropertyAction::class);
         $this->app->singleton(\App\Actions\Property\FindPropertyAction::class);

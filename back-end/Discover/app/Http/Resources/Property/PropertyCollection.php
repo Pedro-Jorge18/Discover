@@ -17,19 +17,19 @@ class PropertyCollection extends ResourceCollection
         return [
             'data' => PropertyResource::collection($this->collection),
             'meta' => [
-                'total' => $this->total(),
-                'per_page' => $this->perPage(),
-                'current_page' => $this->currentPage(),
-                'last_page' => $this->lastPage(),
+                'total' => $this->resource->total(),
+                'per_page' =>  $this->resource->perPage(),
+                'current_page' => $this->resource->currentPage() ,
+                'last_page' => $this->resource->lastPage(),
             ],
-            /*
+
             'links' => [
-                'first' => $this->url(1),
-                'last' => $this->url($this->lastPage()),
-                'prev' => $this->previousPageUrl(),
-                'next' => $this->nextPageUrl(),
+                'first' => $this->resource->url(1),
+                'last' => $this->resource->url($this->lastPage()),
+                'prev' => $this->resource->previousPageUrl(),
+                'next' => $this->resource->nextPageUrl(),
             ],
-            */
+
         ];
     }
 }

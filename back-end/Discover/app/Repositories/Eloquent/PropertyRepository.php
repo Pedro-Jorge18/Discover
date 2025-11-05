@@ -4,14 +4,14 @@ namespace App\Repositories\Eloquent;
 
 use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Models\Property;
-use illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection;
 
-class EloquentPropertyRepository implements PropertyRepositoryInterface
+class PropertyRepository implements PropertyRepositoryInterface
 {
    /*
     1º etapa -> implementação do que vai ser feito.
         onde salvar e o que buscar.
-        Validacoes dos dodos coverte para array e no momento so cria e e procura
+        "Validações dos dados converte para array e no momento só cria e procura"
 
    2º etapa -> contract como tem que ser feito
     *
@@ -25,12 +25,17 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
 
      public function findById(int $id): ?Property
     {
-        //procurar a propiedade
+        // "procurar a propriedade"
         return Property::find($id);
     }
 
     public function getAll():Collection
     {
         return Property::all();
+    }
+
+    public function getPaginated(int $perPage = 15)
+    {
+        return Property::paginate($perPage);
     }
 }
