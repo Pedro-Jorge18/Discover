@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 
 //authentication
@@ -14,6 +15,12 @@ Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
     });
+});
+
+//reset password
+Route::prefix('auth')->group(function () {
+    Route::post('/forget-password', [PasswordResetController::class, 'forgetPassword']);
+    Route::post('/reset-password', [PasswordResetController::class], 'resetPassword');
 });
 
 

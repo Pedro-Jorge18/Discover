@@ -31,5 +31,6 @@ return [
     'user_not_found' => 'No user found with email :email',
     'reset_link_sent' => 'A link to reset your password has been sent to your email.',
     'reset_failed' => 'We were unable to send the reset email. Please try again later.',
-    'password_mismatch' => '',
+    'password_mismatch' => 'Message',
+    'password_reset_failed' => 'Message'
 ];
