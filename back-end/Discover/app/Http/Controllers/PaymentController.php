@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Throwable;
 use App\Models\Payment;
-use CreatePaymentAction;
 use App\DTOs\Payment\PaymentDTO;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Actions\Payment\CreatePaymentAction;
 use App\Actions\Payment\RefundPaymentAction;
 use Illuminate\Auth\Access\AuthorizationException;
 use App\Http\Requests\Payment\CreatePaymentRequest;

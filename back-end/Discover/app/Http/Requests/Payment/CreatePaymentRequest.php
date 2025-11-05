@@ -17,7 +17,7 @@ class CreatePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reservation_id' => ['required', 'integer', 'exists:reservation_id'],
+            'reservation_id' => ['required', 'integer', 'exists:reservations,id'],
             'amount' => ['required', 'numeric', 'min:1'],
             'currency' => ['nullable', 'string', 'size:3'],
             'payment_gateway' => ['nullable', 'string', 'in:stripe,paypal'],

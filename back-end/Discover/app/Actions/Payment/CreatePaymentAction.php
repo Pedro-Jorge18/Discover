@@ -1,5 +1,8 @@
 <?php
 
+namespace App\Actions\Payment;
+
+use Throwable;
 use App\Models\Payment;
 use App\DTOs\Payment\PaymentDTO;
 use Illuminate\Support\Facades\DB;

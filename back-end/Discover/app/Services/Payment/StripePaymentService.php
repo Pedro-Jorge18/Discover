@@ -24,7 +24,7 @@ class StripePaymentService implements PaymentServiceInterface
             'payment_method_types' => ['card'],
             'mode' => 'payment',
             'customer_email' => $dto->user?->email ?? null,
-            'line-itens' => [[
+            'line_itens' => [[
                 'price_data' => [
                     'currency' => strtolower($dto->currency),
                     'unit_amount' => (int)($dto->amount * 100), // for cents
@@ -64,7 +64,7 @@ class StripePaymentService implements PaymentServiceInterface
     public function refund(string $paymentId): array
     {
         $refund = $this->stripe->refunds->create([
-            'paymente_intent' => $paymentId,
+            'payment_intent' => $paymentId,
         ]);
 
         Log::info('Stripe refund processed', ['refund' => $refund->id]);

@@ -38,7 +38,7 @@ class PaymentDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            reservation_id: (int) ($data['reservation_id' ?? 0]),
+            reservation_id: (int) ($data['reservation_id'] ?? 0),
             user_id: (int) ($data['user_id'] ?? 0),
             amount: (float) $data['amount'],
             currency: strtoupper($data['currency'] ?? 'EUR'),

@@ -17,7 +17,7 @@ class RefundPaymentAction
     {
         DB::transaction(function () use ($payment) {
             try {
-                $this->paymentService->refund($payment);
+                $this->paymentService->refund($payment->gateway_payment_id);
 
                 $payment->update([
                     'status' => 'refunded',

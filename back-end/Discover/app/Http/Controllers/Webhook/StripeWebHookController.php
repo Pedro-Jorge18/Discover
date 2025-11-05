@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Webhook;
 use Stripe\Webhook;
 use App\Models\Payment;
 use Illuminate\Http\Request;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Actions\Payment\FailPaymentAction;
 use App\Actions\Payment\ConfirmPaymentAction;
+use Illuminate\Http\JsonResponse;
 
 class StripeWebHookController extends Controller
 {
@@ -18,7 +18,7 @@ class StripeWebHookController extends Controller
         private FailPaymentAction $failPayment,
     ) {}
 
-    public function handle(Request $request): Response
+    public function handle(Request $request): JsonResponse
     {
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
@@ -34,7 +34,7 @@ class StripeWebHookController extends Controller
         $type = $event->type;
         $data = $event->data['object'];
 
-        Log::info('Stripe webook received', ['type' => $type]);
+        Log::info('Stripe webhook received', ['type' => $type]);
 
         if ($type === 'checkout.session.completed') {
             $paymentIntentId = $data['payment_intent'] ?? null;
