@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 
 //authentication
@@ -18,7 +18,7 @@ Route::prefix('auth')->group(function () {
 
 
 //payment
-Route::prefix('payments')->middleware([auth::sanctum])->group(function () {
+Route::prefix('payments')->middleware(['auth:sanctum'])->group(function () {
     //create checkout
     Route::post('/', [PaymentController::class, 'store'])->name('payments.store');
 
