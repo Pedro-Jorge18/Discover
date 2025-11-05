@@ -5,10 +5,10 @@ namespace App\DTOs\User\Auth;
 class ResetPasswordDto
 {
     public function __construct(
-        public string $email,
-        public string $token,
-        public string $password,
-        public string $password_confirmation,
+        public readonly string $email,
+        public readonly string $token,
+        public readonly string $password,
+        public readonly string $password_confirmation,
     ) {}
 
     public static function fromArray(array $data): self

@@ -7,14 +7,14 @@ use App\Http\Requests\Payment\CreatePaymentRequest;
 class PaymentDTO
 {
     public function __construct(
-        public int $reservation_id,
-        public int $user_id,
-        public float $amount,
-        public string $currency = 'EUR',
-        public string $payment_gateway = 'stripe',
-        public ?int $payment_method_id = null,
-        public ?string $description = null,
-        public ?array $metadata = null,
+        public readonly int $reservation_id,
+        public readonly int $user_id,
+        public readonly float $amount,
+        public readonly string $currency = 'EUR',
+        public readonly string $payment_gateway = 'stripe',
+        public readonly ?int $payment_method_id = null,
+        public readonly ?string $description = null,
+        public readonly ?array $metadata = null,
     ) {}
 
 

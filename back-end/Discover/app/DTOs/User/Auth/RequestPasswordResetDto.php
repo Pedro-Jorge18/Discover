@@ -5,7 +5,7 @@ namespace App\DTOs\User\Auth;
 class RequestPasswordResetDto
 {
     public function __construct(
-        public string $email,
+        public readonly string $email,
     ) {}
 
     public static function fromArray(array $data): self
