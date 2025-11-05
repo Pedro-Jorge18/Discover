@@ -6,7 +6,9 @@ use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
 
-class PropertyRepository implements PropertyRepositoryInterface
+class
+
+PropertyRepository implements PropertyRepositoryInterface
 {
    /*
     1º etapa -> implementação do que vai ser feito.
