@@ -27,7 +27,7 @@ class PasswordResetController extends Controller
                 email: $request->validated('email'),
             );
 
-            $this->requestPasswordResetAction->execute($dto);
+            $this->requestPasswordResetAction->execute($dto->email);
 
             return response()->json([
                 'message' => __('passwords.sent'),
@@ -46,7 +46,7 @@ class PasswordResetController extends Controller
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        try{
+        try {
             $dto = new ResetPasswordDto(
                 email: $request->validated('email'),
                 token: $request->validated('token'),
@@ -54,13 +54,12 @@ class PasswordResetController extends Controller
                 password_confirmation: $request->validated('password_confirmation'),
             );
 
-            $this->resetPasswordAction->execute($dto);
+            $result = $this->resetPasswordAction->execute($dto);
 
-            return response()->([
-                'message' => __('passwords.reset'),
+            return response()->json([
+                'message' => $result['message'],
             ], 200);
-
-        }catch(Throwable $e){
+        } catch (Throwable $e) {
             Log::error('Erro ao redefinir senha', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

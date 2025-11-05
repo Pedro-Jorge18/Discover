@@ -27,7 +27,7 @@ class ResetPasswordDto
             'email' => $this->email,
             'token' => $this->token,
             'password' => $this->password,
-            'pasword_confirmation' => $this->password_confirmation,
+            'password_confirmation' => $this->password_confirmation,
         ];
     }
 }
