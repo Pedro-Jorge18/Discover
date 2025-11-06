@@ -20,6 +20,16 @@ class CreatePaymentAction
 
         try {
             return DB::transaction(function () use ($dto) {
+
+                //create payment record
+                $payment = Payment::create([
+                    'reservation_id' => $dto->reservation_id,
+                    'amount' => $dto->amount,
+                    'currency' => $dto->currency,
+                    'status' => 'pending', // Initial status
+                    'stripe_session_id' => null, // Will be updated after Stripe session creation
+                ]);
+
                 //create Stripe checkout
                 $session = $this->paymentService->createCheckoutSession($dto);
 

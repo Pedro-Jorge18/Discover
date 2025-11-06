@@ -15,13 +15,10 @@ Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
     });
-});
-
-//reset password
-Route::prefix('auth')->group(function () {
     Route::post('/forget-password', [PasswordResetController::class, 'forgetPassword']);
     Route::post('/reset-password', [PasswordResetController::class], 'resetPassword');
 });
+
 
 
 //payment
@@ -40,4 +37,5 @@ Route::prefix('payments')->middleware(['auth:sanctum'])->group(function () {
 });
 
 //webhook
-Route::post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
+
+Route::withoutMiddleware(['auth:sanctum'])->post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');

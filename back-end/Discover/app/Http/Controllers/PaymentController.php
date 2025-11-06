@@ -62,9 +62,10 @@ class PaymentController extends Controller
             ], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json([
                 'error' => 'Erro ao criar sessão de pagamento.',
-                'details' => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -115,7 +116,7 @@ class PaymentController extends Controller
             report($e);
             return response()->json([
                 'error' => 'Error processing refund.',
-                'details' => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }

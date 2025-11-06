@@ -14,7 +14,7 @@ class FailPaymentAction
         DB::transaction(function () use ($payment, $reason) {
             $payment->update([
                 'status' => 'failed',
-                'failure_reason' => $reason ?? 'Unknown fault.',
+                'failure_reason' => $reason ?? 'Unknown failure.',
                 'failed_at' => Carbon::now(),
             ]);
         });

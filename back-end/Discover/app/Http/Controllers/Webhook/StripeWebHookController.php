@@ -38,7 +38,7 @@ class StripeWebHookController extends Controller
 
         if ($type === 'checkout.session.completed') {
             $paymentIntentId = $data['payment_intent'] ?? null;
-            $reservationId = $data['metadata']['reservation_id'] ?? null;
+            $reservationId = isset($data['metadata']) && is_array($data['metadata']) ? ($data['metadata']['reservation_id'] ?? null) : null;
 
             if ($paymentIntentId && $reservationId) {
                 $payment = Payment::where('gateway_intent_id', $paymentIntentId)->first();
@@ -60,7 +60,12 @@ class StripeWebHookController extends Controller
             if ($intentId) {
                 $payment = Payment::where('gateway_intent_id', $intentId)->first();
                 if ($payment) {
-                    $this->failPayment->execute($payment, $data['last_payment_error']['message'] ?? null);
+                    $this->failPayment->execute(
+                        $payment,
+                        isset($data['last_payment_error']['message'])
+                            ? $data['last_payment_error']['message']
+                            : 'Payment failed'
+                    );
                 }
             }
         }
