@@ -21,7 +21,12 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
-        return false;
+        return $payment->user_id === $user->id || $user->is_admin;
+    }
+
+    public function refund(User $user, Payment $payment): bool
+    {
+        return $user->is_admin || $payment->user_id === $user->id;
     }
 
     /**

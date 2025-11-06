@@ -43,7 +43,7 @@ class RegisterUserRequest extends FormRequest
             'email' => strtolower(trim($this->email)),
             'name' => trim($this->name),
             'last_name' => trim($this->last_name),
-            'phone' => preg_replace('/[^0-9]', '',$this->phone),
+            'phone' => preg_replace('/[^0-9]', '', $this->phone),
         ]);
     }
 }
