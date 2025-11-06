@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Payment;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Payment\CreatePaymentRequest;
 
 class PaymentDTO
@@ -24,7 +25,7 @@ class PaymentDTO
 
         return new self(
             reservation_id: (int) ($data['reservation_id'] ?? 0),
-            user_id: (int) ($data['user_id'] ?? 0),
+            user_id: Auth::id(),
             amount: (float) $data['amount'],
             currency: strtoupper($data['currency'] ?? 'EUR'),
             payment_gateway: $data['payment_gateway'] ?? 'stripe',

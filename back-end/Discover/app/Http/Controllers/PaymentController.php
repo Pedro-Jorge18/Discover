@@ -58,7 +58,7 @@ class PaymentController extends Controller
             return response()->json([
                 'message' => 'Payment session created!',
                 'checkout_url' => $result['checkout_url'] ?? null,
-                'session' => $result['session'] ?? null,
+                'payment' => $result['payment'] ?? null,
             ], 201);
         } catch (Throwable $e) {
             report($e);

@@ -67,8 +67,7 @@ class PasswordResetController extends Controller
         }
 
         return response()->json([
-            'message' =>
-            __('auth.password_reset_failed'),
+            'message' => __('auth.password_reset_failed'),
         ], 500);
     }
 }
