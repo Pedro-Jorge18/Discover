@@ -14,7 +14,7 @@ class PropertyService
 {
 
     /*
-     *  5º etapa -> Services toda a logica de negocio, podemos tratar os erros aqui.
+     *  5º etapa -> Services toda a lógica de negocio, podemos tratar os erros aqui.
      *
      *  6º etapa -> resources
      * */

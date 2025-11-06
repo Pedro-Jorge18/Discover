@@ -33,7 +33,7 @@ class StorePropertyRequest extends FormRequest
             'check_in_time' => 'required|date_format:H:i',
             'check_out_time' => 'required|date_format:H:i',
 
-            // LOCALIZÇÃO
+            // LOCALIZAÇÃO
             'address' => 'required|string|max:255',
             'neighborhood' => 'required|string|max:255',
             'postal_code' => 'required|string|max:25',
@@ -66,7 +66,7 @@ class StorePropertyRequest extends FormRequest
     public function messages(): array
     {
         return [
-               //messagens de obrigação
+               //menssagens de obrigação
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',

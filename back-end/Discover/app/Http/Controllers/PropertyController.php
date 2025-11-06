@@ -50,7 +50,7 @@ class PropertyController extends Controller
     public function show(int $id)
     {
         /*
-         * apos as atualizacoes essa que vai valer.
+         * após as atualizacoes essa que vai valer.
          */
         $property = $this->propertyService->find($id);
         if (!$property) {

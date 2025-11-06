@@ -7,7 +7,7 @@ use InvalidArgumentException;
 class PropertyData
 {
     /*
-     4º etapa -> Dados a serem validados para ser tranfeirodas entre camandas
+     4º etapa -> Dados a serem validados para ser tranfeirodas entre camadas
 
     5º etapa -> service
 

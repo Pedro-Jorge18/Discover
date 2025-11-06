@@ -6,10 +6,10 @@ use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
 
 /*
-  2º etapa -> o que tem que ser feito
-     Vai buscar os Dados no DB.
+ * 2º etapa -> o que tem que ser feito
+ *    Vai buscar os Dados no DB.
  *   Repository Eloquent
-  3º etapa -> Action
+ * 3º etapa -> Action
  *
  * */
 interface PropertyRepositoryInterface

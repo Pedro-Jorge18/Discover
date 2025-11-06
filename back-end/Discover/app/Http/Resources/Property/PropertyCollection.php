@@ -25,7 +25,7 @@ class PropertyCollection extends ResourceCollection
 
             'links' => [
                 'first' => $this->resource->url(1),
-                'last' => $this->resource->url($this->lastPage()),
+                'last' => $this->resource->url($this->resource->lastPage()),
                 'prev' => $this->resource->previousPageUrl(),
                 'next' => $this->resource->nextPageUrl(),
             ],
