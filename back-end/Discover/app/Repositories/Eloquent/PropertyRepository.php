@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Collection;
 class PropertyRepository implements PropertyRepositoryInterface
 {
    /*
-    1º etapa -> implementação do que vai ser feito.
-        onde salvar e o que buscar.
-        "Validações dos dados converte para array e no momento só cria e procura"
+    * 1º etapa -> implementação do que vai ser feito.
+    *    onde salvar e o que buscar.
+    *    "Validações dos dados converte para array e no momento só cria e procura"
+    *
+    * 2º etapa -> contract como tem que ser feito
+    */
 
-   2º etapa -> contract como tem que ser feito
-    *
-    *
-    * */
     public function create(array $data): Property
     {
         //Salvar property no DB

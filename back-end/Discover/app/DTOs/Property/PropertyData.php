@@ -76,8 +76,8 @@ class PropertyData
             security_deposit: $data['security_deposit'] ?? null,
             area: $data['area'] ?? null,
             floor: $data['floor'] ?? null,
-            check_in_time: $data['check_in_time'],
-            check_out_time: $data['check_out_time'],
+            check_in_time: $data['check_in_time'] ?? '15:00',
+            check_out_time: $data['check_out_time'] ?? '11:00',
             min_nights: $data['min_nights'] ?? null,
             max_nights: $data['max_nights'] ?? null
 

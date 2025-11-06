@@ -70,7 +70,7 @@ class StorePropertyRequest extends FormRequest
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',
-              'price_per_night.required' => 'The minimum allowed is one night.',
+              'price_per_night.required' => 'The price per night is mandatory.',
               'host_id.required' => 'It has to have a host.',
               'check_in_time.required' => 'It has to have a Check In Time.',
               'check_out_time.required' => 'It has to have a Check Out Time.',
