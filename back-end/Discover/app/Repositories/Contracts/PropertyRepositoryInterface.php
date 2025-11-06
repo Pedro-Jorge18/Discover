@@ -2,10 +2,8 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Http\Requests\StorePropertyRequest;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
-
 
 /*
   2º etapa -> o que tem que ser feito

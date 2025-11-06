@@ -23,7 +23,7 @@ class PropertyResource extends JsonResource
             'description' => $this->description,
             'summary' => $this->summary,
 
-            // definção dos preços
+            // definição dos preços
             'price' => [
                 'per_night' => number_format($this->price_per_night,2,'.',''),
                 'cleaning_fee' => number_format($this->cleaning_fee,2,'.',''),
@@ -31,7 +31,7 @@ class PropertyResource extends JsonResource
                 'total_per_night' =>(float)$this->price_per_night + $this->cleaning_fee + $this->service_fee,
                 'currency' => 'EUR',
             ],
-            // defenir o endereço
+            // definir o endereço
             'location' => [
                 'address' => $this->address,
                 'neighborhood' => $this->neighborhood,

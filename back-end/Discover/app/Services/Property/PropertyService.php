@@ -8,7 +8,7 @@ use App\Repositories\Contracts\PropertyRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+
 
 class PropertyService
 {
@@ -60,7 +60,7 @@ class PropertyService
             throw $exception;
         }
     }
-    // Listagem de pagi
+    // Listagem de paginação
     public function listPaginated(int $perPage = 15) : LengthAwarePaginator
     {
         try {

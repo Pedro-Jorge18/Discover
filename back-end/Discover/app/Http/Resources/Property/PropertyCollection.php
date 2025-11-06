@@ -10,7 +10,7 @@ class PropertyCollection extends ResourceCollection
     /*
      *  6º etapa -> recources - formatacao das paginas lista delas
      *
-     *  7º etapa -> serviceProvide
+     *  7º etapa -> serviceProvider
      * */
     public function toArray(Request $request): array
     {

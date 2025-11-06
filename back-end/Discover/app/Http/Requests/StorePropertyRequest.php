@@ -33,7 +33,7 @@ class StorePropertyRequest extends FormRequest
             'check_in_time' => 'required|date_format:H:i',
             'check_out_time' => 'required|date_format:H:i',
 
-            // lOCALIZÇÃO
+            // LOCALIZÇÃO
             'address' => 'required|string|max:255',
             'neighborhood' => 'required|string|max:255',
             'postal_code' => 'required|string|max:25',
@@ -70,7 +70,7 @@ class StorePropertyRequest extends FormRequest
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',
-              'price_per_night.required' => 'The minimum allowed is one nigh.',
+              'price_per_night.required' => 'The minimum allowed is one night.',
               'host_id.required' => 'It has to have a host.',
               'check_in_time.required' => 'It has to have a Check In Time.',
               'check_out_time.required' => 'It has to have a Check Out Time.',

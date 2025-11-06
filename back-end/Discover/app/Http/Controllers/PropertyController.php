@@ -7,9 +7,7 @@ use App\Http\Resources\Property\PropertyCollection;
 use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Services\Property\PropertyService;
-use Illuminate\Http\JsonResponse;
 use App\Http\Requests\UpdatePropertyRequest;
-use App\Repositories\Contracts\PropertyRepositoryInterface;
 
 class PropertyController extends Controller
 {
@@ -39,7 +37,7 @@ class PropertyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePropertyRequest $request): JsonResponse
+    public function store(StorePropertyRequest $request)
     {
         $property = $this->propertyService->create($request->validated());
 
@@ -49,7 +47,7 @@ class PropertyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id) :JsonResponse
+    public function show(int $id)
     {
         /*
          * apos as atualizacoes essa que vai valer.

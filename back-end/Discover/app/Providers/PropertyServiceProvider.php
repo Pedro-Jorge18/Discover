@@ -11,7 +11,7 @@ class PropertyServiceProvider extends ServiceProvider
 {
 
     /*
-     *  7º etapa -> ServiceProvider - Conecção de tudo que foi feito.
+     *  7º etapa -> ServiceProvider - Conexão de tudo que foi feito.
      *
      * */
     public function register(): void
