@@ -20,13 +20,13 @@ return [
         'success' => 'Logout successful.',
         'failed' => 'Logout failed.',
     ],
-    'auth' => [
-        'success' => 'Authentication successful.',
-        'failed' => 'Authentication failed.',
-        'user_not_authenticated' => 'User not authenticated.',
-    ],
     'token' => [
         'success' => 'Token generated successfully',
         'failed' => 'Failed to generate token.',
-    ]
+    ],
+
+    'success' => 'Authentication successful.',
+    'failed' => 'Authentication failed.',
+    'user_not_authenticated' => 'User not authenticated.',
+
 ];
