@@ -35,7 +35,7 @@ class EnableTwoFactorAuthAction
             ];
         } catch (\Throwable $e) {
             Log::error('Erro ao habilitar 2FA' . [
-                'user_id' => $dto->user?->id,
+                'user_id' => $user->id ?? null,
                 'error' => $e->getMessage(),
             ]);
 

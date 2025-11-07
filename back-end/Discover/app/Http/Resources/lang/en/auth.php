@@ -28,5 +28,11 @@ return [
     'success' => 'Authentication successful.',
     'failed' => 'Authentication failed.',
     'user_not_authenticated' => 'User not authenticated.',
+    'unauthenticated' => 'You must be logged in.',
+    '2fa' => [
+        'enabled_success' => 'Two-factor authentication enabled successfully.',
+        'verified_success' => 'Two-factor authentication verified successfully.',
+        'invalid_code' => 'Invalid verification code.',
+    ],
 
 ];
