@@ -66,7 +66,7 @@ class PropertyService
         try {
             return $this->propertyRepository->getPaginated($perPage);
         } catch (\Throwable $exception) {
-            Log::error('Error listing properties: '.$exception->getMessage(),[
+            Log::error('Error listing properties: '.$exception->getMessage(), [
                 'perPage='.$perPage,
                 'exception' => $exception->getTraceAsString(),
             ]);

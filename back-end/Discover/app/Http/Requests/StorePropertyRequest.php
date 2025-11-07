@@ -30,8 +30,8 @@ class StorePropertyRequest extends FormRequest
             'price_per_night' => 'required|numeric|min:1',
 
             'host_id' => 'required|integer|exists:users,id',
-            'check_in_time' => 'required|date_format:H:i',
-            'check_out_time' => 'required|date_format:H:i',
+            'check_in_time' => 'required|date_format: Ymd H:i :s',
+            'check_out_time' => 'required|date_format: Ymd H:i :s',
 
             // LOCALIZAÇÃO
             'address' => 'required|string|max:255',
@@ -66,7 +66,7 @@ class StorePropertyRequest extends FormRequest
     public function messages(): array
     {
         return [
-               //menssagens de obrigatórias
+            // mensagens de acompanhamento
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',
@@ -76,14 +76,14 @@ class StorePropertyRequest extends FormRequest
               'check_out_time.required' => 'It has to have a Check Out Time.',
               'address.required' => 'Address is required.',
               'neighborhood.required' => 'Neighborhood is required.',
-              'postal_code.required' => 'Postal code is required',
-              'city_id.required' => 'City is required',
-              'property_type_id.required' => 'Property Type is required',
-              'listing_type_id.required' => 'Listing Type is required',
-              'max_guests.required' => 'Maximum number of guests is required',
-              'bedrooms.required' => 'Number of bedrooms is required',
-              'beds.required' => 'Number of beds is required',
-              'bathrooms.required' => 'Number of bathrooms is required',
+              'postal_code.required' => 'Postal code is required.',
+              'city_id.required' => 'City is required.',
+              'property_type_id.required' => 'Property Type is required.',
+              'listing_type_id.required' => 'Listing Type is required.',
+              'max_guests.required' => 'Maximum number of guests is required.',
+              'bedrooms.required' => 'Number of bedrooms is required.',
+              'beds.required' => 'Number of beds is required.',
+              'bathrooms.required' => 'Number of bathrooms is required.',
         ];
     }
 }
