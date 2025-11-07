@@ -15,16 +15,11 @@ class PropertyData
     public function __construct(
         public string $title,
         public string $description,
-        public ?string $summary = null,
         public float $price_per_night,
-
         public string $address,
         public string $neighborhood,
         public string $postal_code,
         public int $city_id,
-        public ?float  $latitude  = null,
-        public ?float  $longitude = null,
-
         public int $host_id,
         public int $property_type_id,
         public int $listing_type_id,
@@ -33,6 +28,9 @@ class PropertyData
         public int $beds = 1,
         public int $bathrooms = 1,
 
+        public ?string $summary = null,
+        public ?float  $latitude  = null,
+        public ?float  $longitude = null,
         public ?float $cleaning_fee = 0,
         public ?float $service_fee = 0,
         public ?float $security_deposit = 0,
@@ -42,7 +40,6 @@ class PropertyData
         public string $check_out_time = '11:00',
         public ?int $min_nights = 1,
         public ?int $max_nights = 30
-
 
     )
     {
@@ -56,14 +53,11 @@ class PropertyData
         return new self(
             title: $data['title'],
             description: $data['description'],
-            summary: $data['summary'] ?? null,
             price_per_night: $data['price_per_night'],
             address: $data['address'],
             neighborhood: $data['neighborhood'],
             postal_code: $data['postal_code'],
             city_id: $data['city_id'],
-            latitude: $data['latitude'] ?? null,
-            longitude: $data['longitude'] ?? null,
             host_id: $data['host_id'],
             property_type_id: $data['property_type_id'],
             listing_type_id: $data['listing_type_id'],
@@ -71,15 +65,19 @@ class PropertyData
             bedrooms: $data['bedrooms'],
             beds: $data['beds'],
             bathrooms: $data['bathrooms'],
-            cleaning_fee: $data['cleaning_fee'] ?? null,
-            service_fee: $data['service_fee'] ?? null,
-            security_deposit: $data['security_deposit'] ?? null,
+
+            summary: $data['summary'] ?? null,
+            latitude: $data['latitude'] ?? null,
+            longitude: $data['longitude'] ?? null,
+            cleaning_fee: $data['cleaning_fee'] ?? 0.0,
+            service_fee: $data['service_fee'] ?? 0.0,
+            security_deposit: $data['security_deposit'] ?? 0.0,
             area: $data['area'] ?? null,
             floor: $data['floor'] ?? null,
             check_in_time: $data['check_in_time'] ?? '15:00',
             check_out_time: $data['check_out_time'] ?? '11:00',
-            min_nights: $data['min_nights'] ?? null,
-            max_nights: $data['max_nights'] ?? null
+            min_nights: $data['min_nights'] ?? 1,
+            max_nights: $data['max_nights'] ?? 30
 
         );
     }
