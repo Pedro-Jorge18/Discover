@@ -2,6 +2,7 @@
 
 namespace App\Actions\Auth\TwoFactor;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use App\DTOs\Auth\TwoFactor\DisableTwoFactorDto;
 
