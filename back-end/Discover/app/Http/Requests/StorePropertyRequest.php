@@ -66,7 +66,7 @@ class StorePropertyRequest extends FormRequest
     public function messages(): array
     {
         return [
-               //menssagens de obrigação
+               //menssagens de obrigatórias
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
               'summary.required' => 'It has to have a summary.',
@@ -74,8 +74,8 @@ class StorePropertyRequest extends FormRequest
               'host_id.required' => 'It has to have a host.',
               'check_in_time.required' => 'It has to have a Check In Time.',
               'check_out_time.required' => 'It has to have a Check Out Time.',
-              'address.required' => 'Address is required',
-              'neighborhood.required' => 'Neighborhood is required',
+              'address.required' => 'Address is required.',
+              'neighborhood.required' => 'Neighborhood is required.',
               'postal_code.required' => 'Postal code is required',
               'city_id.required' => 'City is required',
               'property_type_id.required' => 'Property Type is required',

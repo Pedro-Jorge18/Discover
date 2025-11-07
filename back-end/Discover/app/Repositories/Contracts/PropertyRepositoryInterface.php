@@ -19,7 +19,8 @@ interface PropertyRepositoryInterface
 
     // "vai buscar a propriedade pelo id, se não encontrar volta nulo"
     public function findById(int $id): ?Property;
-
+    public function update(int $id, array $data): bool;
+    public function delete(int $id): bool;
     public function getAll():Collection;
 
     public function getPaginated(int $perPage = 15);

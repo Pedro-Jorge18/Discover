@@ -28,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Se quiseres agrupar middleware para o grupo “api”:
         //$middleware->appendToGroup('api', [
-        //    'auth.sanctum',
+         //   'auth.sanctum',
         //]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -78,16 +78,41 @@ class PropertyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePropertyRequest $request, Property $property)
+    public function update(UpdatePropertyRequest $request, int $id)
     {
-        //
+        $updated = $this->propertyService->update($id, $request->validated());
+
+        if (!$updated) {
+            return response()->json(['error' => 'Property not found'], 404);
+        }
+
+        $property = $this->propertyService->find($id);
+        $property->load([
+            'host',
+            'propertyType',
+            'listingType',
+            'city',
+            'images'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => new PropertyResource($property),
+            'message' => 'Property updated successfully'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Property $property)
+    public function destroy(int $id)
     {
-        //
+        $deleted = $this->propertyService->delete($id);
+
+        if (!$deleted) {
+            return response()->json(['error' => 'Property not found'], 404);
+        }
+
+        return response()->json([null,204]);
     }
 }

@@ -27,7 +27,25 @@ class PropertyRepository implements PropertyRepositoryInterface
         // "procurar a propriedade"
         return Property::find($id);
     }
+    public function update(int $id, array $data): bool
+    {
+        $property = Property::find($id);
 
+        if(!$property){
+            return false;
+        }
+        return $property->update($data);
+    }
+    public function delete(int $id): bool
+    {
+        $property =Property::find($id);
+
+        if(!$property){
+            return false;
+
+        }
+        return $property->delete();
+    }
     public function getAll():Collection
     {
         return Property::all();
