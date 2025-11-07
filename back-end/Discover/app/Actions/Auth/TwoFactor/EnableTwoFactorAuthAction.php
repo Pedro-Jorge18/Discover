@@ -2,56 +2,44 @@
 
 namespace App\Actions\Auth\TwoFactor;
 
-use PragmaRX\Google2FA\Google2FA;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use App\DTOs\User\Auth\TwoFactorl\EnableTwoFactorDto;
+use App\Services\TwoFactor\TwoFactorAuthService;
+use Illuminate\Auth\Access\AuthorizationException;
+use App\DTOs\User\Auth\TwoFactor\EnableTwoFactorDto;
 
 class EnableTwoFactorAuthAction
 {
     public function __construct(
-        protected Google2FA $google2fa
+        protected TwoFactorAuthService $twoFactorAuthService
     ) {}
 
     public function execute(EnableTwoFactorDto $dto): array
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            throw new \RuntimeException(__('auth.user_not_authenticated'));
-        }
 
         try {
-            //create a new secret key
-            $secretKey = $this->google2fa->generateSecretKey();
+            $user = $dto->userId ?? Auth::user();
 
-            //create url for qr code
-            $qrCodeUrl = $this->google2fa->getQRCodeUrl(
-                config('app.name'),
-                $user->email,
-                $secretKey
-            );
+            if (!$user) {
+                throw new AuthorizationException(__('auth.unauthenticated'));
+            }
 
-            //update user with secret without activate
-            $user->update([
-                'two_factor_secret' => encrypt($secretKey),
-                'two_factor_enabled' => false,
-            ]);
-
-            Log::info('Two-factor secret generated', ['user_id' => $user->id]);
+            //create and generate the 2FA service
+            $data = $this->twoFactorAuthService->enable($user);
 
             return [
-                'qr_code_url' => $qrCodeUrl,
-                'secret_key' => $secretKey,
-                'message' => __('two_factor_secret_generated'),
+                'message' => __('auth.2fa.enabled.success'),
+                'secret' => $data['secret'],
+                'qr_code' => $data['qr_code'],
             ];
         } catch (\Throwable $e) {
-            Log::error('Failed to enable two-factor auth' . [
-                'user_id' => $user->id ?? null,
+            Log::error('Erro ao habilitar 2FA' . [
+                'user_id' => $dto->user?->id,
                 'error' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException(__('two_factor.enable_failed'));
+            throw $e;
         }
     }
 }

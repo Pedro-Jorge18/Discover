@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTOs\User\Auth\TwoFactorl;
+namespace App\DTOs\User\Auth\TwoFactor;
 
 
 final readonly class EnableTwoFactorDto
