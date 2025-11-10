@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\DTOs\User\Auth\RegisterUserDto;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\User\UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\DTOs\User\Auth\AuthenticateUserDto;
 use App\Actions\Auth\LogoutUserAction;
@@ -15,7 +15,6 @@ use App\Actions\Auth\AuthenticateUserAction;
 use App\Http\Requests\Users\Auth\LoginUserRequest;
 use App\Http\Requests\Users\Auth\RegisterUserRequest;
 use App\Actions\Auth\GetAuthenticatedUserAction;
-use Illuminate\Auth\Middleware\Authenticate;
 
 class AuthController extends Controller
 {
