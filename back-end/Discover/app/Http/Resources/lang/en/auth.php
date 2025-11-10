@@ -33,6 +33,11 @@ return [
         'enabled_success' => 'Two-factor authentication enabled successfully.',
         'verified_success' => 'Two-factor authentication verified successfully.',
         'invalid_code' => 'Invalid verification code.',
+        'enable_failed' => 'Two-factor authentication enabled failed.',
+        'verify_failed' => 'Two-factor authentication verification failed.',
+        'disabled_success' => 'Two-factor authentication disabled successfully.',
+        'disable_failed' => 'Two-factor authentication disabled failed.',
+
     ],
 
 ];

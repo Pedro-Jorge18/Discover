@@ -7,7 +7,6 @@ use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Log;
 use App\ValueObjects\TwoFactor\TwoFactorSecret;
 use App\Repositories\Eloquent\TwoFactorRepository;
-use Illuminate\Auth\Events\Login;
 
 class TwoFactorAuthService
 {
