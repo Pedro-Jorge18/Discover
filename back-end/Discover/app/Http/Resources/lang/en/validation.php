@@ -35,4 +35,37 @@ return [
     ],
     'in' => 'The selected :attribute is invalid.',
     'boolean' => 'The :attribute field must be true or false.',
+
+
+
+    //user
+    'login' => [
+        'invalid_credentials' => 'Invalid email or password.',
+        'success' => 'Login successful.',
+        'failed' => 'Login failed.',
+
+    ],
+    'register' => [
+        'success' => 'Registration successful.',
+        'failed' => 'Registration failed.',
+    ],
+    'validation' => [
+        'email_exists' => 'This email is already registered.',
+        'phone_exists' => 'This phone number is already in use.',
+        'birthday_invalid' => 'Invalid birth date.',
+    ],
+    'logout' => [
+        'success' => 'Logout successful.',
+        'failed' => 'Logout failed.',
+    ],
+    'token' => [
+        'success' => 'Token generated successfully',
+        'failed' => 'Failed to generate token.',
+    ],
+    "auth" => [
+        'success' => 'Authentication successful.',
+        'failed' => 'Authentication failed.',
+        'user_not_authenticated' => 'User not authenticated.',
+    ],
+
 ];
