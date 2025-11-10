@@ -4,13 +4,21 @@ namespace App\Actions\Auth\TwoFactor;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use App\DTOs\Auth\TwoFactor\DisableTwoFactorDto;
+use App\DTOs\User\Auth\TwoFactor\DisableTwoFactorDto;
+use App\Services\TwoFactor\TwoFactorAuthService;
 
 class DisableTwoFactorAuthAction
 {
-    public function execute(User $user, DisableTwoFactorDto $dto): bool
+    public function __construct(
+        protected TwoFactorAuthService $twoFactorAuthService,
+    ) {}
+
+    public function execute(DisableTwoFactorDto $dto): bool
     {
         try {
+
+            $user = User::findOrFail($dto->userId);
+
             if (!$user->two_factor_enabled) {
                 Log::info('Tentativa de desativar 2FA, mas já estava desativado', [
                     'user_id' => $user->id,
@@ -19,12 +27,7 @@ class DisableTwoFactorAuthAction
                 return false;
             }
 
-            $user->update([
-                'two_factor_secret' => null,
-                'two_factor_enabled' => false,
-                'two_factor_confirmed' => false,
-                'two_factor_recovery_codes' => null,
-            ]);
+            $this->twoFactorAuthService->disable($user);
 
             return true;
         } catch (\Throwable $e) {

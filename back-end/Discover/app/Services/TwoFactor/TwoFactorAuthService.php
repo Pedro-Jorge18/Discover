@@ -7,8 +7,7 @@ use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Log;
 use App\ValueObjects\TwoFactor\TwoFactorSecret;
 use App\Repositories\Eloquent\TwoFactorRepository;
-
-
+use Illuminate\Auth\Events\Login;
 
 class TwoFactorAuthService
 {
@@ -52,12 +51,12 @@ class TwoFactorAuthService
     //disable the 2FA and remove the user secret
     public function disable(User $user): void
     {
-        try{
+        try {
             $this->repository->clearSecret($user);
-        }catch(\Throwable $e){
-            Lof::info('Erro ao desativar autenticação 2FA.', [
+        } catch (\Throwable $e) {
+            Log::info('Erro ao desativar autenticação 2FA.', [
                 'user_id' => $user->id ?? null,
-                'error' => $e->getMessage();
+                'error' => $e->getMessage(),
             ]);
             throw $e;
         }

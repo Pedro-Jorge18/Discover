@@ -5,9 +5,8 @@ namespace App\Actions\Auth\TwoFactor;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
-use App\DTOs\Auth\TwoFactor\VerifyTwoFactorDto;
+use App\DTOs\User\Auth\TwoFactor\VerifyTwoFactorDto;
 use App\Services\TwoFactor\TwoFactorAuthService;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -20,7 +19,7 @@ class VerifyTwoFactorCodeAction
     public function execute(VerifyTwoFactorDto $dto): bool
     {
         try {
-            $user = $dto->userId ?? Auth::user();
+            $user = $dto->userId ? User::find($dto->userId) : Auth::user();
 
             if (!$user) {
                 throw new AuthorizationException(__('auth.unauthenticated'));

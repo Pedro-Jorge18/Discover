@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTOs\Auth\TwoFactor;
+namespace App\DTOs\User\Auth\TwoFactor;
 
 final readonly class VerifyTwoFactorDto
 {

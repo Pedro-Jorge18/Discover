@@ -45,7 +45,7 @@ final readonly class TwoFactorSecret
         return $google2FA->verifyKey($this->secret, $code);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->secret;
     }

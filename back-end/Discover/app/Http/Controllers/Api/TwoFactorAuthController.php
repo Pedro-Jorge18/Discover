@@ -7,8 +7,8 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\DTOs\Auth\TwoFactor\VerifyTwoFactorDto;
-use App\DTOs\Auth\TwoFactor\DisableTwoFactorDto;
+use App\DTOs\User\Auth\TwoFactor\VerifyTwoFactorDto;
+use App\DTOs\User\Auth\TwoFactor\DisableTwoFactorDto;
 use App\DTOs\User\Auth\TwoFactor\EnableTwoFactorDto;
 use App\Http\Requests\Users\Auth\EnableTwoFactorRequest;
 use App\Http\Requests\Users\Auth\VerifyTwoFactorRequest;
@@ -30,7 +30,7 @@ class TwoFactorAuthController extends Controller
     {
         try {
             $user = Auth::user();
-            $dto = new EnableTwoFactorDto($user);
+            $dto = new EnableTwoFactorDto($user->id);
 
             $data = $this->enableTwoFactorAuthAction->execute($dto);
 
@@ -54,7 +54,7 @@ class TwoFactorAuthController extends Controller
         try {
             $user = Auth::user();
             $dto = new VerifyTwoFactorDto(
-                $user,
+                $user->id,
                 $request->input('code')
             );
 
@@ -80,7 +80,7 @@ class TwoFactorAuthController extends Controller
     {
         try {
             $user = Auth::user();
-            $dto = new DisableTwoFactorDto($user);
+            $dto = new DisableTwoFactorDto($user->id);
 
             $disabled = $this->disableTwoFactorAuthAction->execute($dto);
 
