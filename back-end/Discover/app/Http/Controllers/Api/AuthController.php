@@ -15,7 +15,6 @@ use App\Actions\Auth\AuthenticateUserAction;
 use App\Http\Requests\Users\Auth\LoginUserRequest;
 use App\Http\Requests\Users\Auth\RegisterUserRequest;
 use App\Actions\Auth\GetAuthenticatedUserAction;
-use Illuminate\Auth\Middleware\Authenticate;
 
 class AuthController extends Controller
 {
