@@ -24,7 +24,7 @@ class StorePropertyImageRequest extends FormRequest
         return [
             'images' => 'required|array|min:1|max:10',
             'images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
-            'primary_index' => 'sometimes|integer|min:0',
+            'primary_index' => 'sometimes|integer|min:0|lt:images',
             'captions' => 'sometimes|array',
             'captions.*' => 'sometimes|string|max:255',
             'alt_texts' => 'sometimes|array',

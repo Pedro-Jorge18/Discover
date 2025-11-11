@@ -29,7 +29,7 @@ Route::prefix('auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
     });
     Route::post('/forgot-password', [PasswordResetController::class, 'forgetPassword']);
-    Route::post('/reset-password', [PasswordResetController::class], 'resetPassword');
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 });
 
 

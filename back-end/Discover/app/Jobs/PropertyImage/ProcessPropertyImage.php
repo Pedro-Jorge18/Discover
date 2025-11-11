@@ -54,12 +54,12 @@ class ProcessPropertyImage implements ShouldQueue
             //  5. Save thumbnail to public storage
             Storage::disk('public')->put($thumbnailPath, (string) $thumbnail);
 
-            Log::info("Job ProcessPropertyImage: Thumbnail criado com sucesso para Imagem ID: {$image->id}");
+            Log::info("Job ProcessPropertyImage: Thumbnail created successfully for Image ID: {$image->id}");
 
         } catch (\Throwable $exception) {
 
             //If it fails, it logs and fails the job (it will be retried)
-            Log::error("Job ProcessPropertyImage falhou para ID {$image->id}: " . $exception->getMessage());
+            Log::error("Job ProcessPropertyImage failed for ID {$image->id}: " . $exception->getMessage());
 
             // Fail the Job for retry (because of --tries=3)
             $this->fail($exception);

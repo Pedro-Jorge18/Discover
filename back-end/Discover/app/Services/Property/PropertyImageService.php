@@ -6,12 +6,17 @@ use App\Models\Property;
 use App\Models\PropertyImage;
 use App\DTOs\Property\PropertyImageData;
 use Illuminate\Http\UploadedFile;
+use App\Actions\Files\DeleteFilesAction;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\PropertyImage\ProcessPropertyImage;
 
 class PropertyImageService
 {
+    public function __construct(
+        private DeleteFilesAction $deleteFilesAction
+    ) {}
     public function uploadImages(Property $property, array $images, array $data = []): array
     {
         \Log::info('PropertyImageService: uploadImages started', [
@@ -21,6 +26,9 @@ class PropertyImageService
         ]);
 
         $uploadedImages = []; // array de imagens
+        $uploadedFiles = [];
+
+        DB::beginTransaction();
 
         try {
             $primaryIndex = $data['primary_index'] ?? 0;
@@ -36,11 +44,18 @@ class PropertyImageService
                 $imageData = $this->createImageData($property, $image, $index, $data, $primaryIndex);
                 $uploadedImage = $this->uploadSingleImage($imageData);
                 $uploadedImages[] = $uploadedImage;
+                $uploadedFiles[] = $uploadedImage->image_path;
             }
 
+            DB::commit();
             return $uploadedImages;
 
         } catch (\Throwable $exception) {
+            DB::rollBack();
+
+            if (!empty($uploadedFiles)) {
+                $this->deleteFilesAction->rollbackPropertyImages($uploadedFiles);
+            }
             Log::error('Error uploading property images: '.$exception->getMessage());
             throw $exception;
         }
@@ -100,10 +115,7 @@ class PropertyImageService
     public function deleteImage(PropertyImage $image): bool
     {
         try {
-            // Delete files from storage
-            Storage::disk('public')->delete($image->image_path);
-            $thumbnailPath = str_replace('/images/', '/thumbnails/', $image->image_path);
-            Storage::disk('public')->delete($thumbnailPath);
+            $this->deleteFilesAction->rollbackPropertyImages([$image->image_path]);
 
             // Se era primária, definir outra como primária
             if ($image->is_primary) {
