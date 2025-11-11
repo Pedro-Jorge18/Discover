@@ -2,65 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PropertyImage;
 use App\Http\Requests\StorePropertyImageRequest;
-use App\Http\Requests\UpdatePropertyImageRequest;
+use App\Http\Resources\Property\PropertyImageResource;
+use App\Models\Property;
+use App\Models\PropertyImage;
+use App\Services\Property\PropertyImageService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PropertyImageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(
+        private PropertyImageService $service
+    ) {}
+
+    public function store(StorePropertyImageRequest $request, Property $property): JsonResponse
     {
-        //
+        $metadata = $request->safe()->except(['images']);
+            $uploaded = $this->service->uploadImages(
+                $property,
+                $request->file('images'),
+                $metadata
+            );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Images uploaded successfully',
+            'images' => $uploaded
+        ], 201);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function setPrimary(Property $property, PropertyImage $image): JsonResponse
     {
-        //
+        $this->service->setPrimaryImage($image);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Primary image set successfully'
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePropertyImageRequest $request)
+    public function reorder(Request $request, Property $property): JsonResponse
     {
-        //
+        $orderData = $request->input('order',[]);
+        $this->service->reorderImages($property, $orderData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Images reordered successfully'
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PropertyImage $propertyImage)
+    public function destroy(Property $property, PropertyImage $image): JsonResponse
     {
-        //
-    }
+        $this->service->deleteImage($image);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PropertyImage $propertyImage)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePropertyImageRequest $request, PropertyImage $propertyImage)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PropertyImage $propertyImage)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'message' => 'Image deleted successfully'
+        ]);
     }
 }

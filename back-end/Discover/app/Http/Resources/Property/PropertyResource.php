@@ -63,12 +63,20 @@ class PropertyResource extends JsonResource
                 'published' => (bool) $this->published,
             ],
 
+            'host' => $this->whenLoaded('host', function() {
+                return $this->host ? [
+                    'id' => $this->host->id,
+                    'name' => $this->host->name,
+                    'email' => $this->host->email
+                ] : null;
+            }),
+            'images' => PropertyImageResource::collection($this->whenLoaded('images')),
             /*
-            'host' => new UserResource($this->whenLoaded('host')),
+
             'property_type' => new PropertyTypeResource($this->whenLoaded('propertyType')),
             'listing_type' => new ListingTypeResource($this->whenLoaded('listingType')),
             'city' => new CityResource($this->whenLoaded('city')),
-            'images' => PropertyImageResource::collection($this->whenLoaded('images')),
+
 
             // metricas para futuras rotas
             'metrics' => [

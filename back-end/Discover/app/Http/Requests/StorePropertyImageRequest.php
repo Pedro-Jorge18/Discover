@@ -11,7 +11,7 @@ class StorePropertyImageRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,24 @@ class StorePropertyImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'images' => 'required|array|min:1|max:10',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
+            'primary_index' => 'sometimes|integer|min:0',
+            'captions' => 'sometimes|array',
+            'captions.*' => 'sometimes|string|max:255',
+            'alt_texts' => 'sometimes|array',
+            'alt_texts.*' => 'sometimes|string|max:255',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'images.required' => 'min one image is required.',
+            'images.*.image' => 'Each file must be a valid image.',
+            'images.*.mimes' => 'only jpeg,png,jpg format are allowed.',
+            'images.*.max' => 'Max file size is 5MB.',
+
         ];
     }
 }

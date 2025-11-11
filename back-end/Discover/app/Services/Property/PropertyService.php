@@ -2,120 +2,184 @@
 
 namespace App\Services\Property;
 
-use App\Models\Property;
+use App\Actions\Property\CreatePropertyAction;
+use App\Actions\Property\DeletePropertyAction;
+use App\Actions\Property\FindPropertyAction;
+use App\Actions\Property\UpdatePropertyAction;
+use App\Http\Resources\Property\PropertyCollection;
+use App\Http\Resources\Property\PropertyResource;
 use App\DTOs\Property\PropertyData;
-use App\Repositories\Contracts\PropertyRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Services\Property\PropertyImageService;
+use Illuminate\Support\Facades\Auth;
 
 
 class PropertyService
 {
 
-    /*
-     *  5º etapa -> Services toda a lógica de negocio, podemos tratar os erros aqui.
-     *
-     *  6º etapa -> resources
-     * */
     public function __construct(
-        private PropertyRepositoryInterface $propertyRepository,
+        private CreatePropertyAction $createPropertyAction,
+        private FindPropertyAction $findPropertyAction,
+        private UpdatePropertyAction $updatePropertyAction,
+        private DeletePropertyAction $deletePropertyAction,
+        private PropertyImageService $propertyImageService,
     ) {}
 
-    public function create(array $data)
+    public function createService(array $data): JsonResponse
     {
+        $images = $data['images'] ?? [];
+        unset($data['images']);
         try {
-            // dado para o DTO
+            if (!Auth::check()) {
+                throw new \Exception('Authentication required to create property.');
+            }
+            $data['host_id'] = Auth::id();
+            // dados do DTO
             $propertyData = PropertyData::fromArray($data);
 
-             // Action executa e cria
-            return $this->propertyRepository->create($propertyData->toArray());
-        } catch (\Throwable $exception){
-            Log::error('Error creating property: '.$exception->getMessage(),[
-                'data'=>$data,
-                'exception'=>$exception->getTraceAsString(),
-            ]);
+            //Usa o Action
+            $property = $this->createPropertyAction->execute($propertyData->toArray());
 
-            throw $exception;
+            if (!empty($images)){
+                $this->propertyImageService->uploadImages($property, $images,$data);
+            }
+            // Relações
+            $property->load(['host','propertyType','listingType','city','images']);
+
+            return response()->json([
+                'success' => true,
+                'data' => new PropertyResource($property),
+                'message' => 'Property created successfully',
+            ],201);
+
+        } catch (\Throwable $exception){
+            Log::error('Error creating property: '.$exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Creation failed:' .$exception->getTraceAsString(),
+            ],500);
+
         }
     }
-    public function find(int $id): ?Property
+    public function findService(int $id): JsonResponse
     {
         try {
-            return $this->propertyRepository->findById($id);
+            $property = $this->findPropertyAction->execute($id);
+
+            if (!$property) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Property not found'
+                ], 404);
+            }
+
+            $property->load(['host','propertyType','listingType','city','images']);
+
+            return response()->json([
+                'success' => true,
+                'data' => new PropertyResource($property),
+            ]);
+
         } catch (\Throwable $exception){
-            Log::error('Error finding property: '.$exception->getMessage(),[
+            Log::error('Error finding property: '.$exception->getMessage());
+            return response()->json([
                 'data'=>$id,
                 'exception'=>$exception->getTraceAsString(),
-            ]);
-            throw $exception;
-        }
-    }
-    public function listAll() : Collection
-    {
-        try {
-            return $this->propertyRepository->getAll();
-        } catch (\Throwable $exception) {
-            Log::error('Error listing properties: '.$exception->getMessage());
-            throw $exception;
-        }
-    }
-    // Listagem de paginação
-    public function listPaginated(int $perPage = 15) : LengthAwarePaginator
-    {
-        try {
-            return $this->propertyRepository->getPaginated($perPage);
-        } catch (\Throwable $exception) {
-            Log::error('Error listing properties: '.$exception->getMessage(), [
-                'perPage='.$perPage,
-                'exception' => $exception->getTraceAsString(),
-            ]);
-            throw $exception;
+            ],500);
+
         }
     }
 
-    public function update(int $id, array $data): bool
+    // Listagem de paginação
+    public function listService(): JsonResponse
+    {
+        try {
+            $property = $this->findPropertyAction->executePaginated(15);
+
+            return response()->json([
+                'success' => true,
+                'data' => new PropertyCollection($property),
+            ]);
+
+        } catch (\Throwable $exception) {
+            Log::error('Error listing properties: '.$exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Error listing properties: '
+            ],500);
+
+        }
+    }
+
+    public function updateService(int $id, array $data): JsonResponse
     {
         try {
 
             //preço não poder ser menor que 1
-            if (isset($date['price_per_night']) && $date['price_per_night'] <  1 ){
+            if (isset($data['price_per_night']) && $data['price_per_night'] <  1 ){
                 throw new \Exception('Price per night must be greater than 1');
             }
 
+            $updated = $this->updatePropertyAction->execute($id, $data);
+
+            if (!$updated) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Property not found'
+                ], 404);
+            }
+
             // validação de quantidade de hóspides
-            if (isset($date['max_guests']) && $date['max_guests'] <  1 ){
+            if (isset($data['max_guests']) && $data['max_guests'] <  1 ){
                 throw new \Exception('Maximum number of guests must be greater than 1');
             }
 
             // quantidade de camas
-            if (isset($date['beds']) && $date['beds'] <  1 ){
+            if (isset($data['beds']) && $data['beds'] <  1 ){
                 throw new \Exception('Beds must be greater than 1');
             }
 
-            return $this->propertyRepository->update($id, $data);
+            $property = $this->findPropertyAction->execute($id);
+            $property->load(['host', 'propertyType', 'listingType', 'city', 'images']);
+
+            return response()->json([
+                'success' => true,
+                'data' => new PropertyResource($property),
+                'message' => 'Property updated successfully'
+            ]);
 
         } catch (\Throwable $exception) {
-            Log::error('Error updating property: '.$exception->getMessage(),[
-                'property_id' => $id,
-                'data' => $data,
-                'exception' => $exception->getTraceAsString(),
-            ]);
-            throw $exception;
+            Log::error('Error updating property: '.$exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Update failed: ' . $exception->getMessage()
+            ], 500);
+
         }
     }
 
-    public function delete(int $id): bool
+    public function deleteService(int $id): JsonResponse
     {
         try {
-            return $this->propertyRepository->delete($id);
+            $deleted = $this->deletePropertyAction->execute($id);
+
+            if (!$deleted) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Property not found'
+                ], 404);
+            }
+
+            return response()->json(null, 204);
 
         } catch (\Throwable $exception) {
-            Log::error('Error deleting property: '.$exception->getMessage(),[
-                'property_id'=>$id,
-                'exception'=>$exception->getTraceAsString(),
-            ]);
-            throw $exception;
+            Log::error('Error deleting property: '.$exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Deletion failed: ' . $exception->getMessage()
+            ], 500);
         }
 
     }
