@@ -11,17 +11,13 @@ use App\Http\Controllers\Webhook\StripeWebHookController;
 
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
 
-//authentication
-Route::prefix('auth')->group(function () {
-    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::get('me', [AuthController::class, 'me']);
-    });
-    Route::post('/forgot-password', [PasswordResetController::class, 'forgetPassword']);
-    Route::post('/reset-password', [PasswordResetController::class], 'resetPassword');
+
+//auth
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
 });
 
 
