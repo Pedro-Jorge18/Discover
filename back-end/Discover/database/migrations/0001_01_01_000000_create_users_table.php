@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('image')->nullable();
-            $table->enum('gender', ['M', 'F', 'O'])->nullable();
+            $table->enum('gender', ['M', 'W', 'O'])->nullable();
             $table->enum('language', ['pt', 'en', 'es'])->default('en');
             $table->text('about')->nullable();
             $table->boolean('verified')->default(false);
