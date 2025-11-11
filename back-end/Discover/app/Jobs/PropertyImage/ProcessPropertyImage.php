@@ -40,26 +40,28 @@ class ProcessPropertyImage implements ShouldQueue
             // Onde a thumbnail será salva
             $thumbnailPath = str_replace('/images/', '/thumbnails/', $image->image_path);
 
-            // 1. Cria instância do novo ImageManager com o driver GD
+
+            //1. Create an instance of the new ImageManager using the GD driver.
             $manager = new ImageManager(new Driver());
 
-            // 2. Lê a imagem
+            // 2. Read the image
             $thumbnail = $manager->read($originalPath)
-                // 3. Redimensiona (scale é excelente por manter proporção)
+                // 3. Resize (scale is excellent for maintaining aspect ratio)
                 ->scale(width: 300, height: 200)
-                // 4. Codifica no formato original com qualidade 80
+                // 4. Encode in original format with quality 80
                 ->encodeByExtension(pathinfo($originalPath, PATHINFO_EXTENSION), quality: 80);
 
-            // 5. Salva o thumbnail no storage público
+            //  5. Save thumbnail to public storage
             Storage::disk('public')->put($thumbnailPath, (string) $thumbnail);
 
             Log::info("Job ProcessPropertyImage: Thumbnail criado com sucesso para Imagem ID: {$image->id}");
 
         } catch (\Throwable $exception) {
-            // Se falhar, registra e falha o Job (será re-tentado)
+
+            //If it fails, it logs and fails the job (it will be retried)
             Log::error("Job ProcessPropertyImage falhou para ID {$image->id}: " . $exception->getMessage());
 
-            // Falha o Job para re-tentativa (por causa do --tries=3)
+            // Fail the Job for retry (because of --tries=3)
             $this->fail($exception);
         }
     }

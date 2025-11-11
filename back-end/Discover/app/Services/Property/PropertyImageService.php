@@ -100,7 +100,7 @@ class PropertyImageService
     public function deleteImage(PropertyImage $image): bool
     {
         try {
-            // Deletar arquivos do storage
+            // Delete files from storage
             Storage::disk('public')->delete($image->image_path);
             $thumbnailPath = str_replace('/images/', '/thumbnails/', $image->image_path);
             Storage::disk('public')->delete($thumbnailPath);

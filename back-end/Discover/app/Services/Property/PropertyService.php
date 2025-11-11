@@ -36,7 +36,7 @@ class PropertyService
                 throw new \Exception('Authentication required to create property.');
             }
             $data['host_id'] = Auth::id();
-            // dados do DTO
+            // DTO data
             $propertyData = PropertyData::fromArray($data);
 
             //Usa o Action
@@ -117,7 +117,7 @@ class PropertyService
     {
         try {
 
-            //preço não poder ser menor que 1
+            // The price cannot be less than 1.
             if (isset($data['price_per_night']) && $data['price_per_night'] <  1 ){
                 throw new \Exception('Price per night must be greater than 1');
             }
@@ -131,12 +131,12 @@ class PropertyService
                 ], 404);
             }
 
-            // validação de quantidade de hóspides
+            // validation of guest quantity
             if (isset($data['max_guests']) && $data['max_guests'] <  1 ){
                 throw new \Exception('Maximum number of guests must be greater than 1');
             }
 
-            // quantidade de camas
+            // Bed count validation
             if (isset($data['beds']) && $data['beds'] <  1 ){
                 throw new \Exception('Beds must be greater than 1');
             }

@@ -35,9 +35,9 @@ class StorePropertyImageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'images.required' => 'min one image is required.',
+            'images.required' => 'At least one image is required.',
             'images.*.image' => 'Each file must be a valid image.',
-            'images.*.mimes' => 'only jpeg,png,jpg format are allowed.',
+            'images.*.mimes' => 'Only JPEG, PNG, and JPG formats are allowed',
             'images.*.max' => 'Max file size is 5MB.',
 
         ];

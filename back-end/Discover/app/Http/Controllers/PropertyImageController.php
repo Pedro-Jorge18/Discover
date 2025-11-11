@@ -9,6 +9,7 @@ use App\Models\PropertyImage;
 use App\Services\Property\PropertyImageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PropertyImageController extends Controller
 {
@@ -18,6 +19,9 @@ class PropertyImageController extends Controller
 
     public function store(StorePropertyImageRequest $request, Property $property): JsonResponse
     {
+        if (Auth::id() !== $property->host_id) {
+            abort(403, 'Unauthorized action.');
+        }
         $metadata = $request->safe()->except(['images']);
             $uploaded = $this->service->uploadImages(
                 $property,
