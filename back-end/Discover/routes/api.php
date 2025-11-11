@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\PropertyController;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
@@ -21,7 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-
 //payment
 Route::prefix('payments')->middleware(['auth:sanctum'])->group(function () {
     //create checkout
@@ -38,5 +36,4 @@ Route::prefix('payments')->middleware(['auth:sanctum'])->group(function () {
 });
 
 //webhook
-
 Route::withoutMiddleware(['auth:sanctum'])->post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
