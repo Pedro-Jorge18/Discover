@@ -33,13 +33,13 @@ class PropertyImageService
         try {
             $primaryIndex = $data['primary_index'] ?? 0;
 
-            // Atualiza imagem principal,
+            // Updates primary image
             if (isset($data['primary_index'])) {
                 $property->images()->where('is_primary', true)->update(['is_primary' => false]);
             }
 
 
-            // add as imagens
+            // Add the images
             foreach ($images as $index => $image) {
                 $imageData = $this->createImageData($property, $image, $index, $data, $primaryIndex);
                 $uploadedImage = $this->uploadSingleImage($imageData);
@@ -80,24 +80,22 @@ class PropertyImageService
 
     private function uploadSingleImage(PropertyImageData $imageData): PropertyImage
     {
-        // Gera nome único e caminhos
+        // Generates unique name and paths
         $imageName = $this->generateImageName($imageData->uploaded_file);
         $imagePath = "properties/{$imageData->property_id}/images/{$imageName}";
         // $thumbnailPath = "properties/{$imageData->property_id}/thumbnails/{$imageName}";
 
-        // Salva imagem original
+        // Saves original image
         Storage::disk('public')->putFileAs(
             "properties/{$imageData->property_id}/images",
             $imageData->uploaded_file,
             $imageName
         );
-        // Criar thumbnail (opcional)
-        // $this->createThumbnail($imageData->uploaded_file, $thumbnailPath);
 
-        // Atualiza DTO com caminho final
+        // Updates DTO with final path
         $imageData = $imageData->withImagePath($imagePath);
 
-        // Cria registro no banco usando DTO
+        //  Creates database record using DTO
         $propertyImage = PropertyImage::create([
             ...$imageData->toArray(),
             'image_name' => $imageName,
@@ -117,7 +115,7 @@ class PropertyImageService
         try {
             $this->deleteFilesAction->rollbackPropertyImages([$image->image_path]);
 
-            // Se era primária, definir outra como primária
+            // If it was primary, set another as primary
             if ($image->is_primary) {
                 $newPrimary = $image->property->images()
                     ->where('id', '!=', $image->id)
@@ -138,12 +136,12 @@ class PropertyImageService
     public function setPrimaryImage(PropertyImage $image): bool
     {
         try {
-            // Remover primária atual
+            // Remove current primary
             $image->property->images()
                 ->where('is_primary', true)
                 ->update(['is_primary' => false]);
 
-            // Definir nova primária
+            // Set new primary
             return $image->update(['is_primary' => true]);
 
         } catch (\Throwable $exception) {

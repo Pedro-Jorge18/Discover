@@ -65,7 +65,7 @@ class PropertyImageData
         }
     }
 
-    // DTO
+    // Factory method to create PropertyImageData DTO from an uploaded file
     public static function fromUpload(
         int $property_id,
         UploadedFile $file,

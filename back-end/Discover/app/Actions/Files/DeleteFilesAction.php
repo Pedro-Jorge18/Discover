@@ -34,7 +34,8 @@ class DeleteFilesAction
     }
 
     /**
-     * Especializado para rollback de imagens de propriedade
+     * Specialized for property image rollback
+     *
      */
     public function rollbackPropertyImages(array $imagePaths): void
     {

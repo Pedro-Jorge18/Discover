@@ -4,10 +4,11 @@ namespace App\Actions;
 
 use App\Models\Property;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class authorizePropertyOwnership
 {
-    private function authorizePropertyOwnership(Property $property): void
+    public function authorizePropertyOwnership(Property $property): void
     {
         if ((Auth::id() ?? 0) !== $property->host_id) {
             Log::warning('Unauthorized attempt to modify property.', [

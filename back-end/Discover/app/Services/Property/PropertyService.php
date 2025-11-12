@@ -86,7 +86,8 @@ class PropertyService
             Log::error('Error finding property: '.$exception->getMessage());
             return response()->json([
                 'data'=>$id,
-                'exception'=>$exception->getTraceAsString(),
+                'success' => false,
+                'error' => 'Error finding property: .',
             ],500);
 
         }

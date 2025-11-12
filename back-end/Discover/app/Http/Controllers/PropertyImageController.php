@@ -69,7 +69,6 @@ class PropertyImageController extends Controller
             'order.*' => 'integer|exists:property_images,id'
         ]);
 
-        //
         //Check if all IDs belong to the property.
         $validImageIds = $property->images()->pluck('id')->toArray();
         foreach ($request->input('order', []) as $imageId) {

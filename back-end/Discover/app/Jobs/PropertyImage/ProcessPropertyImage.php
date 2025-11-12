@@ -34,10 +34,10 @@ class ProcessPropertyImage implements ShouldQueue
         $image = $this->propertyImage;
 
         try {
-            // Caminho do ficheiro original
+            // Original file path
             $originalPath = Storage::disk('public')->path($image->image_path);
 
-            // Onde a thumbnail será salva
+            // Where the thumbnail will be saved
             $thumbnailPath = str_replace('/images/', '/thumbnails/', $image->image_path);
 
 
