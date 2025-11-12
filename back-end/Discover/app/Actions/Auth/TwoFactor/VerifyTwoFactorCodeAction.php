@@ -36,7 +36,7 @@ class VerifyTwoFactorCodeAction
             return true;
         } catch (\Throwable $e) {
             Log::error('Erro ao verificar código 2FA', [
-                'user_id' => $user->id ?? null,
+                'user_id' => $dto->userId,
                 'error' => $e->getMessage(),
             ]);
 

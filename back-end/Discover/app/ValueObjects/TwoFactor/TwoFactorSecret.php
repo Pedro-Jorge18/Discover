@@ -6,8 +6,11 @@ use PragmaRX\Google2FA\Google2FA;
 
 final readonly class TwoFactorSecret
 {
+
+
     public function __construct(
-        private string $secret
+        private string $secret,
+        protected Google2FA $google2FA,
     ) {}
 
     //creates a new instance with a generated secret
@@ -16,7 +19,7 @@ final readonly class TwoFactorSecret
         $google2FA = new Google2FA();
         $secret = $google2FA->generateSecretKey();
 
-        return new self($secret);
+        return new self($secret, $google2FA);
     }
 
     //returns the raw value of the secret

@@ -32,7 +32,7 @@ class DisableTwoFactorAuthAction
             return true;
         } catch (\Throwable $e) {
             Log::error('Erro ao desativar autenticação de dois fatores', [
-                'user_id' => $user->id ?? null,
+                'user_id' => $dto->userId,
                 'error' => $e->getMessage(),
             ]);
             throw $e;
