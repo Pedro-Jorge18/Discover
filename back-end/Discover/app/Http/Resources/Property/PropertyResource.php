@@ -47,7 +47,35 @@ class PropertyResource extends JsonResource
                 'coordinates' => [
                     'latitude' => (float) $this->latitude,
                     'longitude' => (float) $this->longitude,
-                ]
+                ],
+                'city' => $this->whenLoaded('city', function() {
+                    return $this->city ? [
+                        'id' => $this->city->id,
+                        'name' => $this->city->name,
+                        'postal_code' => $this->city->postal_code,
+                    ] : null;
+                }),
+                'state' => $this->whenLoaded('city.state', function() {
+                    return $this->city && $this->city->state ? [
+                        'id' => $this->city->state->id,
+                        'name' => $this->city->state->name,
+                        'code' => $this->city->state->code,
+                        'timezone' => $this->city->state->timezone,
+                    ] : null;
+                }),
+                'country' => $this->whenLoaded('city.state.country', function() {
+                    return $this->city && $this->city->state && $this->city->state->country ? [
+                        'id' => $this->city->state->country->id,
+                        'name' => $this->city->state->country->name,
+                        'code' => $this->city->state->country->code,
+                        'currency' => $this->city->state->country->currency,
+                        'currency_symbol' => $this->city->state->country->currency_symbol,
+                        'phone_code' => $this->city->state->country->phone_code,
+                    ] : null;
+                }),
+                // ↓↓↓ ENDEREÇO COMPLETO FORMATADO ↓↓↓
+                'full_address' => $this->getFullAddress(),
+
             ],
             // definir o que pode e o que tem no imovel
             'capacity' => [
