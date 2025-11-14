@@ -57,6 +57,45 @@ class PropertyResource extends JsonResource
                 'bathrooms' => $this->bathrooms,
                 'area' => $this->area ? $this->area . ' m²' : null,
             ],
+            // Tipos e categorias
+            'types' => [
+                'property_type' => $this->whenLoaded('propertyType', function() {
+                    return $this->propertyType ? [
+                        'id' => $this->propertyType->id,
+                        'name' => $this->propertyType->name,
+                        'icon' => $this->propertyType->icon,
+                    ] : null;
+                }),
+                'listing_type' => $this->whenLoaded('listingType', function() {
+                    return $this->listingType ? [
+                        'id' => $this->listingType->id,
+                        'name' => $this->listingType->name,
+                        'slug' => $this->listingType->slug,
+                    ] : null;
+                }),
+            ],
+
+            // Amenities
+            'amenities' => $this->whenLoaded('amenities', function() {
+                return $this->amenities->map(function($amenity) {
+                    return [
+                        'id' => $amenity->id,
+                        'name' => $amenity->name,
+                        'icon' => $amenity->icon,
+                        'category' => $amenity->category ? [
+                            'id' => $amenity->category->id,
+                            'name' => $amenity->category->name,
+                        ] : null,
+                        'value' => $amenity->pivot ? [
+                            'boolean' => $amenity->pivot->value_boolean,
+                            'numeric' => $amenity->pivot->value_numeric,
+                            'text' => $amenity->pivot->value_text,
+                            'formatted' => $amenity->pivot->formatted_value,
+                        ] : null,
+                    ];
+                });
+            }),
+
             // configurações
             'settings' => [
                 'instant_book' => (bool) $this->instant_book,
