@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Property\PropertyResource;
-use App\Http\Resources\Property\PropertyCollection;
 use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Services\Property\PropertyService;
 use App\Http\Requests\UpdatePropertyRequest;
+use Illuminate\Http\JsonResponse;
 
 class PropertyController extends Controller
 {
@@ -18,12 +17,12 @@ class PropertyController extends Controller
 
     /**
      * @throws \Throwable
+     *
+     * GET /api/properties
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        $properties = $this->propertyService->listPaginated(15);
-
-        return new PropertyCollection($properties);
+        return $this->propertyService->listService();
     }
 
     /**
@@ -35,36 +34,20 @@ class PropertyController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/properties
      */
     public function store(StorePropertyRequest $request)
     {
-        $property = $this->propertyService->create($request->validated());
-
-        return new PropertyResource($property);
+        return $this->propertyService->createService($request->validated());
     }
 
+
     /**
-     * Display the specified resource.
+     * GET /api/properties/{id}
      */
     public function show(int $id)
     {
-        /*
-         * após as atualizacoes essa que vai valer.
-         */
-        $property = $this->propertyService->find($id);
-        if (!$property) {
-            return response()->json(['error' => 'Property not found'], 404);
-        }
-        $property->load([
-            'host',
-            'propertyType',
-            'listingType',
-            'city',
-            'images'
-        ]);
-
-        return new PropertyResource($property);
+        return $this->propertyService->findService($id);
     }
 
     /**
@@ -76,43 +59,18 @@ class PropertyController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * PUT/PATCH /api/properties/{id}
      */
     public function update(UpdatePropertyRequest $request, int $id)
     {
-        $updated = $this->propertyService->update($id, $request->validated());
-
-        if (!$updated) {
-            return response()->json(['error' => 'Property not found'], 404);
-        }
-
-        $property = $this->propertyService->find($id);
-        $property->load([
-            'host',
-            'propertyType',
-            'listingType',
-            'city',
-            'images'
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'data' => new PropertyResource($property),
-            'message' => 'Property updated successfully'
-        ]);
+        return $this->propertyService->updateService($id, $request->validated());
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /api/properties/{id}
      */
     public function destroy(int $id)
     {
-        $deleted = $this->propertyService->delete($id);
-
-        if (!$deleted) {
-            return response()->json(['error' => 'Property not found'], 404);
-        }
-
-        return response()->json([null,204]);
+        return $this->propertyService->deleteService($id);
     }
 }

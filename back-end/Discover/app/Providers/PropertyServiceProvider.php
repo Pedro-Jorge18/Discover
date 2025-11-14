@@ -6,6 +6,7 @@ namespace App\Providers;
 use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Repositories\Eloquent\PropertyRepository;
 use Illuminate\Support\ServiceProvider;
+use App\Services\Property\PropertyImageService;
 
 class PropertyServiceProvider extends ServiceProvider
 {
@@ -22,8 +23,11 @@ class PropertyServiceProvider extends ServiceProvider
 
         $this->app->singleton(\App\Actions\Property\CreatePropertyAction::class);
         $this->app->singleton(\App\Actions\Property\FindPropertyAction::class);
+        $this->app->singleton(\App\Actions\Property\UpdatePropertyAction::class);
+        $this->app->singleton(\App\Actions\Property\DeletePropertyAction::class);
 
         $this->app->bind(\App\Services\Property\PropertyService::class);
+        $this->app->bind(PropertyImageService::class);
 
     }
 
