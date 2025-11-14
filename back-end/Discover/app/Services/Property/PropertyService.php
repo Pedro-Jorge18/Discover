@@ -9,6 +9,7 @@ use App\Actions\Property\UpdatePropertyAction;
 use App\Http\Resources\Property\PropertyCollection;
 use App\Http\Resources\Property\PropertyResource;
 use App\DTOs\Property\PropertyData;
+use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +26,8 @@ class PropertyService
         private UpdatePropertyAction $updatePropertyAction,
         private DeletePropertyAction $deletePropertyAction,
         private PropertyImageService $propertyImageService,
+        private CreatePropertyAmenitiesAction $createAmenitiesAction,
+        private UpdatePropertyAmenitiesAction $updateAmenitiesAction,
     ) {}
 
     public function createService(array $data): JsonResponse
@@ -45,8 +48,12 @@ class PropertyService
             if (!empty($images)){
                 $this->propertyImageService->uploadImages($property, $images,$data);
             }
+
+            if (!empty($propertyData->amenities)) {
+                $this->createAmenitiesAction->execute($property,$propertyData->amenities);
+            }
             // Relações
-            $property->load(['host','propertyType','listingType','city','images']);
+            $property->load(['host','propertyType','listingType','city','images', 'amenities']);
 
             return response()->json([
                 'success' => true,
@@ -75,7 +82,7 @@ class PropertyService
                 ], 404);
             }
 
-            $property->load(['host','propertyType','listingType','city','images']);
+            $property->load(['host','propertyType','listingType','city','images','amenities']);
 
             return response()->json([
                 'success' => true,
@@ -142,8 +149,13 @@ class PropertyService
                 throw new \Exception('Beds must be greater than 1');
             }
 
+            if (isset($data['amenities'])){
+                $property = Property::find($id);
+                $this->updateAmenitiesAction->execute($property,$data['amenities']);
+            }
+
             $property = $this->findPropertyAction->execute($id);
-            $property->load(['host', 'propertyType', 'listingType', 'city', 'images']);
+            $property->load(['host', 'propertyType', 'listingType', 'city', 'images', 'amenities']);
 
             return response()->json([
                 'success' => true,
