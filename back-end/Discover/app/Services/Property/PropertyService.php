@@ -3,9 +3,12 @@
 namespace App\Services\Property;
 
 use App\Actions\Property\CreatePropertyAction;
+use App\Actions\Property\CreatePropertyAmenitiesAction;
 use App\Actions\Property\DeletePropertyAction;
 use App\Actions\Property\FindPropertyAction;
 use App\Actions\Property\UpdatePropertyAction;
+use App\Actions\Property\UpdatePropertyAmenitiesAction;
+use App\Actions\Property\validatePropertyUpdateAction;
 use App\Http\Resources\Property\PropertyCollection;
 use App\Http\Resources\Property\PropertyResource;
 use App\DTOs\Property\PropertyData;
@@ -21,13 +24,14 @@ class PropertyService
 {
 
     public function __construct(
-        private CreatePropertyAction $createPropertyAction,
-        private FindPropertyAction $findPropertyAction,
-        private UpdatePropertyAction $updatePropertyAction,
-        private DeletePropertyAction $deletePropertyAction,
-        private PropertyImageService $propertyImageService,
+        private CreatePropertyAction          $createPropertyAction,
+        private FindPropertyAction            $findPropertyAction,
+        private UpdatePropertyAction          $updatePropertyAction,
+        private DeletePropertyAction          $deletePropertyAction,
+        private PropertyImageService          $propertyImageService,
         private CreatePropertyAmenitiesAction $createAmenitiesAction,
         private UpdatePropertyAmenitiesAction $updateAmenitiesAction,
+        private validatePropertyUpdateAction  $validateUpdateAction,
     ) {}
 
     public function createService(array $data): JsonResponse
@@ -65,7 +69,7 @@ class PropertyService
             Log::error('Error creating property: '.$exception->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Creation failed:' .$exception->getTraceAsString(),
+                'error' => 'Creation failed:'.$exception->getTraceAsString(),
             ],500);
 
         }
@@ -125,10 +129,7 @@ class PropertyService
     {
         try {
 
-            // The price cannot be less than 1.
-            if (isset($data['price_per_night']) && $data['price_per_night'] <  1 ){
-                throw new \Exception('Price per night must be greater than 1');
-            }
+            $this->validateUpdateAction->execute($data);
 
             $updated = $this->updatePropertyAction->execute($id, $data);
 
@@ -139,15 +140,6 @@ class PropertyService
                 ], 404);
             }
 
-            // validation of guest quantity
-            if (isset($data['max_guests']) && $data['max_guests'] <  1 ){
-                throw new \Exception('Maximum number of guests must be greater than 1');
-            }
-
-            // Bed count validation
-            if (isset($data['beds']) && $data['beds'] <  1 ){
-                throw new \Exception('Beds must be greater than 1');
-            }
 
             if (isset($data['amenities'])){
                 $property = Property::find($id);

@@ -42,10 +42,10 @@ class DeleteFilesAction
         $allFiles = [];
 
         foreach ($imagePaths as $imagePath) {
-            // Adiciona a imagem original
+            // Add original image
             $allFiles[] = $imagePath;
 
-            // Adiciona o thumbnail correspondente
+            // Add corresponding thumbnail
             $thumbnailPath = str_replace('/images/', '/thumbnails/', $imagePath);
             $allFiles[] = $thumbnailPath;
         }

@@ -37,7 +37,7 @@ class StorePropertyImageRequest extends FormRequest
         return [
             'images.required' => 'At least one image is required.',
             'images.*.image' => 'Each file must be a valid image.',
-            'images.*.mimes' => 'Only JPEG, PNG, and JPG formats are allowed',
+            'images.*.mimes' => 'Only JPEG, PNG, and JPG formats are allowed.',
             'images.*.max' => 'Max file size is 5MB.',
 
         ];
