@@ -62,7 +62,7 @@ class PropertyImageController extends Controller
      */
     public function reorder(Request $request, Property $property): JsonResponse
     {
-        ($this->authorizePropertyOwnership)($property);
+        $this->authorizePropertyOwnership->execute($property);
 
         $request->validate([
             'order' => 'required|array',
@@ -90,7 +90,7 @@ class PropertyImageController extends Controller
      */
     public function destroy(Property $property, PropertyImage $image): JsonResponse
     {
-        ($this->authorizePropertyOwnership)($property);
+        $this->authorizePropertyOwnership->execute($property);
 
         if ($image->property_id !== $property->id) {
             abort(404, 'Image not found for this property.');

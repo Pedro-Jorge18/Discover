@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class authorizePropertyOwnership
 {
-    public function authorizePropertyOwnership(Property $property): void
+    public function execute(Property $property): void
     {
         if ((Auth::id() ?? 0) !== $property->host_id) {
             Log::warning('Unauthorized attempt to modify property.', [

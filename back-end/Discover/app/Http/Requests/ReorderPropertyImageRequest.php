@@ -6,6 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ReorderPropertyImageRequest extends FormRequest
 {
+    public function authorize()
+    {
+        return true;
+    }
     public function rules()
     {
         return [

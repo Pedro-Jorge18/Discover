@@ -3,6 +3,7 @@
 namespace App\DTOs\Property;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class PropertyImageData
@@ -50,7 +51,7 @@ class PropertyImageData
     {
         // $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         $maxSize = 5120 * 1024;
-        \Log::info('Validando arquivo:', [
+        Log::info('Validando arquivo:', [
             'mime_type' => $this->uploaded_file->getMimeType(),
             'size' => $this->uploaded_file->getSize(),
             'original_name' => $this->uploaded_file->getClientOriginalName()

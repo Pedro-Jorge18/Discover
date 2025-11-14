@@ -69,7 +69,7 @@ class PropertyService
             Log::error('Error creating property: '.$exception->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Creation failed:'.$exception->getTraceAsString(),
+                'error' => 'Creation failed:' .$exception->getMessage(),
             ],500);
 
         }
@@ -98,7 +98,7 @@ class PropertyService
             return response()->json([
                 'data'=>$id,
                 'success' => false,
-                'error' => 'Error finding property: .',
+                'error' => 'Error finding property: .'. $exception->getMessage(),
             ],500);
 
         }

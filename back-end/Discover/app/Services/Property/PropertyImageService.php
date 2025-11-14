@@ -19,7 +19,7 @@ class PropertyImageService
     ) {}
     public function uploadImages(Property $property, array $images, array $data = []): array
     {
-        \Log::info('PropertyImageService: uploadImages started', [
+        Log::info('PropertyImageService: uploadImages started', [
             'property_id' => $property->id,
             'images_count' => count($images),
             'data' => $data
