@@ -26,10 +26,10 @@ class ForgotPasswordRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidationForgotPassword():void
+    protected function prepareForValidationForgotPassword(): void
     {
         $this->merge([
             'email' => strtolower(trim($this->email),)
-        ])
+        ]);
     }
 }

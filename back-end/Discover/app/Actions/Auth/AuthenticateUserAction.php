@@ -59,6 +59,6 @@ class AuthenticateUserAction
 
     public function updateUserAfterAuthentication(User $user): User
     {
-        return $user->load(['roles', 'profile']);
+        return $user->load(['roles']);
     }
 }

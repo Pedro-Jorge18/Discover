@@ -21,7 +21,7 @@ class TwoFactorAuthService
         try {
             $secret = $this->google2FA->generateSecretKey();
 
-            $twoFactorSecret = new TwoFactorSecret($secret);
+            $twoFactorSecret = new TwoFactorSecret($secret, $this->google2FA);
 
             $this->repository->storeSecret($user, $twoFactorSecret);
 

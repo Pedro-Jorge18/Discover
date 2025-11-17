@@ -26,12 +26,12 @@ class EnableTwoFactorAuthAction
             }
 
             //create and generate the 2FA service
-            $data = $this->twoFactorAuthService->enable($user);
+            $twoFactorSecret = $this->twoFactorAuthService->enable($user);
 
             return [
                 'message' => __('auth.2fa.enabled_success'),
-                'secret' => $data['secret'],
-                'qr_code' => $data['qr_code'],
+                'secret' => $twoFactorSecret->value(),
+                'qr_code' => $twoFactorSecret->getQrCodeUrl($user->email),
             ];
         } catch (\Throwable $e) {
             Log::error('Erro ao habilitar 2FA', [

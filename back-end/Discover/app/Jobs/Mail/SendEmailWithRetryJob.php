@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use Closure;
 
 class SendEmailWithRetryJob implements ShouldQueue
 {
@@ -20,7 +21,7 @@ class SendEmailWithRetryJob implements ShouldQueue
     public function __construct(
         private string $type,
         private string $target,
-        private callable $callback
+        private Closure $callback
     ) {}
 
     public function handle(): void

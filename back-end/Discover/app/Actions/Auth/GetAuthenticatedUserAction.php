@@ -29,7 +29,6 @@ class GetAuthenticatedUserAction
     protected function loadRelations(User $user, array $relations = []): User
     {
         $allowedRelations = [
-            'profile',
             'roles',
             'permissions',
             'posts',
@@ -40,7 +39,7 @@ class GetAuthenticatedUserAction
 
         $validRelations = $relations
             ? array_intersect($relations, $allowedRelations)
-            : ['profile', 'roles', 'permissions']; //basic pattern
+            : ['roles', 'permissions']; //basic pattern
 
         return $user->load($validRelations);
     }
