@@ -2,6 +2,7 @@
 
 namespace App\Actions\Property;
 
+use App\Models\Property;
 use App\Repositories\Contracts\PropertyRepositoryInterface;
 
 
@@ -19,7 +20,7 @@ class CreatePropertyAction
         private PropertyRepositoryInterface $propertyRepository
     ){}
 
-    public function execute(array $data): \App\Models\Property
+    public function execute(array $data): Property
     {
         return $this->propertyRepository->create($data);
 

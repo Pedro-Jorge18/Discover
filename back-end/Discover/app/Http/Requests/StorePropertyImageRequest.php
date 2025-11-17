@@ -21,10 +21,11 @@ class StorePropertyImageRequest extends FormRequest
      */
     public function rules(): array
     {
+        $imageCount = count($this->images ?? []);
         return [
             'images' => 'required|array|min:1|max:10',
             'images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
-            'primary_index' => 'sometimes|integer|min:0|lt:images',
+            'primary_index' => 'sometimes|integer|min:0|max:' . ($imageCount > 0 ? $imageCount -1 : 0),
             'captions' => 'sometimes|array',
             'captions.*' => 'sometimes|string|max:255',
             'alt_texts' => 'sometimes|array',

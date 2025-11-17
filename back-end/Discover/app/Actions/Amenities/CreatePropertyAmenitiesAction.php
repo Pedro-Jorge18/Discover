@@ -8,6 +8,7 @@ class CreatePropertyAmenitiesAction
 {
     public function execute(Property $property, array $amenities): void
     {
+        $amenitiesData = [];
         foreach ($amenities as $amenityData) {
             $property->amenities()->attach($amenityData['id'], [
                 'value_boolean' => $amenityData['value_boolean'] ?? null,
@@ -15,5 +16,6 @@ class CreatePropertyAmenitiesAction
                 'value_text' => $amenityData['value_text'] ?? null,
             ]);
         }
+        $property->amenities()->attach($amenitiesData);
     }
 }
