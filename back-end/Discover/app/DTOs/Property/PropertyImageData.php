@@ -36,7 +36,7 @@ class PropertyImageData
             throw new InvalidArgumentException('Order must be a positive number');
         }
 
-        if ($this->file_size && $this->file_size < 1 )
+        if ($this->file_size && $this->file_size < 1)
         {
             throw new InvalidArgumentException('File size must be greater than 0');
         }

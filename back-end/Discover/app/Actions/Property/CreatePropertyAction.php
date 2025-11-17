@@ -23,6 +23,5 @@ class CreatePropertyAction
     {
         return $this->propertyRepository->create($data);
 
-
     }
 }

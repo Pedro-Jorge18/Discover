@@ -34,8 +34,8 @@ class StorePropertyRequest extends FormRequest
                 'price_per_night' => 'required|numeric|min:1',
 
                 'host_id' => 'required|integer|exists:users,id',
-                'check_in_time' => 'required|date_format:Ymd H:i:s',
-                'check_out_time' => 'required|date_format:Ymd H:i:s',
+                'check_in_time' => 'required|date_format:Y-m-d H:i:s',
+                'check_out_time' => 'required|date_format:Y-m-d H:i:s',
 
                 // LOCALIZAÇÃO
                 'address' => 'required|string|max:255',

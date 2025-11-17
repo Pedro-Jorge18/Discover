@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Concerns;
 
 use Illuminate\Contracts\Validation\Validator;
-Trait ValidatesAmenities
+trait ValidatesAmenities
 {
     protected function amenityRules(): array
     {
