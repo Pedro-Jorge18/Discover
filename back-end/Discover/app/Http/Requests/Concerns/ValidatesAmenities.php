@@ -34,7 +34,7 @@ trait ValidatesAmenities
 
     protected function prepareAmenitiesForValidation(): void
     {
-        // se estiver vazio é nulo
+
         if ($this->has('amenities') && empty($this->amenities)) {
             $this->merge(['amenities' => null]);
         }
@@ -60,7 +60,7 @@ trait ValidatesAmenities
 
             foreach ($this->amenities as $index => $amenity) {
 
-                //tem que pelo menos ter um valor
+                // must have at least one value
                 $hasValue = isset($amenity['value_boolean']) ||
                     isset($amenity['value_numeric']) ||
                     (isset($amenity['value_text']) &&

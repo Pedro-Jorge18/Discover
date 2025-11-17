@@ -8,6 +8,8 @@ use InvalidArgumentException;
 
 class PropertyImageData
 {
+    private const MaxFileSize = 5120 * 1024;
+    private const AllowedMimetype =['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     public function __construct(
         public int $property_id,
         public string $image_path,
@@ -49,21 +51,22 @@ class PropertyImageData
 
     private function validateUploadedFile()
     {
-        // Only allow common image MIME types for security
-        $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        $maxSize = 5120 * 1024;
         Log::info('Validando arquivo:', [
             'mime_type' => $this->uploaded_file->getMimeType(),
             'size' => $this->uploaded_file->getSize(),
             'original_name' => $this->uploaded_file->getClientOriginalName()
         ]);
 
-        if (!in_array($this->uploaded_file->getMimeType(), $allowedMimes)) {
-            throw new InvalidArgumentException('Invalid file type. Allowed: ' . implode(', ', $allowedMimes));
+        if (!in_array($this->uploaded_file->getMimeType(), self::AllowedMimetype)) {
+            throw new InvalidArgumentException(
+                'Invalid file type. Allowed: ' . implode(', ', self::AllowedMimetype)
+            );
         }
 
-        if ($this->uploaded_file->getSize() > $maxSize) {
-            throw new InvalidArgumentException('File size must be less than 5MB');
+        if ($this->uploaded_file->getSize() > self::MaxFileSize) {
+            throw new InvalidArgumentException(
+                'File size must be less than ' . (self::MaxFileSize / 1024 / 1024) . 'MB'
+            );
         }
     }
 

@@ -73,7 +73,7 @@ class PropertyResource extends JsonResource
                         'phone_code' => $this->city->state->country->phone_code,
                     ] : null;
                 }),
-                // ↓↓↓ ENDEREÇO COMPLETO FORMATADO ↓↓↓
+                // FULL FORMATTED ADDRESS
                 'full_address' => $this->getFullAddress(),
 
             ],

@@ -53,7 +53,7 @@ class PropertyService
                 $this->propertyImageService->uploadImages($property, $images,$data);
             }
 
-            if (!empty($propertyData->amenities)) {
+            if (!empty($propertyData->amenities)){
                 $this->createAmenitiesAction->execute($property,$propertyData->amenities);
             }
             // Relações
