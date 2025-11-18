@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\property;
 
 use App\Models\Property;
 use Illuminate\Support\Facades\Auth;

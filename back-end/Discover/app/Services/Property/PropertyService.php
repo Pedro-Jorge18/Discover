@@ -2,12 +2,12 @@
 
 namespace App\Services\Property;
 
+use App\Actions\Amenities\CreatePropertyAmenitiesAction;
 use App\Actions\Property\CreatePropertyAction;
-use App\Actions\Property\CreatePropertyAmenitiesAction;
 use App\Actions\Property\DeletePropertyAction;
 use App\Actions\Property\FindPropertyAction;
 use App\Actions\Property\UpdatePropertyAction;
-use App\Actions\Property\UpdatePropertyAmenitiesAction;
+use App\Actions\Amenities\UpdatePropertyAmenitiesAction;
 use App\Actions\Property\validatePropertyUpdateAction;
 use App\Http\Resources\Property\PropertyCollection;
 use App\Http\Resources\Property\PropertyResource;
@@ -39,9 +39,7 @@ class PropertyService
         $images = $data['images'] ?? [];
         unset($data['images']);
         try {
-            if (!Auth::check()) {
-                throw new \Exception('Authentication required to create property.');
-            }
+
             $data['host_id'] = Auth::id();
             // DTO data
             $propertyData = PropertyData::fromArray($data);
@@ -50,7 +48,12 @@ class PropertyService
             $property = $this->createPropertyAction->execute($propertyData->toArray());
 
             if (!empty($images)){
-                $this->propertyImageService->uploadImages($property, $images,$data);
+                $imageMetadata = [
+                    'primary_index' => $data['primary_index'] ?? null,
+                    'captions' => $data['captions'] ?? null,
+                    'alt_texts' => $data['alt_texts'] ?? null,
+                ];
+                $this->propertyImageService->uploadImages($property, $images, $imageMetadata);
             }
 
             if (!empty($propertyData->amenities)){
@@ -119,7 +122,7 @@ class PropertyService
             Log::error('Error listing properties: '.$exception->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Error listing properties: '
+                'error' => 'Error listing properties: ' .$exception->getMessage(),
             ],500);
 
         }

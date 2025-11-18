@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\authorizePropertyOwnership;
+use App\Actions\property\authorizePropertyOwnership;
 use App\Http\Requests\StorePropertyImageRequest;
 use App\Models\Property;
 use App\Models\PropertyImage;

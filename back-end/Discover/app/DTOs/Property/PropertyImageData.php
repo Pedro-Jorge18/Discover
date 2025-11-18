@@ -9,7 +9,7 @@ use InvalidArgumentException;
 class PropertyImageData
 {
     private const MaxFileSize = 5120 * 1024;
-    private const AllowedMimetype =['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    private const AllowedMimetype =['image/jpeg', 'image/jpg', 'image/png'];
     public function __construct(
         public int $property_id,
         public string $image_path,

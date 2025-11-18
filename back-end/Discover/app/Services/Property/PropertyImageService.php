@@ -97,10 +97,15 @@ class PropertyImageService
 
         //  Creates database record using DTO
         $propertyImage = PropertyImage::create([
-            ...$imageData->toArray(),
+            'property_id' => $imageData->property_id,
+            'image_path' => $imageData->image_path,
+            'order' => $imageData->order,
+            'is_primary' => $imageData->is_primary,
+            'caption' => $imageData->caption,
+            'alt_text' => $imageData->alt_text,
             'image_name' => $imageName,
         ]);
-        ProcessPropertyImage::dispatch($propertyImage);
+        ProcessPropertyImage::dispatch($propertyImage)->afterCommit();
         return $propertyImage;
     }
 
