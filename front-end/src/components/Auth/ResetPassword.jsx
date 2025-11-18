@@ -11,7 +11,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="w-full max-w-xl bg-gray-800 rounded-xl border border-gray-700 p-6">
+    <div className="w-full max-w-xl bg-gray-800  p-6">
 
       {/* Cabeçalho */}
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
@@ -112,9 +112,7 @@ export default function ResetPassword() {
           <div className="text-center space-y-6">
 
             <p className="text-gray-300 text-sm">
-              A palavra-passe foi alterada com sucesso.
-              <br />
-              Se clicar em "Voltar", regressará ao ecrã de Login.
+              A palavra-passe foi alterada com sucesso.       
             </p>
 
             {/* Botão Voltar */}

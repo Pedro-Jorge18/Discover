@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ResetPassword from "../Auth/ResetPassword";
 import TwoFactorAuth from "../Auth/TwoFactory";
+import EditProfile from "./EditProfile";
 export default function SettingsMain() {
   const [selected, setSelected] = useState("perfil");
 
@@ -41,14 +42,23 @@ export default function SettingsMain() {
       </aside>
 
       <main className="flex-1 p-10">
-        <h1 className="text-2xl font-bold mb-4">
+        <h1 className="text-2xl font-bold mb-4 flex justify-center items-center">
           {menuItems.find((x) => x.id === selected)?.label}
         </h1>
 
-        <div className="p-6 bg-gray-800 rounded-xl border border-gray-700 text-gray-300">
+        <div className="p-6 bg-gray-800 rounded-xl border border-gray-700 text-gray-300 flex justify-center items-center">
           {/* Settings Options */}
-          {selected === "perfil" && <ResetPassword /> }
-          {selected === "seguranca" && <TwoFactorAuth/>}
+          {selected === "perfil" && (
+            <div className="flex flex-col gap-4 items-center">
+              <EditProfile />
+            </div>
+          )}
+          {selected === "seguranca" && (
+            <div className="flex flex-col gap-4 items-center">
+              <TwoFactorAuth />
+              <ResetPassword />
+            </div>
+          )}
           {selected === "notificacoes" && <p>Gerir notificações e alertas.</p>}
           {selected === "privacidade" && <p>Controlar definições de privacidade.</p>}
         </div>
