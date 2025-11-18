@@ -10,7 +10,7 @@ final readonly class TwoFactorSecret
 
     public function __construct(
         private string $secret,
-        protected Google2FA $google2FA,
+        protected readonly Google2FA $google2FA,
     ) {}
 
     //creates a new instance with a generated secret

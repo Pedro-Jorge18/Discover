@@ -53,7 +53,7 @@ class TwoFactorAuthService
         try {
             $this->repository->clearSecret($user);
         } catch (\Throwable $e) {
-            Log::info('Erro ao desativar autenticação 2FA.', [
+            Log::error('Erro ao desativar autenticação 2FA.', [
                 'user_id' => $user->id ?? null,
                 'error' => $e->getMessage(),
             ]);
