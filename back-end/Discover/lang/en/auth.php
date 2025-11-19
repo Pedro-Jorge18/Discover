@@ -24,6 +24,7 @@ return [
         'success' => 'Token generated successfully',
         'failed' => 'Failed to generate token.',
     ],
+    
 
     'success' => 'Authentication successful.',
     'failed' => 'Authentication failed.',
