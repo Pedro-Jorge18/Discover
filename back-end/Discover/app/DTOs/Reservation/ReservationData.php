@@ -175,4 +175,16 @@ class ReservationData
         return $this->confirmed_at !== null;
     }
 
+    // Verifica se os dados são para criação instantânea (já pago)
+    public function isInstantCreation(): bool
+    {
+        return $this->isPaid() || $this->isConfirmed();
+    }
+
+    //Obtém o saldo pendente
+    public function getPendingBalance(): float
+    {
+        return $this->total_amount - $this->amount_paid;
+    }
+
 }
