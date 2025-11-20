@@ -10,7 +10,7 @@ function App() {
   const [activeModal, setActiveModal] = useState('login'); // 'login' | 'forgot' | 'register'
 
   return (
-    <SettingsMain />
+    <Registration />
   );
 }
 

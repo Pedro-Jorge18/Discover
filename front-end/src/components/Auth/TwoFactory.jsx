@@ -58,7 +58,7 @@ export default function TwoFactorAuth() {
   };
 
   return (
-    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl border border-gray-700">
+    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl-">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
         Autenticação de Dois Fatores (2FA)
       </h3>
