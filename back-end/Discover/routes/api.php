@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyImageController;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,16 @@ Route::post('/auth/login', [AuthController::class, 'login'])->middleware('thrott
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    // Rotas protegidas de properties
+    Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
+
+    // Rotas de imagens
+    Route::prefix('properties/{property}')->group(function () {
+        Route::post('/images', [PropertyImageController::class, 'store']);
+        Route::delete('/images/{image}', [PropertyImageController::class, 'destroy']);
+        Route::patch('/images/{image}/primary', [PropertyImageController::class, 'setPrimary']);
+        Route::patch('/images/reorder', [PropertyImageController::class, 'reorder']);
+    });
 });
 
 
