@@ -43,6 +43,24 @@ export default function Registration() {
                 className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             </div>
+
+            {/* Phone */}
+            <div>
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
+                Telefone
+              </label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                placeholder="987654321"
+                required
+                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+              />
+            </div>
             
             {/* Email */}
             <div>
