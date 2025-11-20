@@ -7,10 +7,27 @@ import ResetPassword from './components/Auth/ResetPassword';
 import SettingsMain from './components/Settings/SettingsMain';
 
 function App() {
-  const [activeModal, setActiveModal] = useState('login'); // 'login' | 'forgot' | 'register'
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleOpenLogin = () => {
+    setShowLogin(true);
+  };
+
+  const handleCloseLogin = () => {
+    setShowLogin(false);
+  };
+
 
   return (
-    <Registration />
+    <div className="App">
+
+      <AppRoutes onOpenLogin={handleOpenLogin} />
+      {showLogin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Login onClose={handleCloseLogin} />
+        </div>
+      )}
+    </div>
   );
 }
 
