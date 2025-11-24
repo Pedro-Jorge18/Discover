@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyImageController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/images/{image}/primary', [PropertyImageController::class, 'setPrimary']);
         Route::patch('/images/reorder', [PropertyImageController::class, 'reorder']);
     });
+
+    Route::prefix('reservations')->group(function () {
+        // Reservas do usuário
+        Route::get('/', [ReservationController::class, 'index']);
+        Route::post('/', [ReservationController::class, 'store']);
+        Route::post('/with-payment', [ReservationController::class, 'storeWithPayment']);
+        Route::get('/stats', [ReservationController::class, 'stats']);
+        Route::get('/{id}', [ReservationController::class, 'show']);
+        Route::delete('/{id}', [ReservationController::class, 'destroy']);
+        Route::post('/{id}/confirm', [ReservationController::class, 'confirm']);
+    });
+    Route::get('/properties/{id}/availability', [ReservationController::class, 'checkAvailability']);
+    Route::post('/properties/availability/batch', [ReservationController::class, 'checkMultipleAvailability']);
+
+    // Reservas da propriedade (host)
+    Route::get('/properties/{id}/reservations', [ReservationController::class, 'propertyReservations']);
 });
 
 

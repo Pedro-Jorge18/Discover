@@ -2,147 +2,87 @@
 
 namespace App\Actions\Reservation;
 
-use App\DTOs\Reservation\AvailabilityResult;
-use App\Exceptions\Reservation\ReservationConflictException;
-use App\Exceptions\Reservation\ReservationCapacityException;
-use App\Exceptions\Reservation\PropertyNotAvailableException;
 use App\Models\Property;
 use App\Models\Reservation;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class CheckAvailabilityAction
 {
-    /**
-     *
-     * @param int $propertyId
-     * @param Carbon $checkIn
-     * @param Carbon $checkOut
-     * @param int $adults
-     * @param int $children
-     * @param int $infants
-     * @return AvailabilityResult
-     */
-    public function execute(
-        int $propertyId,
-        Carbon $checkIn,
-        Carbon $checkOut,
-        int $adults = 1,
-        int $children = 0,
-        int $infants = 0
-    ): AvailabilityResult {
-        try {
-            //  ENCONTRA A PROPRIEDADE
-            $property = Property::with('host')->find($propertyId);
-
-            if (!$property) {
-                return AvailabilityResult::validationFailed([
-                    'property_id' => 'Property not found.'
-                ]);
-            }
-
-            //  VALIDA STATUS DA PROPRIEDADE
-            if (!$this->validatePropertyStatus($property)) {
-                return AvailabilityResult::validationFailed([
-                    'property' => 'Property is not available for reservations.'
-                ]);
-            }
-
-            //  VALIDA DATAS
-            $dateValidation = $this->validateDates($checkIn, $checkOut, $property);
-            if (!$dateValidation['valid']) {
-                return AvailabilityResult::validationFailed($dateValidation['errors']);
-            }
-
-            //  VALIDA CAPACIDADE
-            $capacityValidation = $this->validateCapacity($property, $adults, $children, $infants);
-            if (!$capacityValidation['valid']) {
-                return AvailabilityResult::validationFailed($capacityValidation['errors']);
-            }
-
-            //  VERIFICA CONFLITOS DE RESERVA
-            $conflicts = $this->checkReservationConflicts($propertyId, $checkIn, $checkOut);
-            if (!empty($conflicts)) {
-                return AvailabilityResult::conflicted($conflicts, $this->formatConflictMessage($conflicts));
-            }
-
-            //  TODAS AS VALIDAÇÕES PASSARAM
-            return AvailabilityResult::available();
-
-        } catch (\Exception $e) {
-            // RO INESPERADO
-            return AvailabilityResult::validationFailed([
-                'system' => 'Unable to check availability at this time.'
-            ]);
+    public function execute(int $propertyId, Carbon $checkIn, Carbon $checkOut, int $adults, int $children = 0, int $infants = 0): array
+    {
+        // 1. FIND PROPERTY
+        $property = Property::find($propertyId);
+        if (!$property) {
+            return $this->error('Property not found');
         }
+
+        // 2. VALIDATE DATES
+        $dateError = $this->validateDates($checkIn, $checkOut, $property);
+        if ($dateError) {
+            return $this->error($dateError);
+        }
+
+        // 3. VALIDATE GUESTS
+        $guestError = $this->validateGuests($property, $adults, $children, $infants);
+        if ($guestError) {
+            return $this->error($guestError);
+        }
+
+        // 4. CHECK FOR CONFLICTS
+        if ($this->hasDateConflicts($propertyId, $checkIn, $checkOut)) {
+            return $this->error('Selected dates are not available');
+        }
+
+        // 5. SUCCESS - CAN RESERVE
+        return [
+            'available' => true,
+            'property' => [
+                'id' => $property->id,
+                'title' => $property->title,
+                'max_guests' => $property->max_guests
+            ],
+            'nights' => $checkIn->diffInDays($checkOut)
+        ];
     }
 
-    //Valida se a propriedade está disponível para reservas
-    private function validatePropertyStatus(Property $property): bool
+    private function validateDates(Carbon $checkIn, Carbon $checkOut, Property $property): ?string
     {
-        return $property->published && $property->active;
-    }
+        if ($checkIn->isPast()) {
+            return 'Check-in date cannot be in the past';
+        }
 
-    //Valida as datas conforme regras da propriedade
-    private function validateDates(Carbon $checkIn, Carbon $checkOut, Property $property): array
-    {
-        $errors = [];
         $nights = $checkIn->diffInDays($checkOut);
 
-        //  Check-in não pode ser no passado
-        if ($checkIn->isPast()) {
-            $errors['check_in'] = 'Check-in date cannot be in the past.';
-        }
-
-        //  Mínimo de noites
         if ($property->min_nights && $nights < $property->min_nights) {
-            $errors['nights'] = "Minimum stay is {$property->min_nights} nights.";
+            return "Minimum stay is {$property->min_nights} nights";
         }
 
-        //  Máximo de noites
         if ($property->max_nights && $nights > $property->max_nights) {
-            $errors['nights'] = "Maximum stay is {$property->max_nights} nights.";
+            return "Maximum stay is {$property->max_nights} nights";
         }
 
-        return [
-            'valid' => empty($errors),
-            'errors' => $errors
-        ];
+        return null;
     }
 
-    //Valida capacidade da propriedade
-    private function validateCapacity(Property $property, int $adults, int $children, int $infants): array
+    private function validateGuests(Property $property, int $adults, int $children, int $infants): ?string
     {
-        $errors = [];
         $totalGuests = $adults + $children;
 
-        // Pelo menos 1 adulto
         if ($adults < 1) {
-            $errors['adults'] = 'At least one adult is required.';
+            return 'At least 1 adult is required';
         }
 
-        //  Excede capacidade máxima
         if ($totalGuests > $property->max_guests) {
-            $errors['guests'] = "This property accommodates maximum {$property->max_guests} guests.";
+            return "Maximum {$property->max_guests} guests allowed";
         }
 
-        //  Números negativos
-        if ($children < 0 || $infants < 0) {
-            $errors['guests'] = 'Number of children and infants cannot be negative.';
-        }
-
-        return [
-            'valid' => empty($errors),
-            'errors' => $errors
-        ];
+        return null;
     }
 
-    //Verifica conflitos com reservas existentes
-    private function checkReservationConflicts(int $propertyId, Carbon $checkIn, Carbon $checkOut): array
+    private function hasDateConflicts(int $propertyId, Carbon $checkIn, Carbon $checkOut): bool
     {
-        $conflictingReservations = Reservation::where('property_id', $propertyId)
-            ->active()->where(function ($query) use ($checkIn, $checkOut) {
-                // Lógica de conflito: reservas que se sobrepõem
+        return Reservation::where('property_id', $propertyId)
+            ->where(function ($query) use ($checkIn, $checkOut) {
                 $query->whereBetween('check_in', [$checkIn, $checkOut->copy()->subDay()])
                     ->orWhereBetween('check_out', [$checkIn->copy()->addDay(), $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
@@ -150,36 +90,17 @@ class CheckAvailabilityAction
                             ->where('check_out', '>=', $checkOut);
                     });
             })
-            ->get();
-
-        if ($conflictingReservations->isEmpty()) {
-            return [];
-        }
-
-        return $conflictingReservations->map(function ($reservation) {
-            return [
-                'reservation_code' => $reservation->reservation_code,
-                'check_in' => $reservation->check_in->toDateString(),
-                'check_out' => $reservation->check_out->toDateString(),
-                'status' => $reservation->status->name,
-            ];
-        })->toArray();
+            ->whereHas('status', function ($query) {
+                $query->whereIn('name', ['Pendente', 'Confirmada']);
+            })
+            ->exists();
     }
 
-   //Formata mensagem de conflito para o usuário
-    private function formatConflictMessage(array $conflicts): string
+    private function error(string $message): array
     {
-        if (empty($conflicts)) {
-            return 'No conflicts found.';
-        }
-
-        $conflict = $conflicts[0]; // Pega o primeiro conflito
-        return "Property is not available. Conflicting reservation {$conflict['reservation_code']} from {$conflict['check_in']} to {$conflict['check_out']}.";
-    }
-
-       public function isAvailable(int $propertyId, Carbon $checkIn, Carbon $checkOut): bool
-    {
-        $result = $this->execute($propertyId, $checkIn, $checkOut);
-        return $result->available;
+        return [
+            'available' => false,
+            'message' => $message
+        ];
     }
 }

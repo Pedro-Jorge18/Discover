@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Reservation;
 
 use App\Actions\Reservation\CheckAvailabilityAction;
+use App\Actions\Reservation\CalculatePricingAction;
 use App\Actions\Reservation\CreateReservationAction;
+use App\Actions\Reservation\ValidateReservationAction;
 use App\DTOs\Reservation\ReservationData;
-use App\DTOs\Reservation\AvailabilityResult;
+use App\Http\Resources\Reservation\ReservationResource;
 use App\Models\Reservation;
 use App\Models\ReservationStatus;
 use App\Models\Property;
-use App\Models\User;
-use App\Services\Payment\PaymentServiceInterface;
-use App\Exceptions\Reservation\ReservationConflictException;
-use App\Exceptions\Reservation\ReservationCreationException;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,188 +19,126 @@ use Illuminate\Support\Facades\Log;
 class ReservationService
 {
     public function __construct(
-        private CheckAvailabilityAction $checkAvailabilityAction,
-        private CreateReservationAction $createReservationAction,
-        private ?PaymentServiceInterface $paymentService = null
+        private CheckAvailabilityAction $checkAvailability,
+        private CalculatePricingAction $calculatePricing,
+        private CreateReservationAction $createReservation,
+        private ValidateReservationAction $validateReservation
     ) {}
 
     /**
-     * Cria uma nova reserva - MÉTODO PRINCIPAL
-     *
-     * @param array $data Dados da reserva
-     * @param int $userId ID do usuário
-     * @return Reservation
-     * @throws ReservationCreationException
+     * Verifica disponibilidade de uma propriedade
+     */
+    public function checkAvailability(int $propertyId, string $checkIn, string $checkOut, int $adults = 1, int $children = 0, int $infants = 0): array
+    {
+        try {
+            $result = $this->checkAvailability->execute(
+                $propertyId,
+                Carbon::parse($checkIn),
+                Carbon::parse($checkOut),
+                $adults,
+                $children,
+                $infants
+            );
+
+            // Se disponível, calcula preços também
+            if ($result['available']) {
+                $property = Property::find($propertyId);
+                $pricing = $this->calculatePricing->execute(
+                    $property,
+                    Carbon::parse($checkIn),
+                    Carbon::parse($checkOut)
+                );
+
+                $result['pricing'] = $pricing;
+                $result['dates'] = [
+                    'check_in' => $checkIn,
+                    'check_out' => $checkOut,
+                    'nights' => $pricing['nights']
+                ];
+            }
+
+            return $result;
+
+        } catch (\Exception $e) {
+            Log::error('Availability check failed', [
+                'property_id' => $propertyId,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'available' => false,
+                'message' => 'Error checking availability'
+            ];
+        }
+    }
+
+    /**
+     * Cria uma nova reserva
      */
     public function createReservation(array $data, int $userId): Reservation
     {
-        Log::info('Starting reservation creation', ['user_id' => $userId, 'property_id' => $data['property_id']]);
-
         try {
-            // VALIDAR E PREPARAR DADOS
-            $reservationData = $this->prepareReservationData($data, $userId);
+            // Prepara dados com user_id
+            $data['user_id'] = $userId;
 
-            // CRIAR RESERVA (já inclui validação de disponibilidade)
-            $reservation = $this->createReservationAction->execute($reservationData);
+            // Converte para DTO
+            $reservationData = $this->prepareReservationData($data);
 
-            // REGISTRAR LOG DE SUCESSO
+            if (empty($reservationData['property_id']) || empty($reservationData['check_in']) || empty($reservationData['check_out'])) {
+                throw new \Exception('Dados da reserva incompletos');
+            }
+
+            // Cria a reserva
+            $reservation = $this->createReservation->execute($reservationData);
+
+            // Cria a reserva
+            $reservation = $this->createReservation->execute($data);
+
             Log::info('Reservation created successfully', [
                 'reservation_code' => $reservation->reservation_code,
-                'user_id' => $userId,
-                'total_amount' => $reservation->total_amount
+                'user_id' => $userId
             ]);
 
             return $reservation;
 
-        } catch (ReservationConflictException $e) {
-            Log::warning('Reservation conflict', [
+        } catch (\Exception $e) {
+            Log::error('Reservation creation failed', [
                 'user_id' => $userId,
-                'property_id' => $data['property_id'],
+                'property_id' => $data['property_id'] ?? 'unknown',
                 'error' => $e->getMessage()
             ]);
-            throw $e;
 
-        } catch (\Exception $e) {
-            Log::error('Unexpected error creating reservation', [
-                'user_id' => $userId,
-                'property_id' => $data['property_id'],
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw new ReservationCreationException(
-                'Internal error creating reservation: ' . $e->getMessage()
-            );
+            throw $e;
         }
     }
 
-    //Verifica disponibilidade de propriedade
-    public function checkAvailability(
-        int $propertyId,
-        Carbon $checkIn,
-        Carbon $checkOut,
-        int $adults = 1,
-        int $children = 0,
-        int $infants = 0
-    ): AvailabilityResult {
-        return $this->checkAvailabilityAction->execute(
-            propertyId: $propertyId,
-            checkIn: $checkIn,
-            checkOut: $checkOut,
-            adults: $adults,
-            children: $children,
-            infants: $infants
-        );
-    }
-
-    // Cria reserva com pagamento integrado
-    public function createReservationWithPayment(array $data, int $userId, array $paymentData = []): array
+    /**
+     * Cria reserva com pagamento instantâneo
+     */
+    public function createReservationWithPayment(array $data, int $userId, string $paymentMethod): Reservation
     {
-        return DB::transaction(function () use ($data, $userId, $paymentData) {
-            // CRIAR RESERVA
-            $reservation = $this->createReservation($data, $userId);
+        return DB::transaction(function () use ($data, $userId, $paymentMethod) {
+            $reservation = $this->createReservation->executeWithFullPayment($data, $paymentMethod);
 
-            // PROCESSAR PAGAMENTO SE NECESSÁRIO
-            $paymentResult = null;
-            $remainingBalance = $reservation->getRemainingBalance();
+            Log::info('Reservation created with payment', [
+                'reservation_code' => $reservation->reservation_code,
+                'payment_method' => $paymentMethod
+            ]);
 
-            if ($remainingBalance > 0 && $this->paymentService) {
-                $paymentResult = $this->processReservationPayment($reservation->id, $paymentData);
-            }
-
-            return [
-                'reservation' => $reservation,
-                'payment' => $paymentResult,
-                'remaining_balance' => $remainingBalance
-            ];
+            return $reservation;
         });
     }
 
-    //Processa pagamento para uma reserva
-    public function processReservationPayment(int $reservationId, array $paymentData): array
-    {
-        $reservation = Reservation::findOrFail($reservationId);
-
-        if (!$this->paymentService) {
-            throw new \RuntimeException('Payment service not available');
-        }
-
-        // VALIDAR SE AINDA HÁ SALDO PENDENTE
-        if ($reservation->getRemainingBalance() <= 0) {
-            throw new \InvalidArgumentException('Reservation already paid');
-        }
-
-        // PROCESSAR PAGAMENTO (integração futura)
-        // $paymentResult = $this->paymentService->createPaymentIntent([
-        //     'amount' => $reservation->getRemainingBalance(),
-        //     'currency' => 'BRL',
-        //     'metadata' => [
-        //         'reservation_id' => $reservation->id,
-        //         'reservation_code' => $reservation->reservation_code
-        //     ]
-        // ]);
-
-        return [
-            'reservation_id' => $reservation->id,
-            'amount_due' => $reservation->getRemainingBalance(),
-            'payment_processed' => false, // Temporariamente false
-            'message' => 'Payment processing would be implemented here'
-        ];
-    }
-
-    //Confirma uma reserva
-    public function confirmReservation(int $reservationId): Reservation
-    {
-        $reservation = Reservation::with(['property', 'user', 'status'])->findOrFail($reservationId);
-
-        $confirmedStatus = ReservationStatus::where('name', 'Confirmed')->first();
-
-        if (!$confirmedStatus) {
-            throw new \RuntimeException('Confirmed status not found');
-        }
-
-        $reservation->update([
-            'status_id' => $confirmedStatus->id,
-            'confirmed_at' => now()
-        ]);
-
-        Log::info('Reserved confirmed', ['reservation_id' => $reservationId]);
-
-        return $reservation->fresh();
-    }
-
-    // Cancela uma reserva
-    public function cancelReservation(int $reservationId, string $reason = null): Reservation
-    {
-        $reservation = Reservation::with(['property', 'user', 'status'])->findOrFail($reservationId);
-
-        $cancelledStatus = ReservationStatus::where('name', 'Cancelled')->first();
-
-        if (!$cancelledStatus) {
-            throw new \RuntimeException('Cancelled status not found');
-        }
-
-        $reservation->update([
-            'status_id' => $cancelledStatus->id,
-            'cancellation_reason' => $reason,
-            'cancelled_at' => now()
-        ]);
-
-        Log::info('Reserved Cancelled', [
-            'reservation_id' => $reservationId,
-            'reason' => $reason
-        ]);
-
-        return $reservation->fresh();
-    }
-
-    // Obtém reservas de um usuário
+    /**
+     * Busca reservas de um usuário
+     */
     public function getUserReservations(int $userId, array $filters = []): Collection
     {
         $query = Reservation::with(['property', 'status'])
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc');
 
-        // FILTROS
+        // Filtros
         if (isset($filters['status'])) {
             $query->whereHas('status', function ($q) use ($filters) {
                 $q->where('name', $filters['status']);
@@ -217,10 +153,17 @@ class ReservationService
             $query->where('check_out', '<', now());
         }
 
+        if (isset($filters['current']) && $filters['current']) {
+            $query->where('check_in', '<=', now())
+                ->where('check_out', '>=', now());
+        }
+
         return $query->get();
     }
 
-    // Obtém reservas de uma propriedade
+    /**
+     * Busca reservas de uma propriedade
+     */
     public function getPropertyReservations(int $propertyId, array $filters = []): Collection
     {
         $query = Reservation::with(['user', 'status'])
@@ -243,78 +186,69 @@ class ReservationService
 
         return $query->get();
     }
-    private function generateReservationCode(): string
+
+    /**
+     * Encontra reserva específica do usuário
+     */
+    public function findUserReservation(int $reservationId, int $userId): ?Reservation
     {
-        return 'RES' . strtoupper(uniqid()) . now()->format('His');
+        return Reservation::where('id', $reservationId)
+            ->where('user_id', $userId)
+            ->with(['property', 'status', 'user'])
+            ->first();
     }
 
-    // Prepara dados para criação da reserva
-    private function prepareReservationData(array $data, int $userId): ReservationData
+    /**
+     * Cancela uma reserva
+     */
+    public function cancelReservation(int $reservationId, int $userId, ?string $reason = null): Reservation
     {
-        // SEGURANÇA: Garante que user_id vem do usuário autenticado
-        $data['user_id'] = $userId;
+        $reservation = $this->findUserReservation($reservationId, $userId);
 
-        // BUSCA PREÇOS DA PROPRIEDADE (se não foram fornecidos)
-        if (!isset($data['price_per_night']) && isset($data['property_id'])) {
-            $property = Property::find($data['property_id']);
-
-            if (!$property) {
-                throw new \InvalidArgumentException('Property not found');
-            }
-
-            // Apenas define preços, NÃO calcula totais
-            $data['price_per_night'] = $property->price_per_night;
-            $data['cleaning_fee'] = $data['cleaning_fee'] ?? $property->cleaning_fee;
-            $data['service_fee'] = $data['service_fee'] ?? $property->service_fee;
-
-            // O DTO vai calcular subtotal e total_amount automaticamente!
+        if (!$reservation) {
+            throw new \Exception('Reservation not found');
         }
 
-        // STATUS PADRÃO
-        if (!isset($data['status_id'])) {
-            $pendingStatus = ReservationStatus::where('name', 'Pending')->first();
-            if ($pendingStatus) {
-                $data['status_id'] = $pendingStatus->id;
-            }
+        if (!$reservation->isCancellable()) {
+            throw new \Exception('This reservation cannot be cancelled');
         }
 
-        // CÓDIGO DA RESERVA
-        if (!isset($data['reservation_code'])) {
-            $data['reservation_code'] = $this->generateReservationCode();
-        }
+        $reservation->cancel($reason);
 
-       return ReservationData::fromArray($data);
+        Log::info('Reservation cancelled', [
+            'reservation_id' => $reservationId,
+            'user_id' => $userId,
+            'reason' => $reason
+        ]);
+
+        return $reservation->fresh();
     }
 
-    // Verifica disponibilidade em lote para múltiplas propriedades
-    public function checkMultiplePropertiesAvailability(
-        array $propertyIds,
-        Carbon $checkIn,
-        Carbon $checkOut,
-        int $adults = 1,
-        int $children = 0,
-        int $infants = 0
-    ): array {
-        $results = [];
+    /**
+     * Confirma uma reserva (para hosts)
+     */
+    public function confirmReservation(int $reservationId): Reservation
+    {
+        $reservation = Reservation::findOrFail($reservationId);
 
-        foreach ($propertyIds as $propertyId) {
-            $result = $this->checkAvailability(
-                $propertyId,
-                $checkIn,
-                $checkOut,
-                $adults,
-                $children,
-                $infants
-            );
+        $confirmedStatus = ReservationStatus::where('name', 'Confirmada')->first();
 
-            $results[$propertyId] = $result;
+        if (!$confirmedStatus) {
+            throw new \Exception('Confirmed status not found');
         }
 
-        return $results;
+        $reservation->update([
+            'status_id' => $confirmedStatus->id,
+            'confirmed_at' => now()
+        ]);
+
+        return $reservation->fresh();
     }
 
-    // Obtém estatísticas de reservas
-    public function getReservationStats(int $userId = null): array
+    /**
+     * Estatísticas de reservas
+     */
+    public function getReservationStats(?int $userId = null): array
     {
         $query = Reservation::query();
 
@@ -324,8 +258,8 @@ class ReservationService
 
         $total = $query->count();
         $confirmed = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Confirmada'))->count();
-        $pending = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Pending'))->count();
-        $cancelled = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Cancelled'))->count();
+        $pending = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Pendente'))->count();
+        $cancelled = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Cancelada'))->count();
 
         return [
             'total' => $total,
@@ -333,6 +267,39 @@ class ReservationService
             'pending' => $pending,
             'cancelled' => $cancelled,
             'completion_rate' => $total > 0 ? round(($confirmed / $total) * 100, 2) : 0,
+        ];
+    }
+
+    /**
+     * Verifica disponibilidade em lote para múltiplas propriedades
+     */
+    public function checkMultiplePropertiesAvailability(array $propertyIds, string $checkIn, string $checkOut, int $adults = 1): array
+    {
+        $results = [];
+
+        foreach ($propertyIds as $propertyId) {
+            $results[$propertyId] = $this->checkAvailability(
+                $propertyId,
+                $checkIn,
+                $checkOut,
+                $adults
+            );
+        }
+
+        return $results;
+    }
+    private function prepareReservationData(array $data): array
+    {
+        return [
+            'property_id' => $data['property_id'],
+            'user_id' => $data['user_id'],
+            'check_in' => $data['check_in'],
+            'check_out' => $data['check_out'],
+            'adults' => $data['adults'] ?? 1,
+            'children' => $data['children'] ?? 0,
+            'infants' => $data['infants'] ?? 0,
+            'special_requests' => $data['special_requests'] ?? null,
+
         ];
     }
 }

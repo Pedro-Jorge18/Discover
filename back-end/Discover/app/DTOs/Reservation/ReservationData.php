@@ -3,7 +3,7 @@
 namespace App\DTOs\Reservation;
 
 use Carbon\Carbon;
-use App\Actions\Reservation\validatesReservation;
+use App\Actions\Reservation\validateReservationAction;
 use InvalidArgumentException;
 
 class ReservationData
@@ -41,8 +41,8 @@ class ReservationData
     )
     {
         $this->calculateDerivedFields();
-        $this->ValidateBasicRules();
-        $this->validateWithAction();
+
+
 
     }
 
