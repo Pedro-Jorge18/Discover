@@ -40,8 +40,8 @@ class ReservationData
         public ?Carbon $payment_date = null,
     )
     {
-        $this->ValidateBasicRules();
         $this->calculateDerivedFields();
+        $this->ValidateBasicRules();
         $this->validateWithAction();
 
     }
@@ -72,7 +72,7 @@ class ReservationData
     {
         $validator = new ValidatesReservation();
 
-        // 🎯 DELEGA validações complexas para a Action
+        // DELEGA validações complexas para a Action
         $validator->validateDates($this->check_in, $this->check_out);
         $validator->validateGuests($this->adults, $this->children, $this->infants);
         $validator->validateFinancials(
@@ -110,7 +110,7 @@ class ReservationData
             status_id: (int) $data['status_id'],
             check_in: Carbon::parse($data['check_in']),
             check_out: Carbon::parse($data['check_out']),
-            nights: (int) $data['nights'],
+            nights: 0,
             adults: (int) ($data['adults'] ?? 1),
             children: (int) ($data['children'] ?? 0),
             infants: (int) ($data['infants'] ?? 0),
@@ -118,8 +118,8 @@ class ReservationData
             cleaning_fee: (float) ($data['cleaning_fee'] ?? 0),
             service_fee: (float) ($data['service_fee'] ?? 0),
             security_deposit: (float) ($data['security_deposit'] ?? 0),
-            subtotal: (float) ($data['subtotal'] ?? 0),
-            total_amount: (float) ($data['total_amount'] ?? 0),
+            subtotal: 0,
+            total_amount: 0,
             amount_paid: (float) ($data['amount_paid'] ?? 0),
             payment_method: $data['payment_method'] ?? null,
             transaction_id: $data['transaction_id'] ?? null,
