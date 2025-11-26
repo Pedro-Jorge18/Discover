@@ -13,16 +13,39 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Middleware para SPA stateful (opcional)
-        $middleware->prependToGroup('api', [
-            EnsureFrontendRequestsAreStateful::class,
+        // Caso precises de middleware global, podes usar:
+        // $middleware->append(\App\Http\Middleware\SomeGlobalMiddleware::class);
+
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Http\Middleware\HandleCors::class,
         ]);
 
-        // Alias para o middleware (mas NÃO aplique globalmente)
         $middleware->alias([
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
-            'auth.sanctum' => \Illuminate\Auth\Middleware\Authenticate::class,
         ]);
+
+        // Configurar CORS
+        $middleware->validateCsrfTokens(except: [
+            'webhook/stripe',
+            'api/webhook/stripe',
+        ]);
+
+
+        // // Adicionar middleware para SPA stateful (cookies + CSRF) — opcional
+        // $middleware->prependToGroup('api', [
+        //     EnsureFrontendRequestsAreStateful::class,
+        // ]);
+
+        // // Adicionar alias para o middleware de autenticação (route middleware)
+        // $middleware->alias([
+        //     'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+        // ]);
+
+        // // Se quiseres agrupar middleware para o grupo “api”:
+        // $middleware->appendToGroup('api', [
+        //     'auth.sanctum',
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
