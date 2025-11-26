@@ -1,38 +1,61 @@
 <?php
 
 use App\Http\Controllers\PropertyController;
-use Illuminate\Http\Request;
 use App\Http\Controllers\PropertyImageController;
+use App\Http\Controllers\ReservationController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 
-Route::apiResource('properties', PropertyController::class)->only(['index', 'show']);
+Route::apiResource('properties', PropertyController::class)->only('index', 'show');
 
-Route::prefix('auth')->group(function () {
-    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
 
-        // Routes de imagens
-        Route::prefix('properties/{property}')->group(function () {
-            Route::post('/images', [PropertyImageController::class, 'store']);
-            Route::delete('/images/{image}', [PropertyImageController::class, 'destroy']);
-            Route::patch('/images/{image}/primary', [PropertyImageController::class, 'setPrimary']);
-            Route::patch('/images/reorder', [PropertyImageController::class, 'reorder']);
-        });
+//auth
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+Route::post('/forgot-password', [PasswordResetController::class, 'forgetPassword']);
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::get('me', [AuthController::class, 'me']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Rotas de Usuário
+    Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+    // Rotas protegidas de properties
+    Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
+
+    // Routes de imagens
+    Route::prefix('properties/{property}')->group(function () {
+        Route::post('/images', [PropertyImageController::class, 'store']);
+        Route::delete('/images/{image}', [PropertyImageController::class, 'destroy']);
+        Route::patch('/images/{image}/primary', [PropertyImageController::class, 'setPrimary']);
+        Route::patch('/images/reorder', [PropertyImageController::class, 'reorder']);
     });
-    Route::post('/forgot-password', [PasswordResetController::class, 'forgetPassword']);
-    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
+
+    // Rotas de RESERVAS
+    Route::prefix('reservations')->group(function () {
+        // Reservas do usuário
+        Route::get('/', [ReservationController::class, 'index']);
+        Route::post('/', [ReservationController::class, 'store']);
+        Route::post('/with-payment', [ReservationController::class, 'storeWithPayment']);
+        Route::get('/stats', [ReservationController::class, 'stats']);
+        Route::get('/{id}', [ReservationController::class, 'show']);
+        Route::delete('/{id}', [ReservationController::class, 'destroy']);
+        Route::post('/{id}/confirm', [ReservationController::class, 'confirm']);
+    });
+
+    // Rotas de disponibilidade
+    Route::get('/properties/{id}/availability', [ReservationController::class, 'checkAvailability']);
+    Route::post('/properties/availability/batch', [ReservationController::class, 'checkMultipleAvailability']);
+
+    // Reservas da propriedade (host)
+    Route::get('/properties/{id}/reservations', [ReservationController::class, 'propertyReservations']);
+
 });
-
-
 
 //payment
 Route::prefix('payments')->middleware(['auth:sanctum'])->group(function () {
