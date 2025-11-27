@@ -29,9 +29,16 @@ return [
     'success' => 'Authentication successful.',
     'failed' => 'Authentication failed.',
     'user_not_authenticated' => 'User not authenticated.',
-    'user_not_found' => 'No user found with email :email',
-    'reset_link_sent' => 'A link to reset your password has been sent to your email.',
-    'reset_failed' => 'We were unable to send the reset email. Please try again later.',
-    'password_mismatch' => 'Message',
-    'password_reset_failed' => 'Message'
+    'unauthenticated' => 'You must be logged in.',
+    '2fa' => [
+        'enabled_success' => 'Two-factor authentication enabled successfully.',
+        'verified_success' => 'Two-factor authentication verified successfully.',
+        'invalid_code' => 'Invalid verification code.',
+        'enable_failed' => 'Two-factor authentication enabled failed.',
+        'verify_failed' => 'Two-factor authentication verification failed.',
+        'disabled_success' => 'Two-factor authentication disabled successfully.',
+        'disable_failed' => 'Two-factor authentication disabled failed.',
+
+    ],
+
 ];
