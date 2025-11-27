@@ -2,65 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PropertyImage;
+use App\Actions\property\authorizePropertyOwnership;
 use App\Http\Requests\StorePropertyImageRequest;
-use App\Http\Requests\UpdatePropertyImageRequest;
+use App\Models\Property;
+use App\Models\PropertyImage;
+use App\Services\Property\PropertyImageService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
 
 class PropertyImageController extends Controller
 {
+    public function __construct(
+        private PropertyImageService $service,
+        private authorizePropertyOwnership $authorizePropertyOwnership,
+    ) {}
+
     /**
-     * Display a listing of the resource.
+     * @throws \Throwable
      */
-    public function index()
+    public function store(StorePropertyImageRequest $request, Property $property): JsonResponse
     {
-        //
+        ($this->authorizePropertyOwnership)($property);
+
+        $metadata = $request->safe()->except(['images']);
+            $uploaded = $this->service->uploadImages(
+                $property,
+                $request->file('images'),
+                $metadata
+            );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Images uploaded successfully',
+            'images' => $uploaded
+        ], 201);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @throws \Throwable
      */
-    public function create()
+    public function setPrimary(Property $property, PropertyImage $image): JsonResponse
     {
-        //
+        ($this->authorizePropertyOwnership)($property);
+
+        if ($image->property_id !== $property->id) {
+            abort(404, 'Image not found for this property.');
+        }
+        $this->service->setPrimaryImage($image);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Primary image set successfully'
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @throws \Throwable
      */
-    public function store(StorePropertyImageRequest $request)
+    public function reorder(Request $request, Property $property): JsonResponse
     {
-        //
+        $this->authorizePropertyOwnership->execute($property);
+
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:property_images,id'
+        ]);
+
+        //Check if all IDs belong to the property.
+        $validImageIds = $property->images()->pluck('id')->toArray();
+        foreach ($request->input('order', []) as $imageId) {
+            if (!in_array($imageId, $validImageIds)) {
+                abort(422, 'Invalid image ID in order array');
+            }
+        }
+        $orderData = $request->input('order', []);
+        $this->service->reorderImages($property, $orderData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Images reordered successfully'
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * @throws \Throwable
      */
-    public function show(PropertyImage $propertyImage)
+    public function destroy(Property $property, PropertyImage $image): JsonResponse
     {
-        //
-    }
+        $this->authorizePropertyOwnership->execute($property);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PropertyImage $propertyImage)
-    {
-        //
-    }
+        if ($image->property_id !== $property->id) {
+            abort(404, 'Image not found for this property.');
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePropertyImageRequest $request, PropertyImage $propertyImage)
-    {
-        //
-    }
+        $this->service->deleteImage($image);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PropertyImage $propertyImage)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'message' => 'Image deleted successfully'
+        ]);
     }
 }
