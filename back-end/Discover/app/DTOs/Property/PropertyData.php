@@ -39,12 +39,18 @@ class PropertyData
         public string $check_in_time = '15:00',
         public string $check_out_time = '11:00',
         public ?int $min_nights = 1,
-        public ?int $max_nights = 30
+        public ?int $max_nights = 30,
+
+        public array $amenities = []
 
     )
     {
         if($this->price_per_night < 1){
             throw new InvalidArgumentException('price per night must be greater than 0');
+        }
+
+        if (count($this->amenities) > 50) {
+            throw new InvalidArgumentException('Maximum 50 amenities allowed');
         }
     }
     //recebe os dados da API
@@ -77,7 +83,9 @@ class PropertyData
             check_in_time: $data['check_in_time'] ?? '15:00',
             check_out_time: $data['check_out_time'] ?? '11:00',
             min_nights: $data['min_nights'] ?? 1,
-            max_nights: $data['max_nights'] ?? 30
+            max_nights: $data['max_nights'] ?? 30,
+
+            amenities: $data['amenities'] ?? [],
 
         );
     }
@@ -111,6 +119,8 @@ class PropertyData
             'check_out_time' => $this->check_out_time,
             'min_nights' => $this->min_nights,
             'max_nights' => $this->max_nights,
+
+            'amenities' => $this->amenities,
 
         ];
     }

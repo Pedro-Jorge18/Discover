@@ -156,17 +156,6 @@ class Reservation extends Model
     }
 
     //  MÉTODOS DE PREÇO
-    public function calculateTotal(): void
-    {
-        $subtotal = $this->price_per_night * $this->nights;
-        $total = $subtotal + $this->cleaning_fee + $this->service_fee;
-
-        $this->update([
-            'subtotal' => $subtotal,
-            'total_amount' => $total,
-        ]);
-    }
-
     public function getRemainingBalance(): float
     {
         return $this->total_amount - $this->amount_paid;
@@ -241,17 +230,7 @@ class Reservation extends Model
                 $model->reservation_code = self::generateReservationCode();
             }
 
-            // Calcular número de noites
-            if ($model->check_in && $model->check_out) {
-                $model->nights = $model->check_in->diffInDays($model->check_out);
-            }
         });
 
-        static::updating(function ($model) {
-            // Recalcular noites se datas mudarem
-            if ($model->isDirty(['check_in', 'check_out'])) {
-                $model->nights = $model->check_in->diffInDays($model->check_out);
-            }
-        });
     }
 }
