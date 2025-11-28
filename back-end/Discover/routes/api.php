@@ -5,15 +5,13 @@ use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorAuthController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 
-
+// Rotas públicas ----------------------------------------------------------
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
 
 // Autenticação
@@ -21,17 +19,24 @@ Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
-//auth
-Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
-Route::post('/forgot-password', [PasswordResetController::class, 'forgetPassword']);
-Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
-
+    Route::post('/forgot-password', [PasswordResetController::class, 'forgetPassword']);
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
+
     // Rotas de Usuário
-    Route::get('/auth/me', [AuthController::class, 'me']);
-    Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::prefix('auth')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('me', [AuthController::class, 'me']);
+
+        // 2FA
+        Route::prefix('2fa')->group(function () {
+            Route::post('/enable', [TwoFactorAuthController::class, 'enable']);
+            Route::post('/verify', [TwoFactorAuthController::class, 'verify']);
+            Route::post('/disable', [TwoFactorAuthController::class, 'disable']);
+        });
+    });
 
     // Rotas protegidas de properties
     Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
@@ -62,24 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Reservas da propriedade (host)
     Route::get('/properties/{id}/reservations', [ReservationController::class, 'propertyReservations']);
-
-});
-
-    // Auth routes
-    Route::prefix('auth')->group(function () {
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::get('me', [AuthController::class, 'me']);
-    });
-
-    // Properties protegidas
-    Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
-
-    // 2FA
-    Route::prefix('auth/2fa')->group(function () {
-        Route::post('/enable', [TwoFactorAuthController::class, 'enable']);
-        Route::post('/verify', [TwoFactorAuthController::class, 'verify']);
-        Route::post('/disable', [TwoFactorAuthController::class, 'disable']);
-    });
 
     // Payments
     Route::prefix('payments')->group(function () {
