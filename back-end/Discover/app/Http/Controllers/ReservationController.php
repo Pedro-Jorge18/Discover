@@ -192,8 +192,6 @@ class ReservationController extends Controller
 
             $filters = $request->only(['status', 'from_date', 'to_date']);
             $reservations = $this->reservationService->getPropertyReservations($propertyId, $filters);
-            $filters = $request->only(['status', 'from_date', 'to_date']);
-            $reservations = $this->reservationService->getPropertyReservations($propertyId, $filters);
 
             return response()->json([
                 'success' => true,

@@ -8,8 +8,8 @@ use InvalidArgumentException;
 
 class PropertyImageData
 {
-    private const MaxFileSize = 5120 * 1024;
-    private const AllowedMimetype =['image/jpeg', 'image/jpg', 'image/png'];
+    private const MAX_FILE_SIZE = 5120 * 1024;
+    private const ALLOWED_MIME_TYPES =['image/jpeg', 'image/jpg', 'image/png'];
     public function __construct(
         public int $property_id,
         public string $image_path,
@@ -57,15 +57,15 @@ class PropertyImageData
             'original_name' => $this->uploaded_file->getClientOriginalName()
         ]);
 
-        if (!in_array($this->uploaded_file->getMimeType(), self::AllowedMimetype)) {
+        if (!in_array($this->uploaded_file->getMimeType(), self::ALLOWED_MIME_TYPES)) {
             throw new InvalidArgumentException(
-                'Invalid file type. Allowed: ' . implode(', ', self::AllowedMimetype)
+                'Invalid file type. Allowed: ' . implode(', ', self::ALLOWED_MIME_TYPES)
             );
         }
 
-        if ($this->uploaded_file->getSize() > self::MaxFileSize) {
+        if ($this->uploaded_file->getSize() > self::MAX_FILE_SIZE) {
             throw new InvalidArgumentException(
-                'File size must be less than ' . (self::MaxFileSize / 1024 / 1024) . 'MB'
+                'File size must be less than ' . (self::MAX_FILE_SIZE / 1024 / 1024) . 'MB'
             );
         }
     }

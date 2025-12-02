@@ -145,13 +145,10 @@ class ValidateReservationAction
     {
         $hasConflict = Reservation::where('property_id', $property->id)
             ->where(function ($query) use ($data) {
-                $query->whereBetween('check_in', [$data->check_in, $data->check_out->copy()->subDay()])
-                    ->orWhereBetween('check_out', [$data->check_in->copy()->addDay(), $data->check_out])
-                    ->orWhere(function ($q) use ($data) {
-                        $q->where('check_in', '<=', $data->check_in)
-                            ->where('check_out', '>=', $data->check_out);
-                    });
-            })
+                $query->where('check_in', '<', $data->check_out)
+                    ->where('check_out', '>', $data->check_in);
+                    })
+
             ->whereHas('status', function ($query) {
                 $query->whereIn('name', ['Pendente', 'Confirmada']);
             })

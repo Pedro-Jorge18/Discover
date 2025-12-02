@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\property\AuthorizePropertyOwnership;
+use App\Actions\Property\AuthorizePropertyOwnership;
 use App\Http\Requests\StorePropertyImageRequest;
 use App\Models\Property;
 use App\Models\PropertyImage;
@@ -44,7 +44,7 @@ class PropertyImageController extends Controller
      */
     public function setPrimary(Property $property, PropertyImage $image): JsonResponse
     {
-        ($this->authorizePropertyOwnership)($property);
+        $this->authorizePropertyOwnership->execute($property);
 
         if ($image->property_id !== $property->id) {
             abort(404, 'Image not found for this property.');
@@ -64,10 +64,6 @@ class PropertyImageController extends Controller
     {
         $this->authorizePropertyOwnership->execute($property);
 
-        $request->validate([
-            'order' => 'required|array',
-            'order.*' => 'integer|exists:property_images,id'
-        ]);
 
         //Check if all IDs belong to the property.
         $validImageIds = $property->images()->pluck('id')->toArray();
