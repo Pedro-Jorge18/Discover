@@ -7,6 +7,8 @@ use App\Http\Requests\CheckAvailabilityRequest;
 use App\Http\Resources\Reservation\ReservationResource;
 use App\Http\Resources\Reservation\ReservationCollection;
 use App\Http\Resources\Reservation\AvailabilityResource;
+use App\Models\Property;
+use App\Models\Reservation;
 use App\Services\Reservation\ReservationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -150,7 +152,7 @@ class ReservationController extends Controller
     public function checkAvailability(CheckAvailabilityRequest $request, int $propertyId): JsonResponse
     {
         try {
-            $result = $this->reservationService->checkAvailability(
+            $result = $this->reservationService->checkPropertyAvailability(
                 $propertyId,
                 $request->check_in,
                 $request->check_out,
@@ -179,7 +181,17 @@ class ReservationController extends Controller
     public function propertyReservations(Request $request, int $propertyId): JsonResponse
     {
         try {
-            // TODO: Verificar se usuário é host da propriedade
+            $property = Property::findOrFail($propertyId);
+
+            if (auth()->id() !== $property->user_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Acesso não autorizado. Você não é o host desta propriedade.'
+                ], 403);
+            }
+
+            $filters = $request->only(['status', 'from_date', 'to_date']);
+            $reservations = $this->reservationService->getPropertyReservations($propertyId, $filters);
             $filters = $request->only(['status', 'from_date', 'to_date']);
             $reservations = $this->reservationService->getPropertyReservations($propertyId, $filters);
 
@@ -202,7 +214,14 @@ class ReservationController extends Controller
     public function confirm(int $id): JsonResponse
     {
         try {
-            // TODO: Verificar se usuário é host da propriedade
+            $reservation = Reservation::findOrFail($id);
+
+            if (auth()->id() !== $reservation->property->user_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Acesso não autorizado. Você não é o host desta propriedade.'
+                ], 403);
+            }
             $reservation = $this->reservationService->confirmReservation($id);
 
             return response()->json([

@@ -3,7 +3,7 @@
 namespace App\DTOs\Reservation;
 
 use Carbon\Carbon;
-use App\Actions\Reservation\validateReservationAction;
+use App\Actions\Reservation\ValidateReservationAction;
 use InvalidArgumentException;
 
 class ReservationData
@@ -18,16 +18,16 @@ class ReservationData
         public Carbon $check_out,
         public int $nights,
 
-        public int $adults = 1,
-        public int $children = 0,
-        public int $infants = 0,
-
         public float $price_per_night,
         public float $cleaning_fee = 0,
         public float $service_fee = 0,
         public float $security_deposit = 0,
         public float $subtotal = 0,
         public float $total_amount = 0,
+
+        public int $adults = 1,
+        public int $children = 0,
+        public int $infants = 0,
 
         public float $amount_paid = 0,
         public ?string $payment_method = null,
@@ -38,10 +38,16 @@ class ReservationData
         public ?string $reservation_code = null,
         public ?Carbon $confirmed_at = null,
         public ?Carbon $payment_date = null,
+
+        private ?ValidateReservationAction $validator = null
     )
     {
         $this->calculateDerivedFields();
+        $this->validateBasicRules();
 
+        if ($this->validator) {
+            $this->validator->execute($this);
+        }
 
 
     }
@@ -66,26 +72,16 @@ class ReservationData
         if ($this->price_per_night < 0) {
             throw new InvalidArgumentException('Price per night cannot be negative');
         }
+        if ($this->check_in >= $this->check_out) {
+            throw new InvalidArgumentException('Check-in date must be before check-out date');
+        }
+        // Valores financeiros
+        if ($this->total_amount < 0 || $this->amount_paid < 0) {
+            throw new InvalidArgumentException('Amounts cannot be negative');
+        }
     }
 
-    private function validateWithAction(): void
-    {
-        $validator = new ValidatesReservation();
-
-        // DELEGA validações complexas para a Action
-        $validator->validateDates($this->check_in, $this->check_out);
-        $validator->validateGuests($this->adults, $this->children, $this->infants);
-        $validator->validateFinancials(
-            $this->price_per_night,
-            $this->cleaning_fee,
-            $this->service_fee,
-            $this->security_deposit,
-            $this->amount_paid,
-            $this->total_amount
-        );
-    }
-
-    private function calculateDerivedFields(): void
+      private function calculateDerivedFields(): void
     {
         // Calcular numero de noites
         $this->nights = $this->check_in->diffInDays($this->check_out);
@@ -102,7 +98,7 @@ class ReservationData
 
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data, ?ValidateReservationAction $validator = null): self
     {
         return new self(
             property_id: (int) $data['property_id'],

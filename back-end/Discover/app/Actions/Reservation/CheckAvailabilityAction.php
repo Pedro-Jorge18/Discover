@@ -83,12 +83,9 @@ class CheckAvailabilityAction
     {
         return Reservation::where('property_id', $propertyId)
             ->where(function ($query) use ($checkIn, $checkOut) {
-                $query->whereBetween('check_in', [$checkIn, $checkOut->copy()->subDay()])
-                    ->orWhereBetween('check_out', [$checkIn->copy()->addDay(), $checkOut])
-                    ->orWhere(function ($q) use ($checkIn, $checkOut) {
-                        $q->where('check_in', '<=', $checkIn)
-                            ->where('check_out', '>=', $checkOut);
-                    });
+                $query->where('check_in', '<', $checkOut)
+                    ->where('check_out', '>', $checkIn);
+                    
             })
             ->whereHas('status', function ($query) {
                 $query->whereIn('name', ['Pendente', 'Confirmada']);

@@ -3,7 +3,7 @@
 namespace App\Actions\Property;
 
 
-class validatePropertyUpdateAction
+class ValidatePropertyUpdateAction
 {
     public function execute(array $data): void
     {

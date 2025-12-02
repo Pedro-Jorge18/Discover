@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Actions\property;
+namespace App\Actions\Property;
 
 use App\Models\Property;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class authorizePropertyOwnership
+class AuthorizePropertyOwnership
 {
     public function execute(Property $property): void
     {

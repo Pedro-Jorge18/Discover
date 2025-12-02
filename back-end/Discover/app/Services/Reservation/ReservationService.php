@@ -28,7 +28,7 @@ class ReservationService
     /**
      * Verifica disponibilidade de uma propriedade
      */
-    public function checkAvailability(int $propertyId, string $checkIn, string $checkOut, int $adults = 1, int $children = 0, int $infants = 0): array
+    public function checkPropertyAvailability(int $propertyId, string $checkIn, string $checkOut, int $adults = 1, int $children = 0, int $infants = 0): array
     {
         try {
             $result = $this->checkAvailability->execute(
@@ -91,8 +91,6 @@ class ReservationService
             // Cria a reserva
             $reservation = $this->createReservation->execute($reservationData);
 
-            // Cria a reserva
-            $reservation = $this->createReservation->execute($data);
 
             Log::info('Reservation created successfully', [
                 'reservation_code' => $reservation->reservation_code,
@@ -293,8 +291,8 @@ class ReservationService
         return [
             'property_id' => $data['property_id'],
             'user_id' => $data['user_id'],
-            'check_in' => $data['check_in'],
-            'check_out' => $data['check_out'],
+            'check_in' => Carbon::parse($data['check_in']),
+            'check_out' => Carbon::parse($data['check_out']),
             'adults' => $data['adults'] ?? 1,
             'children' => $data['children'] ?? 0,
             'infants' => $data['infants'] ?? 0,

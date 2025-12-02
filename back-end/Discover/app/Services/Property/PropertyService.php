@@ -31,7 +31,7 @@ class PropertyService
         private PropertyImageService          $propertyImageService,
         private CreatePropertyAmenitiesAction $createAmenitiesAction,
         private UpdatePropertyAmenitiesAction $updateAmenitiesAction,
-        private validatePropertyUpdateAction  $validateUpdateAction,
+        private ValidatePropertyUpdateAction  $validateUpdateAction,
     ) {}
 
     public function createService(array $data): JsonResponse

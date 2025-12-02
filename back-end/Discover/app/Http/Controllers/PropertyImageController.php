@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\property\authorizePropertyOwnership;
+use App\Actions\property\AuthorizePropertyOwnership;
 use App\Http\Requests\StorePropertyImageRequest;
 use App\Models\Property;
 use App\Models\PropertyImage;
@@ -15,7 +15,7 @@ class PropertyImageController extends Controller
 {
     public function __construct(
         private PropertyImageService $service,
-        private authorizePropertyOwnership $authorizePropertyOwnership,
+        private AuthorizePropertyOwnership $authorizePropertyOwnership,
     ) {}
 
     /**
@@ -23,7 +23,7 @@ class PropertyImageController extends Controller
      */
     public function store(StorePropertyImageRequest $request, Property $property): JsonResponse
     {
-        ($this->authorizePropertyOwnership)($property);
+        $this->authorizePropertyOwnership->execute($property);
 
         $metadata = $request->safe()->except(['images']);
             $uploaded = $this->service->uploadImages(
