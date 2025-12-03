@@ -83,14 +83,8 @@ class ReservationService
 
             // Converte para DTO
             $reservationData = $this->prepareReservationData($data);
-
-            if (empty($reservationData['property_id']) || empty($reservationData['check_in']) || empty($reservationData['check_out'])) {
-                throw new \Exception('Dados da reserva incompletos');
-            }
-
-            // Cria a reserva
+            $this->validateReservation->execute(ReservationData::fromArray($reservationData));
             $reservation = $this->createReservation->execute($reservationData);
-
 
             Log::info('Reservation created successfully', [
                 'reservation_code' => $reservation->reservation_code,
@@ -229,7 +223,7 @@ class ReservationService
     {
         $reservation = Reservation::findOrFail($reservationId);
 
-        $confirmedStatus = ReservationStatus::where('name', 'Confirmada')->first();
+        $confirmedStatus = ReservationStatus::where('name', 'Confirmed')->first();
 
         if (!$confirmedStatus) {
             throw new \Exception('Confirmed status not found');
@@ -255,9 +249,9 @@ class ReservationService
         }
 
         $total = $query->count();
-        $confirmed = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Confirmada'))->count();
-        $pending = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Pendente'))->count();
-        $cancelled = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Cancelada'))->count();
+        $confirmed = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Confirmed'))->count();
+        $pending = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Pending'))->count();
+        $cancelled = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Cancelled'))->count();
 
         return [
             'total' => $total,
@@ -276,7 +270,7 @@ class ReservationService
         $results = [];
 
         foreach ($propertyIds as $propertyId) {
-            $results[$propertyId] = $this->checkAvailability(
+            $results[$propertyId] = $this->checkPropertyAvailability(
                 $propertyId,
                 $checkIn,
                 $checkOut,
@@ -297,6 +291,7 @@ class ReservationService
             'children' => $data['children'] ?? 0,
             'infants' => $data['infants'] ?? 0,
             'special_requests' => $data['special_requests'] ?? null,
+
 
         ];
     }

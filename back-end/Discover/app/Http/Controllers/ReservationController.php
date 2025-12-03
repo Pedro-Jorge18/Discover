@@ -183,10 +183,10 @@ class ReservationController extends Controller
         try {
             $property = Property::findOrFail($propertyId);
 
-            if (auth()->id() !== $property->user_id) {
+            if (auth()->id() !== $property->host_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Acesso não autorizado. Você não é o host desta propriedade.'
+                    'message' => 'Access denied. You are not the host of this property.'
                 ], 403);
             }
 
@@ -214,10 +214,10 @@ class ReservationController extends Controller
         try {
             $reservation = Reservation::findOrFail($id);
 
-            if (auth()->id() !== $reservation->property->user_id) {
+            if (auth()->id() !== $reservation->property->host_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Acesso não autorizado. Você não é o host desta propriedade.'
+                    'message' => 'Access denied. You are not the host of this property.'
                 ], 403);
             }
             $reservation = $this->reservationService->confirmReservation($id);

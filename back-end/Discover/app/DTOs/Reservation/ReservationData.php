@@ -38,18 +38,10 @@ class ReservationData
         public ?string $reservation_code = null,
         public ?Carbon $confirmed_at = null,
         public ?Carbon $payment_date = null,
-
-        private ?ValidateReservationAction $validator = null
     )
     {
         $this->calculateDerivedFields();
         $this->validateBasicRules();
-
-        if ($this->validator) {
-            $this->validator->execute($this);
-        }
-
-
     }
 
     private function validateBasicRules(): void
@@ -81,7 +73,7 @@ class ReservationData
         }
     }
 
-      private function calculateDerivedFields(): void
+    private function calculateDerivedFields(): void
     {
         // Calcular numero de noites
         $this->nights = $this->check_in->diffInDays($this->check_out);
@@ -98,24 +90,24 @@ class ReservationData
 
     }
 
-    public static function fromArray(array $data, ?ValidateReservationAction $validator = null): self
+    public static function fromArray(array $data): self
     {
         return new self(
             property_id: (int) $data['property_id'],
             user_id: (int) $data['user_id'],
-            status_id: (int) $data['status_id'],
+            status_id: (int) $data['status_id'] ?? 0,
             check_in: Carbon::parse($data['check_in']),
             check_out: Carbon::parse($data['check_out']),
             nights: 0,
-            adults: (int) ($data['adults'] ?? 1),
-            children: (int) ($data['children'] ?? 0),
-            infants: (int) ($data['infants'] ?? 0),
             price_per_night: (float) $data['price_per_night'],
             cleaning_fee: (float) ($data['cleaning_fee'] ?? 0),
             service_fee: (float) ($data['service_fee'] ?? 0),
             security_deposit: (float) ($data['security_deposit'] ?? 0),
-            subtotal: 0,
-            total_amount: 0,
+            subtotal: (float) ($data['subtotal'] ?? 0),
+            total_amount: (float) ($data['total_amount'] ?? 0),
+            adults: (int) ($data['adults'] ?? 1),
+            children: (int) ($data['children'] ?? 0),
+            infants: (int) ($data['infants'] ?? 0),
             amount_paid: (float) ($data['amount_paid'] ?? 0),
             payment_method: $data['payment_method'] ?? null,
             transaction_id: $data['transaction_id'] ?? null,

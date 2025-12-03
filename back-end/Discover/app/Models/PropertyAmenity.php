@@ -36,7 +36,7 @@ class PropertyAmenity extends Model
         return match($this->amenity->value_type)
         {
             'boolean' => $this->value_boolean ? 'yes' : 'no',
-            'numeric' => $this->value_numeric .($this->amenity->unit ? ' ' . $this->amenity->unit : ''),
+            'numeric' => $this->value_numeric . ($this->amenity->unit ? ' ' . $this->amenity->unit : ''),
             'text' => $this->value_text ?? 'N/A',
             default => 'N/A',
         };

@@ -14,6 +14,7 @@ use App\Http\Resources\Property\PropertyResource;
 use App\DTOs\Property\PropertyData;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Services\Property\PropertyImageService;
@@ -38,6 +39,8 @@ class PropertyService
     {
         $images = $data['images'] ?? [];
         unset($data['images']);
+        $primaryIndex = $data['primary_index'] ?? null;
+        unset($data['primary_index']);
         try {
 
             $data['host_id'] = Auth::id();
@@ -47,16 +50,16 @@ class PropertyService
             //Usa o Action
             $property = $this->createPropertyAction->execute($propertyData->toArray());
 
-            if (!empty($images)){
+            if (count($images) > 0){
                 $imageMetadata = [
-                    'primary_index' => $data['primary_index'] ?? null,
+                    'primary_index' => $primaryIndex,
                     'captions' => $data['captions'] ?? null,
                     'alt_texts' => $data['alt_texts'] ?? null,
                 ];
                 $this->propertyImageService->uploadImages($property, $images, $imageMetadata);
             }
 
-            if (!empty($propertyData->amenities)){
+            if (count($propertyData->amenities) > 0){
                 $this->createAmenitiesAction->execute($property,$propertyData->amenities);
             }
             // Relações
@@ -77,33 +80,24 @@ class PropertyService
 
         }
     }
-    public function findService(int $id): JsonResponse
+    public function findService(int $id): Property
     {
         try {
             $property = $this->findPropertyAction->execute($id);
 
             if (!$property) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Property not found'
-                ], 404);
+                // Lança exceção padrão do Eloquent para ser capturada pelo Controller (HTTP 404)
+                throw new ModelNotFoundException("Property with ID {$id} not found.");
             }
 
             $property->load(['host','propertyType','listingType','city','images','amenities']);
 
-            return response()->json([
-                'success' => true,
-                'data' => new PropertyResource($property),
-            ]);
+            return $property;
 
         } catch (\Throwable $exception){
+            // Se for uma ModelNotFoundException, ela é relançada acima.
             Log::error('Error finding property: '.$exception->getMessage());
-            return response()->json([
-                'data'=>$id,
-                'success' => false,
-                'error' => 'Error finding property: '. $exception->getMessage(),
-            ],500);
-
+            throw $exception;
         }
     }
 

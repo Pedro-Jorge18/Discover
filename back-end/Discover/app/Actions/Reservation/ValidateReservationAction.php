@@ -35,10 +35,10 @@ class ValidateReservationAction
 
         // Hóspedes
         if ($data->adults < 1) {
-            throw new InvalidArgumentException('Pelo menos 1 adulto é necessário.');
+            throw new InvalidArgumentException('At least one adult is required.');
         }
         if ($data->children < 0 || $data->infants < 0) {
-            throw new InvalidArgumentException('Número de crianças e bebês não pode ser negativo.');
+            throw new InvalidArgumentException('The number of children and babies cannot be negative.');
         }
 
         // Datas
@@ -147,7 +147,7 @@ class ValidateReservationAction
             ->where(function ($query) use ($data) {
                 $query->where('check_in', '<', $data->check_out)
                     ->where('check_out', '>', $data->check_in);
-                    })
+            })
 
             ->whereHas('status', function ($query) {
                 $query->whereIn('name', ['Pendente', 'Confirmada']);

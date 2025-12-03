@@ -77,12 +77,12 @@ class CreateReservationAction
             // Criar status se não existir
             $pendingStatus = ReservationStatus::create([
                 'name' => 'Pendente',
-                'description' => 'Reserva pendente de confirmação',
+                'description' => 'Reservation pending confirmation',
                 'color' => 'yellow',
                 'order' => 1,
                 'active' => true
             ]);
-            }
+        }
 
         return [
             'property_id' => $data['property_id'],
@@ -95,6 +95,7 @@ class CreateReservationAction
             'children' => $data['children'] ?? 0,
             'infants' => $data['infants'] ?? 0,
             'special_requests' => $data['special_requests'] ?? null,
+
 
             // Dados de preço (calculados)
             'price_per_night' => $pricing['price_per_night'],
