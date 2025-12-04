@@ -1,16 +1,17 @@
 <?php
 
+use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyImageController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorAuthController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 
-
+// Rotas públicas ----------------------------------------------------------
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
 
 // Autenticação
@@ -18,30 +19,54 @@ Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
-    // Password reset (rotas públicas)
     Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 });
 
-
-// Rotas protegidas
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Auth routes
+    // Rotas de Usuário
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
+
+        // 2FA
+        Route::prefix('2fa')->group(function () {
+            Route::post('/enable', [TwoFactorAuthController::class, 'enable']);
+            Route::post('/verify', [TwoFactorAuthController::class, 'verify']);
+            Route::post('/disable', [TwoFactorAuthController::class, 'disable']);
+        });
     });
 
-    // Properties protegidas
+    // Rotas protegidas de properties
     Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
 
-    // 2FA
-    Route::prefix('auth/2fa')->group(function () {
-        Route::post('/enable', [TwoFactorAuthController::class, 'enable']);
-        Route::post('/verify', [TwoFactorAuthController::class, 'verify']);
-        Route::post('/disable', [TwoFactorAuthController::class, 'disable']);
+    // Routes de imagens
+    Route::prefix('properties/{property}')->group(function () {
+        Route::post('/images', [PropertyImageController::class, 'store']);
+        Route::delete('/images/{image}', [PropertyImageController::class, 'destroy']);
+        Route::patch('/images/{image}/primary', [PropertyImageController::class, 'setPrimary']);
+        Route::patch('/images/reorder', [PropertyImageController::class, 'reorder']);
     });
+
+    // Rotas de RESERVAS
+    Route::prefix('reservations')->group(function () {
+        // Reservas do usuário
+        Route::get('/', [ReservationController::class, 'index']);
+        Route::post('/', [ReservationController::class, 'store']);
+        Route::post('/with-payment', [ReservationController::class, 'storeWithPayment']);
+        Route::get('/stats', [ReservationController::class, 'stats']);
+        Route::get('/{id}', [ReservationController::class, 'show']);
+        Route::delete('/{id}', [ReservationController::class, 'destroy']);
+        Route::post('/{id}/confirm', [ReservationController::class, 'confirm']);
+    });
+
+    // Rotas de disponibilidade
+    Route::get('/properties/{id}/availability', [ReservationController::class, 'checkAvailability']);
+    Route::post('/properties/availability/batch', [ReservationController::class, 'checkMultipleAvailability']);
+
+    // Reservas da propriedade (host)
+    Route::get('/properties/{id}/reservations', [ReservationController::class, 'propertyReservations']);
 
     // Payments
     Route::prefix('payments')->group(function () {

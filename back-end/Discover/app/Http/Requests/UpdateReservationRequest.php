@@ -11,7 +11,7 @@ class UpdateReservationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,16 @@ class UpdateReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'cancellation_reason' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
+            'special_requests' => [
+                'nullable',
+                'string',
+                'max:1000'
+            ],
         ];
     }
 }

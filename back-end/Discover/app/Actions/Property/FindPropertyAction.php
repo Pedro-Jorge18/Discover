@@ -19,4 +19,14 @@ class FindPropertyAction
     {
         return $this->propertyRepository->findById($id);
     }
+
+    public function executeAll()
+    {
+        return $this->propertyRepository->getAll();
+    }
+
+    public function executePaginated(int $perPage = 15)
+    {
+        return $this->propertyRepository->getPaginated($perPage);
+    }
 }
