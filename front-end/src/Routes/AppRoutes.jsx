@@ -27,6 +27,13 @@ function AppRoutes({ onOpenLogin }) {
             path="/alojamento/:id" 
             element={<ListingDetails />} 
         />
+
+
+        {/* Login Routes */}
+        <Route 
+            path="/register" 
+            element={<Registration />} 
+        />
         
         {/* Host Settings Route */}
         <Route path="/host" 

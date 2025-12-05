@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function Login() {
+export default function Login({setUser}) {
   const [showPassword, setShowPassword] = useState(false);
+{/*
+  useEffect(
+      async () => {
+          const response = await axios.post("/api/auth/login");
+          debugger;
+    });  */}
 
   return (
     <div
@@ -127,7 +133,7 @@ export default function Login() {
           <p className="mt-6 text-center text-sm text-gray-400">
             Ainda não tens conta?{" "}
             <a
-              href="#"
+              href="/register"
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
               Cria uma agora
