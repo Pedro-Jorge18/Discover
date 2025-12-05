@@ -12,8 +12,9 @@ import { Link } from 'react-router-dom';
 function Home({ onOpenLogin }) {
   return (
     <div className="min-h-screen pt-20"> 
+      <title>Home Page</title>
       
-      <Header onOpenLogin={onOpenLogin} />
+      <Header />
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6">
         
