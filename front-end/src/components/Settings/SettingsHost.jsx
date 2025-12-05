@@ -2,6 +2,7 @@ import { useState } from "react";
 import ResetPassword from "../Auth/ResetPassword";
 import TwoFactorAuth from "../Auth/TwoFactory";
 import EditProfile from "./EditProfile";
+import { Link } from 'react-router-dom';
 export default function SettingsMain() {
   const [selected, setSelected] = useState("perfil");
 
@@ -10,6 +11,7 @@ export default function SettingsMain() {
     { id: "seguranca", label: "Segurança", icon: IconShield },
     { id: "notificacoes", label: "Notificações", icon: IconBell },
     { id: "privacidade", label: "Privacidade", icon: IconLock },
+    { id: "sair", label: "Sair", icon: IconShield },
   ];
 
   return (

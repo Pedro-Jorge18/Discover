@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Menu from './Menu.jsx';
 import { Globe, Menu as MenuIcon, User, Search } from 'lucide-react';
-// CRITICAL: Import the Link component
 import { Link } from 'react-router-dom';
 
 /**
@@ -13,21 +12,18 @@ import { Link } from 'react-router-dom';
 function Header({ onOpenLogin }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(prev => !prev);
-  };
+  // Function to toggle the menu state
+  const toggleMenu = () => setIsMenuOpen(prev => !prev);
 
-  const handleCloseMenu = () => {
-    setIsMenuOpen(false);
-  };
+  // Function to close the menu
+  const handleCloseMenu = () => setIsMenuOpen(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-10 transition-colors duration-300">
       {/* Container for the whole header content */}
       <div className="max-w-[1790px] mx-auto px-5 sm:px-10 py-3 flex items-center justify-between h-20">
         
-        {/* 1. Logo and Site Name (Left) - NOW WRAPPED WITH LINK */}
-        {/* The Link sends the user to the root path (Homepage) */}
+        {/* 1. Logo and Site Name (Left) - Link to Homepage */}
         <Link to="/" className="flex items-center space-x-2 flex-shrink-0 w-1/5"> 
           <span className="text-3xl">
             🏨
@@ -35,10 +31,9 @@ function Header({ onOpenLogin }) {
           <span className="text-xl font-bold text-gray-900 hidden sm:block">
             Teste
           </span>
-        </Link> {/* End of Link */}
+        </Link>
 
         {/* 2. CENTRAL SEARCH BAR (MID) */}
-        {/* We set a fixed center column (w-3/5) and use justify-center */}
         <div className="hidden lg:flex items-center justify-center w-3/5">
           <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-md hover:shadow-lg transition-shadow duration-200">
             
@@ -68,12 +63,7 @@ function Header({ onOpenLogin }) {
         </div>
         
         {/* 3. Secondary Menus (Right) */}
-        {/* We set an explicit width (w-1/5) and justify-end for alignment */}
         <div className="flex items-center space-x-1 shrink-0 w-1/5 justify-end">
-          {/* Host Button */}
-          <button className="hidden md:block px-4 py-2 text-sm font-medium text-gray-700 rounded-full hover:bg-gray-100 transition-colors">
-            Tornar-se um Anfitrião
-          </button>
 
           {/* Language Icon */}
           <button className="hidden sm:block p-3 text-gray-700 rounded-full hover:bg-gray-100 transition-colors">

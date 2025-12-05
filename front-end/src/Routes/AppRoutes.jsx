@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '../components/HomePage/Home.jsx';
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import Footer from '../components/Layout/Footer.jsx';
+import SettingsHost from '../components/Settings/SettingsHost.jsx';
 
 /**
  * The central component that configures all application routes.
@@ -27,6 +28,10 @@ function AppRoutes({ onOpenLogin }) {
             element={<ListingDetails />} 
         />
         
+        {/* Host Settings Route */}
+        <Route path="/host" 
+        element={<SettingsHost />} />
+
         {/* Add more routes here in the future (e.g., Profile, Contact, etc.) */}
 
       </Routes>
