@@ -3,35 +3,50 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '../components/HomePage/Home.jsx';
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import Footer from '../components/Layout/Footer.jsx';
-
+import SettingsHost from '../components/Settings/SettingsHost.jsx';
+import Login from '../components/Auth/Login.jsx';
+import Registration from '../components/Auth/Registration.jsx';
+ 
 /**
  * The central component that configures all application routes.
  *
  * @param {object} props
- * @param {function} props.onOpenLogin 
+ * @param {function} props.onOpenLogin
  */
 function AppRoutes({ onOpenLogin }) {
   return (
     <BrowserRouter>
       <Routes>
-        
+       
         {/* Homepage Route */}
-        <Route 
-            path="/" 
-            element={<Home onOpenLogin={onOpenLogin} />} 
+        <Route
+            path="/"
+            element={<Home />}
         />
-
+ 
         {/* Dynamic Route for Listing Details */}
-        <Route 
-            path="/alojamento/:id" 
-            element={<ListingDetails />} 
+        <Route
+            path="/lodging/:id"
+            element={<ListingDetails />}
         />
-        
-        {/* Add more routes here in the future (e.g., Profile, Contact, etc.) */}
+       
+        {/* Host Settings Route */}
+        <Route path="/host"
+        element={<SettingsHost />} />
 
+        {/* Auth */}
+        <Route
+            path="/login"
+            element={<Login />}
+        />
+        <Route
+            path="/register"
+            element={<Registration />}
+        />
+ 
       </Routes>
     </BrowserRouter>
   );
 }
-
+ 
 export default AppRoutes;

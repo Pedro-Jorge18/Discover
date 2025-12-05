@@ -12,29 +12,12 @@ import SettingsMain from './components/Settings/SettingsMain';
  * Manages the global state (like the Login modal) and renders the AppRoutes.
  */
 function App() {
-  const [showLogin, setShowLogin] = useState(false);
-
-  const handleOpenLogin = () => {
-    setShowLogin(true);
-  };
-
-  const handleCloseLogin = () => {
-    setShowLogin(false);
-  };
-
-
   return (
     <div className="App">
       
-      {/* AppRoutes calls Homepage, Header, and Routes */}
-      <AppRoutes onOpenLogin={handleOpenLogin} />
+      {/* AppRoutes calls Routes */}
+      <AppRoutes />
 
-      {/* The Login Modal is rendered here outside of the routes */}
-      {showLogin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Login onClose={handleCloseLogin} />
-        </div>
-      )}
     </div>
   );
 }
