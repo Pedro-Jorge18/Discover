@@ -12,6 +12,7 @@ import SettingsMain from './components/Settings/SettingsMain';
  * Manages the global state (like the Login modal) and renders the AppRoutes.
  */
 function App() {
+
   return (
     <div className="App">
       
