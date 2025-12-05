@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from '../components/Auth/HomePage/Home.jsx';
-import ListingDetails from '../components/Auth/Listing/ListingDetails.jsx';
+import Home from '../components/HomePage/Home.jsx';
+import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import Footer from '../components/Layout/Footer.jsx';
 
 /**
