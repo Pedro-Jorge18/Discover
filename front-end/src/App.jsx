@@ -13,6 +13,7 @@ import SettingsMain from './components/Settings/SettingsMain';
  */
 function App() {
   const [showLogin, setShowLogin] = useState(false);
+  const [user, setUser] = useState(null);
 
   const handleOpenLogin = () => {
     setShowLogin(true);
@@ -30,9 +31,10 @@ function App() {
       <AppRoutes onOpenLogin={handleOpenLogin} />
 
       {/* The Login Modal is rendered here outside of the routes */}
+      {user && (<h1>TESTETETSTET</h1>)}
       {showLogin && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Login onClose={handleCloseLogin} />
+          <Login setUser={setUser}/>
         </div>
       )}
     </div>

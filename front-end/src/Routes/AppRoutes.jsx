@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '../components/HomePage/Home.jsx';
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import Footer from '../components/Layout/Footer.jsx';
+import Registration from '../components/Auth/Registration.jsx';
 
 /**
  * The central component that configures all application routes.
@@ -25,6 +26,13 @@ function AppRoutes({ onOpenLogin }) {
         <Route 
             path="/alojamento/:id" 
             element={<ListingDetails />} 
+        />
+
+
+        {/* Login Routes */}
+        <Route 
+            path="/register" 
+            element={<Registration />} 
         />
         
         {/* Add more routes here in the future (e.g., Profile, Contact, etc.) */}

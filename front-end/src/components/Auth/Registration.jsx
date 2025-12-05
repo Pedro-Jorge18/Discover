@@ -13,12 +13,12 @@ export default function Registration() {
       phone: form.phone.value,
       email: form.email.value,
       password: form.password.value,
-      tipo_conta: form.tipo_conta.value, // 1 = Cliente | 2 = Anfitrião
+      tipo_conta: form.tipo_conta.value,
       remember: form.remember?.checked ? 1 : 0,
     };
 
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,6 @@ export default function Registration() {
       const data = await response.json();
       console.log("Utilizador registado:", data);
       alert("Registo concluído com sucesso!");
-
     } catch (error) {
       console.error(error);
       alert("Ocorreu um erro ao criar a conta.");
@@ -47,56 +46,93 @@ export default function Registration() {
       role="dialog"
       aria-labelledby="dialog-title"
     >
-      <div className="relative w-full max-w-md rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8">
+      <div className="relative w-full max-w-lg rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8 p-6">
 
         {/* Head */}
-        <div className="px-6 pt-6 pb-4 border-b border-gray-700">
+        <div className="pb-4 border-b border-gray-700">
           <h3
             id="dialog-title"
-            className="text-xl font-semibold text-white text-center"
+            className="text-2xl font-semibold text-white text-center"
           >
-            Inicia sessão na tua conta
+            Criar Conta
           </h3>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4">
+        <div className="pt-4">
           <form className="space-y-5" onSubmit={handleSubmit}>
 
-            {/* Name */}
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Nome
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="António Rodrigues"
-                required
-                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-              />
+            {/* Name + Lastname */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Nome
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="António"
+                  required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lastname"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Apelido
+                </label>
+                <input
+                  type="text"
+                  id="lastname"
+                  name="lastname"
+                  placeholder="Rodrigues"
+                  required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+              </div>
             </div>
 
-            {/* Phone */}
-            <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Telefone
-              </label>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                placeholder="987654321"
-                required
-                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-              />
+            {/* Phone + Birth */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Telefone
+                </label>
+                <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  placeholder="987654321"
+                  required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="birth"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Data de Nascimento
+                </label>
+                <input
+                  type="date"
+                  id="birth"
+                  name="birth"
+                  required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+              </div>
             </div>
 
             {/* Email */}
@@ -105,7 +141,7 @@ export default function Registration() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-300 mb-2"
               >
-                Endereço de email
+                Email
               </label>
               <input
                 type="email"
@@ -118,8 +154,8 @@ export default function Registration() {
             </div>
 
             {/* Password */}
-            <div className="space-y-5">
-              <label htmlFor="password" className="block text-sm mb-2 text-gray-300">
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Password
               </label>
 
@@ -128,9 +164,9 @@ export default function Registration() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
+                  placeholder="********"
                   required
-                  className="py-2.5 sm:py-3 ps-4 pe-10 block w-full border border-gray-600 bg-gray-800 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
 
                 <button
@@ -174,7 +210,7 @@ export default function Registration() {
                 Tipo de conta
               </label>
 
-              <div className="inline-flex items-cente bg-gray-700 border border-gray-600 rounded-lg p-3 gap-4">
+              <div className="flex gap-6 bg-gray-700 border border-gray-600 rounded-lg p-3">
                 <label className="flex items-center gap-2 text-gray-200 cursor-pointer">
                   <input
                     type="radio"
@@ -198,26 +234,6 @@ export default function Registration() {
               </div>
             </div>
 
-            {/* Remember me */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center text-sm text-gray-400">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  name="remember"
-                  className="mr-2 rounded border-gray-600 bg-gray-700 focus:ring-indigo-500"
-                />
-                Lembrar-me
-              </label>
-
-              <a
-                href="#"
-                className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
-              >
-                Esqueceste-te da palavra-passe?
-              </a>
-            </div>
-
             {/* Login Button */}
             <button
               type="submit"
@@ -229,12 +245,12 @@ export default function Registration() {
 
           {/* Link to register */}
           <p className="mt-6 text-center text-sm text-gray-400">
-            Ainda não tens conta?{" "}
+            Já tem conta? {" "}
             <a
               href="#"
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
-              Cria uma agora
+              Entre agora
             </a>
           </p>
         </div>
