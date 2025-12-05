@@ -6,6 +6,7 @@ import Footer from '../components/Layout/Footer.jsx';
 import SettingsHost from '../components/Settings/SettingsHost.jsx';
 import Login from '../components/Auth/Login.jsx';
 import Registration from '../components/Auth/Registration.jsx';
+import SettingsMain from '../components/Settings/SettingsHost.jsx';
  
 /**
  * The central component that configures all application routes.
@@ -26,13 +27,21 @@ function AppRoutes({ onOpenLogin }) {
  
         {/* Dynamic Route for Listing Details */}
         <Route
-            path="/lodging/:id"
+            path="/alojamento/:id"
             element={<ListingDetails />}
         />
        
         {/* Host Settings Route */}
         <Route path="/host"
         element={<SettingsHost />} />
+        <Route
+            path="/configuration"
+            element={<SettingsMain />}
+        />
+        <Route
+            path="/adminMenu"
+            element={<SettingsMain />}
+        />
 
         {/* Auth */}
         <Route
