@@ -7,14 +7,10 @@ import SettingsHost from '../components/Settings/SettingsHost.jsx';
 import Login from '../components/Auth/Login.jsx';
 import Registration from '../components/Auth/Registration.jsx';
 import SettingsMain from '../components/Settings/SettingsHost.jsx';
+import ForgotPassword from '../components/Auth/ForgotPassword.jsx';
  
-/**
- * The central component that configures all application routes.
- *
- * @param {object} props
- * @param {function} props.onOpenLogin
- */
-function AppRoutes({ onOpenLogin }) {
+
+function AppRoutes({ user, setUser }) {
   return (
     <BrowserRouter>
       <Routes>
@@ -22,7 +18,7 @@ function AppRoutes({ onOpenLogin }) {
         {/* Homepage Route */}
         <Route
             path="/"
-            element={<Home />}
+            element={<Home user={user} setUser={setUser}/>}
         />
  
         {/* Dynamic Route for Listing Details */}
@@ -51,6 +47,10 @@ function AppRoutes({ onOpenLogin }) {
         <Route
             path="/register"
             element={<Registration />}
+        />
+        <Route
+            path="/forgotpassword"
+            element={<ForgotPassword />}
         />
  
       </Routes>

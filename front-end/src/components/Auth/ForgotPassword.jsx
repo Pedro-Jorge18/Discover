@@ -80,11 +80,12 @@ export default function ForgotPassword() {
 
         {/* Return to Login */}
         <div className="px-6 pb-6 text-center">
-            <button
-                className="font-medium text-indigo-400 hover:text-indigo-300 text-sm"
+            <a
+              href="/login"
+              className="font-medium text-indigo-400 hover:text-indigo-300 text-sm"
             >
-                Voltar ao início de sessão
-            </button>
+              Voltar ao início de sessão
+            </a>
         </div>  
       </div>
     </div>

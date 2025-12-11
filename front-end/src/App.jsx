@@ -1,24 +1,19 @@
 import { useState } from 'react';
 import './App.css';
-import AppRoutes from './Routes/AppRoutes.jsx'; 
-import Login from './components/Auth/Login.jsx'; 
-import Registration from './components/Auth/Registration';
-import ForgotPassword from './components/Auth/ForgotPassword';
-import ResetPassword from './components/Auth/ResetPassword';
-import SettingsMain from './components/Settings/SettingsMain';
+import AppRoutes from './Routes/AppRoutes.jsx';
+import Login from './components/Auth/Login.jsx';
 
-/**
- * The main component of the application.
- * Manages the global state (like the Login modal) and renders the AppRoutes.
- */
 function App() {
+
+  const [user, setUser] = useState(null); // Save auth user
 
   return (
     <div className="App">
-      
-      {/* AppRoutes calls Routes */}
-      <AppRoutes />
 
+      <AppRoutes user={user} setUser={setUser}/>
+
+      {/* render login onde quiseres */}
+      {/* <Login setUser={setUser}/> */}
     </div>
   );
 }

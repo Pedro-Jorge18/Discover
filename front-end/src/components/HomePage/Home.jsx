@@ -2,19 +2,12 @@ import React from 'react';
 import Header from '../Nav/Header.jsx'; 
 import { Link } from 'react-router-dom';
 
-/**
- * The main application homepage component.
- * It integrates the Header and displays the accommodation listing grid.
- *
- * @param {object} props
- * @param {function} props.onOpenLogin - Function to open the Login modal.
- */
-function Home({ onOpenLogin }) {
+function Home({ user, setUser }) {
   return (
     <div className="min-h-screen pt-20"> 
       <title>Home Page</title>
       
-      <Header />
+      <Header user={user} setUser={setUser}/>
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6">
         

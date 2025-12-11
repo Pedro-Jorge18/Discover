@@ -1,13 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import api from "../../api/axios";
 
-export default function Login({setUser}) {
+export default function Login({ setUser }) {
   const [showPassword, setShowPassword] = useState(false);
-{/*
-  useEffect(
-      async () => {
-          const response = await axios.post("/api/auth/login");
-          debugger;
-    });  */}
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    try {
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+
+      alert("Sessão iniciada!");
+      // setUser(response.data.user); se quiseres guardar o user globalmente
+
+    } catch (error) {
+      console.error(error);
+      alert("Credenciais inválidas.");
+    }
+  };
 
   return (
     <div
@@ -17,7 +36,7 @@ export default function Login({setUser}) {
       aria-labelledby="dialog-title"
     >
       <div className="relative w-full max-w-md rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8">
-        
+
         {/* Head */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-700">
           <h3
@@ -30,8 +49,8 @@ export default function Login({setUser}) {
 
         {/* Body */}
         <div className="px-6 py-4">
-          <form className="space-y-5">
-            
+          <form className="space-y-5" onSubmit={handleLogin}>
+
             {/* Email */}
             <div>
               <label
@@ -52,52 +71,52 @@ export default function Login({setUser}) {
 
             {/* Password */}
             <div className="space-y-5">
-                <label htmlFor="password" className="block text-sm mb-2 text-gray-300">
-                    Password
-                </label>
+              <label htmlFor="password" className="block text-sm mb-2 text-gray-300">
+                Password
+              </label>
 
-                <div className="relative">
-                    <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Insere a palavra-passe"
-                    className="py-2.5 sm:py-3 ps-4 pe-10 block w-full border border-gray-600 bg-gray-800 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Insere a palavra-passe"
+                  className="py-2.5 sm:py-3 ps-4 pe-10 block w-full border border-gray-600 bg-gray-800 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
 
-                    <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 end-0 flex items-center z-20 px-3 cursor-pointer text-gray-400 rounded-e-md focus:outline-none focus:text-indigo-400"
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 end-0 flex items-center z-20 px-3 cursor-pointer text-gray-400 rounded-e-md focus:outline-none focus:text-indigo-400"
+                >
+                  {showPassword ? (
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
                     >
-                    {/*Condition if is show password show password else dont show */}
-                    {showPassword ? (
-                        <svg
-                        className="size-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        >
-                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
-                        <circle cx="12" cy="12" r="3" />
-                        </svg>
-                    ) : (
-                        <svg
-                        className="size-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        >
-                        <path d="M17.94 17.94A10.06 10.06 0 0 1 12 19c-7 0-10-7-10-7a16.14 16.14 0 0 1 3.07-4.34" />
-                        <path d="M1 1l22 22" />
-                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                        </svg>
-                    )}
-                    </button>
-                </div>
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path d="M17.94 17.94A10.06 10.06 0 0 1 12 19c-7 0-10-7-10-7a16.14 16.14 0 0 1 3.07-4.34" />
+                      <path d="M1 1l22 22" />
+                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Remember me */}
@@ -113,7 +132,7 @@ export default function Login({setUser}) {
               </label>
 
               <a
-                href="#"
+                href="/forgotpassword"
                 className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
               >
                 Esqueceste-te da palavra-passe?
@@ -143,40 +162,31 @@ export default function Login({setUser}) {
 
         {/* Border */}
         <div className="flex items-center justify-center px-6 py-4">
-            <div className="flex-grow border-t border-gray-700"></div>
-                <span className="mx-3 text-gray-400 text-sm font-medium">ou</span>
-            <div className="flex-grow border-t border-gray-700"></div>
+          <div className="flex-grow border-t border-gray-700"></div>
+          <span className="mx-3 text-gray-400 text-sm font-medium">ou</span>
+          <div className="flex-grow border-t border-gray-700"></div>
         </div>
-                
-        {/* Different Login types */}        
-        <div className="px-6 py-4 max-w-sm mx-auto  ">
-            <div className="flex gap-4">
-                <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300">
-                <img
-                    src="https://img.icons8.com/color/48/google-logo.png"
-                    alt="Google"
-                    className="w-5 h-5"
-                />
-                <span>Google</span>
-                </a>
-                <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300">
-                <img
-                    src="https://img.icons8.com/?size=100&id=uLWV5A9vXIPu&format=png&color=000000"
-                    alt="Google"
-                    className="w-5 h-5"
-                />
-                <span>Facebook</span>
-                </a>
-                <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300">
-                <img
-                    src="https://img.icons8.com/color/48/google-logo.png"
-                    alt="Google"
-                    className="w-5 h-5"
-                />
-                <span>Google</span>
-                </a>
-            </div>
+
+        {/* Social logins */}
+        <div className="px-6 py-4 max-w-sm mx-auto">
+          <div className="flex gap-4">
+            <a
+              href="#"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300"
+            >
+              <img src="https://img.icons8.com/color/48/google-logo.png" className="w-5 h-5" />
+              <span>Google</span>
+            </a>
+            <a
+              href="#"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300"
+            >
+              <img src="https://img.icons8.com/?size=100&id=uLWV5A9vXIPu&format=png" className="w-5 h-5" />
+              <span>Facebook</span>
+            </a>
+          </div>
         </div>
+
       </div>
     </div>
   );

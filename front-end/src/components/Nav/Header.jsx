@@ -3,13 +3,7 @@ import Menu from './Menu.jsx';
 import { Globe, Menu as MenuIcon, User, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-/**
- * Main navigation header component with a central search bar.
- *
- * @param {object} props
- * @param {function} props.onOpenLogin - Function to open the Login modal in App.jsx.
- */
-function Header({ onOpenLogin }) {
+function Header({ user, setUser }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Function to toggle the menu state
@@ -84,7 +78,7 @@ function Header({ onOpenLogin }) {
             
             {/* Render the Menu Popover */}
             {isMenuOpen && (
-              <Menu onOpenLogin={onOpenLogin} onCloseMenu={handleCloseMenu} />
+              <Menu user={user} setUser={setUser} onCloseMenu={handleCloseMenu} />
             )}
           </div>
         </div>

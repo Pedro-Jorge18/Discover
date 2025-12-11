@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'; // Added Link for navigation
  * @param {function} props.onOpenLogin - Function to show the Login modal.
  * @param {function} props.onCloseMenu - Function to close the menu popover.
  */
-function Menu({ onOpenLogin, onCloseMenu }) {
+function Menu({ user, setUser, onCloseMenu }) {
   // Base classes for regular menu items
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
 
@@ -23,15 +23,24 @@ function Menu({ onOpenLogin, onCloseMenu }) {
       <div className="py-2">
         
         {/* Item: Log in or Sign up (Primary action) */}
-        <Link 
-            to="/login" 
-            onClick={onCloseMenu} 
-            className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
-        >
-            <LogIn className="w-5 h-5 text-gray-600" />
-            Entrar ou registar-se
-        </Link>
-        
+        {!user ? (
+          <Link 
+              to="/login"
+              onClick={onCloseMenu}
+              className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+          >
+              <LogIn className="w-5 h-5 text-gray-600" />
+              Entrar ou registar-se
+          </Link>
+          ) : (
+              <button
+                  onClick={() => { setUser(null); onCloseMenu(); }}
+                  className="px-4 py-3 font-semibold text-red-600 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+              >
+                  Terminar sessão
+              </button>
+        )}
+
         <div className="border-t my-2"></div>
         
         {/* HOST TEST BUTTON - Links to the new /host route */}

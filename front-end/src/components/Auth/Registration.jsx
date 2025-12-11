@@ -247,7 +247,7 @@ export default function Registration() {
           <p className="mt-6 text-center text-sm text-gray-400">
             Já tem conta? {" "}
             <a
-              href="#"
+              href="/login"
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
               Entre agora
