@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogIn, HelpCircle, Gift, Home } from 'lucide-react'; // Added Home for host link
+import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react'; // Added Home for host link
 import { Link } from 'react-router-dom'; // Added Link for navigation
 
 /**
@@ -23,25 +23,43 @@ function Menu({ onOpenLogin, onCloseMenu }) {
       <div className="py-2">
         
         {/* Item: Log in or Sign up (Primary action) */}
-        <div 
-          className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
-          // Action: Opens the Login modal and closes the menu popover
-          onClick={() => { onOpenLogin(); }} 
+        <Link 
+            to="/login" 
+            onClick={onCloseMenu} 
+            className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
         >
-          <LogIn className="w-5 h-5 text-gray-600" />
-          Entrar ou registar-se
-        </div>
+            <LogIn className="w-5 h-5 text-gray-600" />
+            Entrar ou registar-se
+        </Link>
         
         <div className="border-t my-2"></div>
         
         {/* HOST TEST BUTTON - Links to the new /host route */}
         <Link 
+            to="/configuration" 
+            onClick={onCloseMenu} 
+            className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+        >
+            <Cog className="w-5 h-5 text-gray-500" />
+            Definições
+        </Link>
+
+        <Link 
             to="/host" 
             onClick={onCloseMenu} 
-            className="px-4 py-3 text-indigo-600 hover:bg-indigo-50 cursor-pointer flex items-center gap-3 transition-colors font-semibold w-full"
+            className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
         >
-            <Home className="w-5 h-5 text-indigo-600" />
-            HostTeste: Menu Anfitrião
+            <Home className="w-5 h-5 text-gray-500" />
+            Menu Anfitrião
+        </Link>
+
+        <Link 
+            to="/adminMenu" 
+            onClick={onCloseMenu} 
+            className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+        >
+            <Home className="w-5 h-5 text-gray-500" />
+            Menu Administração
         </Link>
         
         <div className="border-t my-2"></div>
