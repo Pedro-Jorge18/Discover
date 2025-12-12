@@ -1,41 +1,30 @@
 import { useState } from "react";
+import api from "../../api/axios";
 
 export default function Registration() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     const form = e.target;
 
     const payload = {
       name: form.name.value,
+      last_name: form.last_name.value,
       phone: form.phone.value,
+      birthday: form.birthday.value,
       email: form.email.value,
       password: form.password.value,
-      tipo_conta: form.tipo_conta.value,
-      remember: form.remember?.checked ? 1 : 0,
+      //tipo_conta: form.tipo_conta.value,
     };
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao registar");
-      }
-
-      const data = await response.json();
-      console.log("Utilizador registado:", data);
-      alert("Registo concluído com sucesso!");
+      const response = await api.post("/auth/register", payload);
+      alert("Conta criada com sucesso!");
     } catch (error) {
       console.error(error);
-      alert("Ocorreu um erro ao criar a conta.");
+      alert("Erro ao criar a conta.");
     }
   };
 
@@ -60,7 +49,7 @@ export default function Registration() {
 
         {/* Body */}
         <div className="pt-4">
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-5" onSubmit={handleRegister}>
 
             {/* Name + Lastname */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -83,15 +72,15 @@ export default function Registration() {
 
               <div>
                 <label
-                  htmlFor="lastname"
+                  htmlFor="last_name"
                   className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Apelido
                 </label>
                 <input
                   type="text"
-                  id="lastname"
-                  name="lastname"
+                  id="last_name"
+                  name="last_name"
                   placeholder="Rodrigues"
                   required
                   className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -120,15 +109,15 @@ export default function Registration() {
 
               <div>
                 <label
-                  htmlFor="birth"
+                  htmlFor="birthday"
                   className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Data de Nascimento
                 </label>
                 <input
                   type="date"
-                  id="birth"
-                  name="birth"
+                  id="birthday"
+                  name="birthday"
                   required
                   className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
@@ -246,12 +235,14 @@ export default function Registration() {
           {/* Link to register */}
           <p className="mt-6 text-center text-sm text-gray-400">
             Já tem conta? {" "}
-            <a
-              href="#"
+            <button
+              onClick={() => {
+                window.location.href = "/login"; // Redirect to login
+              }}
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
               Entre agora
-            </a>
+            </button>
           </p>
         </div>
       </div>
