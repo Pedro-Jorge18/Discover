@@ -4,19 +4,19 @@ export default function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const email = e.target.userEmail.value;
+    const email = e.target.userEmail.value;
 
-  try {
-    await axios.post("/api/forgot-password", { email });
+    try {
+      await axios.post("/api/forgot-password", { email });
 
-    setEmailSent(true); 
-  } catch (error) {
-    console.error("Erro ao enviar email:", error);
-    setEmailSent(true); // Show menssage same if have error 
-  }
-};
+      setEmailSent(true); 
+    } catch (error) {
+      console.error("Erro ao enviar email:", error);
+      setEmailSent(true); // Show menssage same if have error 
+    }
+  };
 
 
   return (
