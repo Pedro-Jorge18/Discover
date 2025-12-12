@@ -3,11 +3,21 @@ import { useState } from "react";
 export default function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false);
 
-  {/* Function to change the screen to the confirmation screen */}
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setEmailSent(true);
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const email = e.target.userEmail.value;
+
+  try {
+    await axios.post("/api/forgot-password", { email });
+
+    setEmailSent(true); 
+  } catch (error) {
+    console.error("Erro ao enviar email:", error);
+    setEmailSent(true); // Show menssage same if have error 
+  }
+};
+
 
   return (
     <div
@@ -62,7 +72,10 @@ export default function ForgotPassword() {
                 para redefinir a tua palavra-passe em breve.
               </p>
               <button
-                onClick={() => setEmailSent(false)}
+                onClick={() => {
+                  setEmailSent(false);
+                  window.location.href = "/login"; // Redirect to login
+                }}
                 className="w-full rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 focus:outline-none transition ease-in duration-500"
               >
                 Voltar
@@ -80,12 +93,14 @@ export default function ForgotPassword() {
 
         {/* Return to Login */}
         <div className="px-6 pb-6 text-center">
-            <a
-              href="/login"
+            <button
+              onClick={() => {
+                window.location.href = "/login"; // Redirect to login
+              }}
               className="font-medium text-indigo-400 hover:text-indigo-300 text-sm"
             >
               Voltar ao início de sessão
-            </a>
+            </button>
         </div>  
       </div>
     </div>

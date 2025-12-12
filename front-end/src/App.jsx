@@ -7,13 +7,19 @@ function App() {
 
   const [user, setUser] = useState(null); // Save auth user
 
+  //Test 
+  /*const [user, setUser] = useState({
+    id: 1,
+    email: "teste@exemplo.com",
+    password: "1234"
+  });*/
+
+
   return (
     <div className="App">
 
       <AppRoutes user={user} setUser={setUser}/>
-
-      {/* render login onde quiseres */}
-      {/* <Login setUser={setUser}/> */}
+      
     </div>
   );
 }

@@ -19,8 +19,9 @@ export default function Login({ setUser }) {
       const token = response.data.token;
       localStorage.setItem("token", token);
 
+      setUser(response.data.user); //Save user state
+
       alert("Sessão iniciada!");
-      // setUser(response.data.user); se quiseres guardar o user globalmente
 
     } catch (error) {
       console.error(error);
@@ -130,13 +131,15 @@ export default function Login({ setUser }) {
                 />
                 Lembrar-me
               </label>
-
-              <a
-                href="/forgotpassword"
+              
+              <button
+                onClick={() => {
+                  window.location.href = "/forgotpassword"; // Redirect to login
+                }}
                 className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
               >
                 Esqueceste-te da palavra-passe?
-              </a>
+              </button>
             </div>
 
             {/* Login Button */}
@@ -151,12 +154,14 @@ export default function Login({ setUser }) {
           {/* Link to register page */}
           <p className="mt-6 text-center text-sm text-gray-400">
             Ainda não tens conta?{" "}
-            <a
-              href="/register"
+            <button
+              onClick={() => {
+                window.location.href = "/register"; // Redirect to login
+              }}
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
               Cria uma agora
-            </a>
+            </button>
           </p>
         </div>
 

@@ -30,14 +30,15 @@ function Menu({ user, setUser, onCloseMenu }) {
               className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
           >
               <LogIn className="w-5 h-5 text-gray-600" />
-              Entrar ou registar-se
+              Entrar ou Registar-se
           </Link>
           ) : (
               <button
                   onClick={() => { setUser(null); onCloseMenu(); }}
-                  className="px-4 py-3 font-semibold text-red-600 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+                  className="px-4 py-3 font-semibold text-red-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
-                  Terminar sessão
+                <LogIn className="w-5 h-5 text-gray-600" />
+                Terminar Sessão
               </button>
         )}
 
