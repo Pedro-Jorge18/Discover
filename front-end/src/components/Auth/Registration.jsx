@@ -3,11 +3,17 @@ import api from "../../api/axios";
 
 export default function Registration() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     const form = e.target;
+
+    // Verify if the password is
+    if (form.password.value !== form.password_confirmation.value) {
+      alert("As passwords não coincidem.");
+      return;
+    }
 
     const payload = {
       name: form.name.value,
@@ -16,15 +22,33 @@ export default function Registration() {
       birthday: form.birthday.value,
       email: form.email.value,
       password: form.password.value,
-      //tipo_conta: form.tipo_conta.value,
+      password_confirmation: form.password_confirmation.value,
+      role: form.role.value,
     };
 
     try {
-      const response = await api.post("/auth/register", payload);
+      await api.post("/auth/register", payload);
       alert("Conta criada com sucesso!");
     } catch (error) {
-      console.error(error);
-      alert("Erro ao criar a conta.");
+      if (error.response) {
+      const data = error.response.data;
+
+      if (data.errors) {
+        
+        const messages = Object.values(data.errors)
+          .flat()
+          .join("\n");
+        alert(messages);
+      } else if (data.message) {
+        
+        alert(data.message);
+      } else {
+        alert("Erro desconhecido.");
+      }
+    } else {
+      
+      alert("Erro de rede ou servidor.");
+    }
     }
   };
 
@@ -36,13 +60,9 @@ export default function Registration() {
       aria-labelledby="dialog-title"
     >
       <div className="relative w-full max-w-lg rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8 p-6">
-
         {/* Head */}
         <div className="pb-4 border-b border-gray-700">
-          <h3
-            id="dialog-title"
-            className="text-2xl font-semibold text-white text-center"
-          >
+          <h3 id="dialog-title" className="text-2xl font-semibold text-white text-center">
             Criar Conta
           </h3>
         </div>
@@ -50,197 +70,94 @@ export default function Registration() {
         {/* Body */}
         <div className="pt-4">
           <form className="space-y-5" onSubmit={handleRegister}>
-
             {/* Name + Lastname */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-300 mb-2"
-                >
-                  Nome
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  placeholder="António"
-                  required
-                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+                <input type="text" id="name" name="name" placeholder="António" required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
-
               <div>
-                <label
-                  htmlFor="last_name"
-                  className="block text-sm font-medium text-gray-300 mb-2"
-                >
-                  Apelido
-                </label>
-                <input
-                  type="text"
-                  id="last_name"
-                  name="last_name"
-                  placeholder="Rodrigues"
-                  required
-                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <label htmlFor="last_name" className="block text-sm font-medium text-gray-300 mb-2">Apelido</label>
+                <input type="text" id="last_name" name="last_name" placeholder="Rodrigues" required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
             </div>
 
-            {/* Phone + Birth */}
+            {/* Phone + Birthday */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-300 mb-2"
-                >
-                  Telefone
-                </label>
-                <input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  placeholder="987654321"
-                  required
-                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
+                <input type="text" id="phone" name="phone" placeholder="987654321" required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
-
               <div>
-                <label
-                  htmlFor="birthday"
-                  className="block text-sm font-medium text-gray-300 mb-2"
-                >
-                  Data de Nascimento
-                </label>
-                <input
-                  type="date"
-                  id="birthday"
-                  name="birthday"
-                  required
-                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <label htmlFor="birthday" className="block text-sm font-medium text-gray-300 mb-2">Data de Nascimento</label>
+                <input type="date" id="birthday" name="birthday" required
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="exemplo@empresa.com"
-                required
-                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-              />
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+              <input type="email" id="email" name="email" placeholder="exemplo@empresa.com" required
+                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Password</label>
               <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="********"
-                  required
-                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="********" required
+                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 cursor-pointer">
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
+            </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 cursor-pointer"
-                >
-                  {showPassword ? (
-                    <svg
-                      className="size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path d="M17.94 17.94A10.06 10.06 0 0 1 12 19c-7 0-10-7-10-7a16.14 16.14 0 0 1 3.07-4.34" />
-                      <path d="M1 1l22 22" />
-                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                    </svg>
-                  )}
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-300 mb-2">Confirmar Password</label>
+              <div className="relative">
+                <input id="password_confirmation" name="password_confirmation" type={showConfirmPassword ? "text" : "password"} placeholder="********" required
+                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 cursor-pointer">
+                  {showConfirmPassword ? "🙈" : "👁️"}
                 </button>
               </div>
             </div>
 
             {/* Tipo de conta */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Tipo de conta
-              </label>
-
+              <label className="block text-sm font-medium text-gray-300 mb-2">Tipo de conta</label>
               <div className="flex gap-6 bg-gray-700 border border-gray-600 rounded-lg p-3">
                 <label className="flex items-center gap-2 text-gray-200 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="tipo_conta"
-                    value={1}
-                    className="text-indigo-500 focus:ring-indigo-500"
-                    defaultChecked
-                  />
+                  <input type="radio" name="role" value={"guest"} className="text-indigo-500 focus:ring-indigo-500" defaultChecked />
                   <span className="text-sm">Cliente</span>
                 </label>
-
                 <label className="flex items-center gap-2 text-gray-200 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="tipo_conta"
-                    value={2}
-                    className="text-indigo-500 focus:ring-indigo-500"
-                  />
+                  <input type="radio" name="role" value={"host"} className="text-indigo-500 focus:ring-indigo-500" />
                   <span className="text-sm">Anfitrião</span>
                 </label>
               </div>
             </div>
 
-            {/* Login Button */}
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition"
-            >
-              Entrar
+            {/* Register Button */}
+            <button type="submit"
+              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition">
+              Criar Conta
             </button>
           </form>
 
-          {/* Link to register */}
+          {/* Link to login */}
           <p className="mt-6 text-center text-sm text-gray-400">
-            Já tem conta? {" "}
-            <button
-              onClick={() => {
-                window.location.href = "/login"; // Redirect to login
-              }}
-              className="font-medium text-indigo-400 hover:text-indigo-300"
-            >
+            Já tem conta?{" "}
+            <button onClick={() => window.location.href = "/login"}
+              className="font-medium text-indigo-400 hover:text-indigo-300">
               Entre agora
             </button>
           </p>
