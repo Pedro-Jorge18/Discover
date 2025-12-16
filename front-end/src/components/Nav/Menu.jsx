@@ -1,91 +1,65 @@
 import React from 'react';
-import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react'; // Added Home for host link
-import { Link } from 'react-router-dom'; // Added Link for navigation
+import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import api from '../../api/axios';
 
-/**
- * Menu popover component that appears when the user/hamburger icon is clicked.
- * It provides options for login, help, and navigation.
- *
- * @param {object} props
- * @param {function} props.onOpenLogin - Function to show the Login modal.
- * @param {function} props.onCloseMenu - Function to close the menu popover.
- */
-function Menu({ user, setUser, onCloseMenu }) {
-  // Base classes for regular menu items
+function Menu({ user, setUser }) {
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await api.post("/auth/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
+
+      // Clear token and user state
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      setUser(null);
+
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
+
   return (
-    <div 
-      className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right"
-      // Prevent immediate close on link click
-      onClick={onCloseMenu} 
-    >
+    <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right">
       <div className="py-2">
-        
-        {/* Item: Log in or Sign up (Primary action) */}
-        {!user ? (
-          <Link 
-              to="/login"
-              onClick={onCloseMenu}
-              className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+        {user && user.id ? (
+          <button
+            onClick={handleLogout} //Calls Backend
+            className="px-4 py-3 font-semibold text-red-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
           >
-              <LogIn className="w-5 h-5 text-gray-600" />
-              Entrar ou Registar-se
+            Terminar Sessão
+          </button>
+        ) : (
+          <Link 
+            to="/login"
+            className="px-4 py-3 font-semibold text-gray-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+          >
+            Entrar ou Registar-se
           </Link>
-          ) : (
-              <button
-                  onClick={() => { setUser(null); onCloseMenu(); }}
-                  className="px-4 py-3 font-semibold text-red-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
-              >
-                <LogIn className="w-5 h-5 text-gray-600" />
-                Terminar Sessão
-              </button>
         )}
 
         <div className="border-t my-2"></div>
-        
-        {/* HOST TEST BUTTON - Links to the new /host route */}
-        <Link 
-            to="/configuration" 
-            onClick={onCloseMenu} 
-            className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
-        >
-            <Cog className="w-5 h-5 text-gray-500" />
-            Definições
+
+        <Link to="/configuration" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
+          <Cog className="w-5 h-5 text-gray-500" /> Definições
+        </Link>
+        <Link to="/host" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
+          <Home className="w-5 h-5 text-gray-500" /> Menu Anfitrião
+        </Link>
+        <Link to="/adminMenu" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
+          <Home className="w-5 h-5 text-gray-500" /> Menu Administração
         </Link>
 
-        <Link 
-            to="/host" 
-            onClick={onCloseMenu} 
-            className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
-        >
-            <Home className="w-5 h-5 text-gray-500" />
-            Menu Anfitrião
-        </Link>
-
-        <Link 
-            to="/adminMenu" 
-            onClick={onCloseMenu} 
-            className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-gray-100 flex items-center gap-3 w-full text-left"
-        >
-            <Home className="w-5 h-5 text-gray-500" />
-            Menu Administração
-        </Link>
-        
         <div className="border-t my-2"></div>
-        
-        {/* Item: Help Center */}
-        <Link to="/help" onClick={onCloseMenu} className={itemClasses}>
-          <HelpCircle className="w-5 h-5 text-gray-500" />
-          Centro de Ajuda
-        </Link>
 
-        {/* Item: Gift Cards */}
-        <Link to="/gifts" onClick={onCloseMenu} className={itemClasses}>
-          <Gift className="w-5 h-5 text-gray-500" />
-          Cartões-oferta
+        <Link to="/help" className={itemClasses}>
+          <HelpCircle className="w-5 h-5 text-gray-500" /> Centro de Ajuda
         </Link>
-        
+        <Link to="/gifts" className={itemClasses}>
+          <Gift className="w-5 h-5 text-gray-500" /> Cartões-oferta
+        </Link>
       </div>
     </div>
   );
