@@ -9,16 +9,17 @@ use App\Http\Requests\Users\Auth\RegisterUserRequest;
 class RegisterUserDto
 {
     public function __construct(
-        public readonly string $name,
-        public readonly string $last_name,
-        public readonly string $phone,
-        public readonly Carbon $birthday,
-        public readonly string $email,
-        public readonly string $password,
-        public readonly ?string $gender = null,
-        public readonly string $language = 'en',
-        public readonly ?string $about = null,
-        public readonly ?UploadedFile $image = null
+        public string $name,
+        public string $last_name,
+        public string $phone,
+        public Carbon $birthday,
+        public string $email,
+        public string $password,
+        public ?string $gender = null,
+        public string $language = 'en',
+        public ?string $about = null,
+        public ?UploadedFile $image = null,
+        public string $role,
     ) {}
 
     public static function fromRequest(RegisterUserRequest $request): self
@@ -35,7 +36,8 @@ class RegisterUserDto
             gender: $data['gender'] ?? null,
             language: $data['language'] ?? 'en',
             about: $data['about'] ?? null,
-            image: $request->hasFile('image') ? $request->file('image') : null
+            image: $request->hasFile('image') ? $request->file('image') : null,
+            role: $data['role'],
         );
     }
 
@@ -53,7 +55,8 @@ class RegisterUserDto
             gender: $data['gender'] ?? null,
             language: $data['language'] ?? 'en',
             about: $data['about'] ?? null,
-            image: $data['image'] instanceof UploadedFile ? $data['image'] : null
+            image: $data['image'] instanceof UploadedFile ? $data['image'] : null,
+            role: $data['role'],
         );
     }
 
@@ -70,6 +73,7 @@ class RegisterUserDto
             'language' => $this->language,
             'about' => $this->about,
             'image' => $this->image,
+            'role' => $this->role,
         ];
     }
 
