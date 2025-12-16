@@ -75,7 +75,6 @@ function Home({ user, setUser, onOpenLogin }) {
       <Header user={user} setUser={setUser} onOpenLogin={onOpenLogin}/>
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6">
-        
         <div className="text-center py-5">
             {/* Error Message Display */}
             {error && (
@@ -85,7 +84,7 @@ function Home({ user, setUser, onOpenLogin }) {
             )}
 
           <h2 className="text-xl font-semibold text-gray-700 mb-8">
-            Encontre o seu próximo destino em Portugal
+            Encontre o seu próximo destino (LIGADO À BASE DE DADOS!)
           </h2>
           
           {/* EMPTY STATE CHECK: If the array is empty, show a message instead of breaking */}
