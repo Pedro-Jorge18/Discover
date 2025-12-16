@@ -133,9 +133,7 @@ export default function Login({ setUser }) {
               </label>
               
               <button
-                onClick={() => {
-                  window.location.href = "/forgotpassword"; // Redirect to login
-                }}
+                href="#"
                 className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
               >
                 Esqueceste-te da palavra-passe?
@@ -155,9 +153,7 @@ export default function Login({ setUser }) {
           <p className="mt-6 text-center text-sm text-gray-400">
             Ainda não tens conta?{" "}
             <button
-              onClick={() => {
-                window.location.href = "/register"; // Redirect to login
-              }}
+              href="/register"
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
               Cria uma agora
