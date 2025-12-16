@@ -39,6 +39,7 @@ class RegisterUserAction
                 'about' => $dto->about,
                 'verified' => false,
                 'active' => true,
+                'role' => $dto->role,
             ]);
 
             //upload image (if exists)
@@ -46,8 +47,7 @@ class RegisterUserAction
                 $this->handleImageUpload($user, $dto->image);
             }
 
-            //add role
-            $this->assignDefaultRole($user);
+
 
             //register log
             Log::info('New user registered', [
@@ -80,32 +80,6 @@ class RegisterUserAction
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to upload user image', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    protected function assignDefaultRole(User $user): void
-    {
-        DB::beginTransaction();
-
-        try {
-            $role = UserRole::where('name', UserRole::GUEST)->first();
-
-            if (! $role) {
-                throw new \RuntimeException("Default role 'user' not found. Run RoleSeeder first.");
-            }
-
-            if (! $user->roles()->where('role_id', $role->id)->exists()) {
-                $user->roles()->attach($role->id);
-            }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::warning('Failed to assign default role', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
