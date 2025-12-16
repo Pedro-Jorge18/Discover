@@ -27,6 +27,7 @@ class User extends Authenticatable
         'verified',
         'active',
         'last_login_date',
+        'role',
     ];
 
     protected $hidden = [
@@ -41,6 +42,7 @@ class User extends Authenticatable
         'last_login_date' => 'datetime',
         'verified' => 'boolean',
         'active' => 'boolean',
+        'two_factor_enabled' => 'boolean',
     ];
 
 
@@ -83,52 +85,21 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
-    //Identificao de Usuario anfittiao, cliente ou admin
-    public function isClient()
+
+    public function isGuest(): bool
     {
-        return $this->roles()->where('name', 'client')->exists();
+        return $this->role === 'guest';
     }
 
-    public function isHost()
+    public function isHost(): bool
     {
-        return $this->roles()->where('name', 'host')->exists();
+        return $this->role === 'host';
     }
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->roles()->where('name', 'admin')->exists();
+        return $this->role === 'admin';
     }
-
-    public function hasRole($roleName)
-    {
-        return $this->roles()->where('name', $roleName)->exists();
-    }
-
-    public function hasAnyRole(array $roleNames)
-    {
-        return $this->roles()->whereIn('name', $roleNames)->exists();
-    }
-
-
-    public function assignRole($roleName)
-    {
-        $role = UserRole::where('name', $roleName)->first();
-
-        if ($role && !$this->hasRole($roleName)) {
-            $this->roles()->attach($role);
-        }
-    }
-
-
-    public function removeRole($roleName)
-    {
-        $role = UserRole::where('name', $roleName)->first();
-
-        if ($role) {
-            $this->roles()->detach($role);
-        }
-    }
-
 
     public function getFullNameAttribute()
     {
@@ -138,5 +109,10 @@ class User extends Authenticatable
     public function getInitialsAttribute()
     {
         return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_enabled === true;
     }
 }

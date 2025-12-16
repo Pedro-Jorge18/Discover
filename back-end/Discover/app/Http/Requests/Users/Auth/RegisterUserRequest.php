@@ -34,6 +34,7 @@ class RegisterUserRequest extends FormRequest
             'gender' => 'nullable|in:M,F,O',
             'language' => 'sometimes|in:pt,en,es',
             'about' => 'nullable|string|max:500',
+            'role' => 'required|in:guest,host,admin',
         ];
     }
 
