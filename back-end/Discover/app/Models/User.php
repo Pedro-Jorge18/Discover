@@ -41,6 +41,7 @@ class User extends Authenticatable
         'last_login_date' => 'datetime',
         'verified' => 'boolean',
         'active' => 'boolean',
+        'two_factor_enabled' => 'boolean',
     ];
 
 
@@ -138,5 +139,10 @@ class User extends Authenticatable
     public function getInitialsAttribute()
     {
         return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_enabled === true;
     }
 }

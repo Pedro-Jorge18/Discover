@@ -34,6 +34,10 @@ class UserResource extends JsonResource
                 ] : null;
             }),
 
+            'two_factor' => [
+                'enabled' => $this->two_factor_enabled,
+            ],
+
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
