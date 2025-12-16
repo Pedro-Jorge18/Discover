@@ -131,8 +131,8 @@ export default function Login({ setUser }) {
                 />
                 Lembrar-me
               </label>
-
-              <a
+              
+              <button
                 href="#"
                 className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
               >
@@ -152,7 +152,7 @@ export default function Login({ setUser }) {
           {/* Link to register page */}
           <p className="mt-6 text-center text-sm text-gray-400">
             Ainda não tens conta?{" "}
-            <a
+            <button
               href="/register"
               className="font-medium text-indigo-400 hover:text-indigo-300"
             >
