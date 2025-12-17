@@ -47,7 +47,35 @@ class PropertyResource extends JsonResource
                 'coordinates' => [
                     'latitude' => (float) $this->latitude,
                     'longitude' => (float) $this->longitude,
-                ]
+                ],
+                'city' => $this->whenLoaded('city', function() {
+                    return $this->city ? [
+                        'id' => $this->city->id,
+                        'name' => $this->city->name,
+                        'postal_code' => $this->city->postal_code,
+                    ] : null;
+                }),
+                'state' => $this->whenLoaded('city.state', function() {
+                    return $this->city && $this->city->state ? [
+                        'id' => $this->city->state->id,
+                        'name' => $this->city->state->name,
+                        'code' => $this->city->state->code,
+                        'timezone' => $this->city->state->timezone,
+                    ] : null;
+                }),
+                'country' => $this->whenLoaded('city.state.country', function() {
+                    return $this->city && $this->city->state && $this->city->state->country ? [
+                        'id' => $this->city->state->country->id,
+                        'name' => $this->city->state->country->name,
+                        'code' => $this->city->state->country->code,
+                        'currency' => $this->city->state->country->currency,
+                        'currency_symbol' => $this->city->state->country->currency_symbol,
+                        'phone_code' => $this->city->state->country->phone_code,
+                    ] : null;
+                }),
+                // FULL FORMATTED ADDRESS
+                'full_address' => $this->getFullAddress(),
+
             ],
             // definir o que pode e o que tem no imovel
             'capacity' => [
@@ -57,18 +85,65 @@ class PropertyResource extends JsonResource
                 'bathrooms' => $this->bathrooms,
                 'area' => $this->area ? $this->area . ' m²' : null,
             ],
+            // Tipos e categorias
+            'types' => [
+                'property_type' => $this->whenLoaded('propertyType', function() {
+                    return $this->propertyType ? [
+                        'id' => $this->propertyType->id,
+                        'name' => $this->propertyType->name,
+                        'icon' => $this->propertyType->icon,
+                    ] : null;
+                }),
+                'listing_type' => $this->whenLoaded('listingType', function() {
+                    return $this->listingType ? [
+                        'id' => $this->listingType->id,
+                        'name' => $this->listingType->name,
+                        'slug' => $this->listingType->slug,
+                    ] : null;
+                }),
+            ],
+
+            // Amenities
+            'amenities' => $this->whenLoaded('amenities', function() {
+                return $this->amenities->map(function($amenity) {
+                    return [
+                        'id' => $amenity->id,
+                        'name' => $amenity->name,
+                        'icon' => $amenity->icon,
+                        'category' => $amenity->category ? [
+                            'id' => $amenity->category->id,
+                            'name' => $amenity->category->name,
+                        ] : null,
+                        'value' => $amenity->pivot ? [
+                            'boolean' => $amenity->pivot->value_boolean,
+                            'numeric' => $amenity->pivot->value_numeric,
+                            'text' => $amenity->pivot->value_text,
+                            'formatted' => $amenity->pivot->formatted_value,
+                        ] : null,
+                    ];
+                });
+            }),
+
             // configurações
             'settings' => [
                 'instant_book' => (bool) $this->instant_book,
                 'published' => (bool) $this->published,
             ],
 
+            'host' => $this->whenLoaded('host', function() {
+                return $this->host ? [
+                    'id' => $this->host->id,
+                    'name' => $this->host->name,
+                    'email' => $this->host->email
+                ] : null;
+            }),
+            'images' => PropertyImageResource::collection($this->whenLoaded('images')),
             /*
-            'host' => new UserResource($this->whenLoaded('host')),
+
             'property_type' => new PropertyTypeResource($this->whenLoaded('propertyType')),
             'listing_type' => new ListingTypeResource($this->whenLoaded('listingType')),
             'city' => new CityResource($this->whenLoaded('city')),
-            'images' => PropertyImageResource::collection($this->whenLoaded('images')),
+
 
             // metricas para futuras rotas
             'metrics' => [

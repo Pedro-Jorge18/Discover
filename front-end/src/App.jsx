@@ -1,42 +1,33 @@
-import { useState } from 'react';
+// App.jsx
+import { useState, useEffect } from 'react';
 import './App.css';
-import Login from './components/Auth/Login';
-import Registration from './components/Auth/Registration';
-import ForgotPassword from './components/Auth/ForgotPassword';
-import ResetPassword from './components/Auth/ResetPassword';
-import SettingsMain from './components/Settings/SettingsMain';
+import AppRoutes from './Routes/AppRoutes.jsx';
+import api from './api/axios';
 
-function App() {/*
-  const [showLogin, setShowLogin] = useState(false);
+function App() {
+  const [user, setUser] = useState(null);
 
-  const handleOpenLogin = () => {
-    setShowLogin(true);
-  };
+  useEffect(() => {
+    // Only load user if there is a token in sessionStorage or localStorage
+    const sessionToken = sessionStorage.getItem("token");
+    const localToken = localStorage.getItem("token");
 
-  const handleCloseLogin = () => {
-    setShowLogin(false);
-  };
+    const token = sessionToken || localToken;
 
+    if (token) {
+      api.get("/auth/me", { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => {
+          setUser(res.data.user);
+        })
+        .catch(() => {
+          // If token is invalid, remove it
+          sessionStorage.removeItem("token");
+          localStorage.removeItem("token");
+        });
+    }
+  }, []);
 
-  return (
-    <div className="App">
-      <AppRoutes onOpenLogin={handleOpenLogin} />
-      {showLogin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Login onClose={handleCloseLogin} />
-        </div>
-      )}
-    </div>
-  );
-
-  
-*/
-const [showLogin, setShowLogin] = useState(false)
-    return (
-      <div className="min-h-screen bg-green-400 text-white flex flex-col items-center justify-center">
-        <Registration />
-      </div>
-    );
+  return <AppRoutes user={user} setUser={setUser} />;
 }
 
 export default App;

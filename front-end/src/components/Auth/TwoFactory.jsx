@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../../api/axios";
 
 export default function TwoFactorAuth() {
   const [enabled, setEnabled] = useState(false);
@@ -8,19 +9,33 @@ export default function TwoFactorAuth() {
   const [copied, setCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Verify if 2FA is active or inactive
+  useEffect(() => {
+    const fetch2FAStatus = async () => {
+      try {
+        const response = await api.get("/2fa/status");
+        setEnabled(response.data.enabled);
+      } catch (err) {
+        console.error("Erro ao obter estado 2FA:", err);
+      }
+    };
+
+    fetch2FAStatus();
+  }, []);
 
   const handleToggle = async () => {
+    setErrorMessage("");
     if (!enabled) {
       setLoading(true);
       try {
-        const response = await fetch("/api/2fa/enable", { method: "POST" });
-        const result = await response.json();
+        const response = await api.post("/2fa/enable");
+        const result = response.data;
 
         if (result.status) {
           setSecret(result.data?.secret || "");
           setShowCodePopup(true);
         } else {
-          alert(result.message || "Erro ao ativar 2FA");
+          setErrorMessage(result.message || "Erro ao ativar 2FA");
         }
       } catch (err) {
         console.error(err);
@@ -29,10 +44,17 @@ export default function TwoFactorAuth() {
         setLoading(false);
       }
     } else {
+      // Disable 2FA
       setLoading(true);
       try {
-        await fetch("/api/2fa/disable", { method: "POST" });
-        setEnabled(false);
+        const response = await api.post("/2fa/disable");
+        const result = response.data;
+
+        if (result.status) {
+          setEnabled(false);
+        } else {
+          setErrorMessage(result.message || "Erro ao desativar 2FA");
+        }
       } catch (err) {
         console.error(err);
         setErrorMessage("Erro ao desativar 2FA");
@@ -42,9 +64,25 @@ export default function TwoFactorAuth() {
     }
   };
 
-  const handleConfirmCode = () => {
-    setShowCodePopup(false);
-    setEnabled(true);
+  const handleConfirmCode = async (code) => {
+    setLoading(true);
+    try {
+      const response = await api.post("/2fa/verify", { code });
+      const result = response.data;
+
+      if (result.status) {
+        setShowCodePopup(false);
+        setEnabled(true);
+        setSecret("");
+      } else {
+        setErrorMessage(result.message || "Código inválido");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Erro ao verificar código");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const copyToClipboard = async () => {
@@ -58,7 +96,7 @@ export default function TwoFactorAuth() {
   };
 
   return (
-    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl-">
+    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
         Autenticação de Dois Fatores (2FA)
       </h3>
@@ -77,7 +115,7 @@ export default function TwoFactorAuth() {
           <button
             onClick={handleToggle}
             disabled={loading}
-            className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 outline-none ${
+            className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 outline-none cursor-pointer ${
               enabled ? "bg-indigo-600" : "bg-gray-700"
             }`}
           >
@@ -91,8 +129,8 @@ export default function TwoFactorAuth() {
 
         <p className="text-gray-300 text-sm">
           {enabled
-            ? "A autenticação de dois factores está ativada."
-            : "A autenticação de dois factores está desativada."}
+            ? "A autenticação de dois fatores está ativada."
+            : "A autenticação de dois fatores está desativada."}
         </p>
 
         {/* Pop-up */}
@@ -103,7 +141,6 @@ export default function TwoFactorAuth() {
                 Código de Autenticação
               </h4>
 
-              {/* Código */}
               <p className="text-indigo-400 text-2xl font-bold tracking-widest mb-4 select-text">
                 {secret}
               </p>
@@ -113,7 +150,7 @@ export default function TwoFactorAuth() {
                 (Google Authenticator, Authy, etc.)
               </p>
 
-              {/* Botão Copiar */}
+              {/* Copy Button */}
               <button
                 onClick={copyToClipboard}
                 className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600 transition duration-300 mb-3 w-full"
@@ -121,9 +158,19 @@ export default function TwoFactorAuth() {
                 {copied ? "Copiado ✔" : "Copiar código"}
               </button>
 
-              {/* Confirmar */}
+              {/* Confirm */}
+              <input
+                type="text"
+                placeholder="Código"
+                maxLength={6}
+                className="w-full mb-3 px-3 py-2 rounded-lg text-gray-900"
+                id="2fa-code-input"
+              />
               <button
-                onClick={handleConfirmCode}
+                onClick={() => {
+                  const code = document.getElementById("2fa-code-input").value;
+                  handleConfirmCode(code);
+                }}
                 className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
               >
                 Confirmar
@@ -131,13 +178,13 @@ export default function TwoFactorAuth() {
             </div>
           </div>
         )}
+
+        {/* Error */}
         {errorMessage && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full text-center border border-gray-700 shadow-lg">
               <h4 className="text-white font-semibold mb-3 text-lg">Ocorreu um erro</h4>
-
               <p className="text-gray-300 text-sm mb-6">{errorMessage}</p>
-
               <button
                 onClick={() => setErrorMessage("")}
                 className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition duration-300 w-full"
@@ -147,7 +194,6 @@ export default function TwoFactorAuth() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
