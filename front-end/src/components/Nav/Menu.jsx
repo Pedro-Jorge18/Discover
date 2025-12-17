@@ -23,6 +23,7 @@ function Menu({ user, setUser }) {
 
   return (
     <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right">
+      {user && <p>Bem-vindo, {user.name}</p>}
       <div className="py-2">
         {user && user.id ? (
           <button
