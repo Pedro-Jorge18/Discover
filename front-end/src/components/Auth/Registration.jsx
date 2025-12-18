@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
-export default function Registration() {
+export default function Registration({ setUser }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -27,14 +29,17 @@ export default function Registration() {
     };
 
     try {
-      await api.post("/auth/register", payload);
+      const response = await api.post("/auth/register", payload);
+
       alert("Conta criada com sucesso!");
+      setUser(response.data.user);
+      navigate("/");
+
     } catch (error) {
       if (error.response) {
       const data = error.response.data;
 
-      if (data.errors) {
-        
+      if (data.errors) {        
         const messages = Object.values(data.errors)
           .flat()
           .join("\n");
@@ -45,8 +50,7 @@ export default function Registration() {
       } else {
         alert("Erro desconhecido.");
       }
-    } else {
-      
+    } else {      
       alert("Erro de rede ou servidor.");
     }
     }

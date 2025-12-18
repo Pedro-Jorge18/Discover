@@ -7,7 +7,7 @@ export default function Login({ setUser }) {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
 
-  // Carregar user se houver token guardado
+  // Load user if saved token exist
   useEffect(() => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (token) {
@@ -35,10 +35,10 @@ export default function Login({ setUser }) {
 
     if (remember) {
       localStorage.setItem("token", token);
-      sessionStorage.removeItem("token"); // evita duplicidade
+      sessionStorage.removeItem("token"); // Avoid duplication
     } else {
       sessionStorage.setItem("token", token);
-      localStorage.removeItem("token"); // evita duplicidade
+      localStorage.removeItem("token"); // Avoid duplication
     }
 
     setUser(response.data.user);
@@ -49,8 +49,6 @@ export default function Login({ setUser }) {
     alert("Erro no login. Verifica as credenciais.");
   }
 };
-
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" role="dialog">

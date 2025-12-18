@@ -11,8 +11,7 @@ function Header({ user, setUser }) {
     <header className="fixed top-0 left-0 right-0 z-10 transition-colors duration-300">
       <div className="max-w-[1790px] mx-auto px-5 sm:px-10 py-3 flex items-center justify-between h-20">
         <Link to="/" className="flex items-center space-x-2 flex-shrink-0 w-1/5"> 
-          <span className="text-3xl">🏨 </span>
-          <span className="text-xl font-bold text-gray-900 hidden sm:block">Teste</span>
+          <span className="text-3xl"><img src='../public/Logo_Discover.png' height="60" width="60" /></span>
         </Link>
 
         <div className="hidden lg:flex items-center justify-center w-3/5">
