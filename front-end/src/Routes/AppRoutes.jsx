@@ -9,12 +9,36 @@ import ForgotPassword from '../components/Auth/ForgotPassword.jsx';
 import Footer from '../components/Layout/Footer.jsx';
 import SettingsMain from '../components/Settings/SettingsHost.jsx'; 
 
-function AppRoutes({ user, setUser }) {
+// Added search props to the arguments
+function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa }) {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home user={user} setUser={setUser}/>}/>
-        <Route path="/alojamento/:id" element={<ListingDetails />}/>
+        {/* Pass search props to Home */}
+        <Route 
+          path="/" 
+          element={
+            <Home 
+              user={user} 
+              setUser={setUser} 
+              termoPesquisa={termoPesquisa} 
+              setTermoPesquisa={setTermoPesquisa}
+            />
+          }
+        />
+
+        {/* Pass search props to ListingDetails so the Header stays functional there */}
+        <Route 
+          path="/alojamento/:id" 
+          element={
+            <ListingDetails 
+              user={user} 
+              setUser={setUser} 
+              termoPesquisa={termoPesquisa} 
+              setTermoPesquisa={setTermoPesquisa}
+            />
+          }
+        />
 
         {/* User Routes */}
         <Route path="/host" element={<SettingsHost />} />

@@ -5,12 +5,11 @@ import api from './api/axios';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [termoPesquisa, setTermoPesquisa] = useState(""); 
 
   useEffect(() => {
-    // Only load user if there is a token in sessionStorage or localStorage
     const sessionToken = sessionStorage.getItem("token");
     const localToken = localStorage.getItem("token");
-
     const token = sessionToken || localToken;
 
     if (token) {
@@ -19,14 +18,20 @@ function App() {
           setUser(res.data.user);
         })
         .catch(() => {
-          // If token is invalid, remove it
           sessionStorage.removeItem("token");
           localStorage.removeItem("token");
         });
     }
   }, []);
 
-  return <AppRoutes user={user} setUser={setUser} />;
+  return (
+    <AppRoutes 
+      user={user} 
+      setUser={setUser} 
+      termoPesquisa={termoPesquisa} 
+      setTermoPesquisa={setTermoPesquisa} 
+    />
+  );
 }
 
 export default App;
