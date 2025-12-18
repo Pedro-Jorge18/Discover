@@ -23,8 +23,10 @@ function Menu({ user, setUser }) {
 
   return (
     <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right">
-      {user && <p>Bem-vindo, {user.name}</p>}
+
+      {user && <p>Bem-vindo, {user.role}</p>}
       <div className="py-2">
+
         {user && user.id ? (
           <button
             onClick={handleLogout} //Calls Backend
@@ -41,25 +43,36 @@ function Menu({ user, setUser }) {
           </Link>
         )}
 
-        <div className="border-t my-2"></div>
-
-        <Link to="/configuration" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
-          <Cog className="w-5 h-5 text-gray-500" /> Definições
-        </Link>
-        <Link to="/host" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
-          <Home className="w-5 h-5 text-gray-500" /> Menu Anfitrião
-        </Link>
-        <Link to="/adminMenu" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
-          <Home className="w-5 h-5 text-gray-500" /> Menu Administração
-        </Link>
+        {/* Show and Hide Pages */}
+        {user && user.role ? (
+          <>
+            <div className="border-t my-2"></div>
+            <Link to="/configuration" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
+              <Cog className="w-5 h-5 text-gray-500" /> Definições
+            </Link>
+          
+            {user.role === "host" ? (
+              <Link to="/host" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
+                <Home className="w-5 h-5 text-gray-500" /> Menu Anfitrião
+              </Link>
+            ) : user.role === "admin" ? (
+              <Link to="/adminMenu" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
+                <Home className="w-5 h-5 text-gray-500" /> Menu Administração
+              </Link>
+            ) : (
+              <>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+          </>
+        )}      
 
         <div className="border-t my-2"></div>
 
         <Link to="/help" className={itemClasses}>
           <HelpCircle className="w-5 h-5 text-gray-500" /> Centro de Ajuda
-        </Link>
-        <Link to="/gifts" className={itemClasses}>
-          <Gift className="w-5 h-5 text-gray-500" /> Cartões-oferta
         </Link>
       </div>
     </div>

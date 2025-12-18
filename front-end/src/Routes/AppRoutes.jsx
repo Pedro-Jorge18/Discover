@@ -15,6 +15,8 @@ function AppRoutes({ user, setUser }) {
       <Routes>
         <Route path="/" element={<Home user={user} setUser={setUser}/>}/>
         <Route path="/alojamento/:id" element={<ListingDetails />}/>
+
+        {/* User Routes */}
         <Route path="/host" element={<SettingsHost />} />
         <Route path="/configuration" element={<SettingsMain />} />
         <Route path="/adminMenu" element={<SettingsMain />} />
