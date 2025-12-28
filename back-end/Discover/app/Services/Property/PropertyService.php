@@ -105,7 +105,9 @@ class PropertyService
     public function listService(): JsonResponse
     {
         try {
-            $property = $this->findPropertyAction->executePaginated(15);
+            $property = Property::with(['propertyType', 'listingType', 'images', 'city'])
+                ->where('published', true)
+                ->paginate(15);
 
             return response()->json([
                 'success' => true,
