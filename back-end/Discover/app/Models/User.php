@@ -21,6 +21,7 @@ class User extends Authenticatable
         'birthday',
         'email',
         'password',
+        'google_id',
         'image',
         'gender',
         'about',
@@ -33,6 +34,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
     ];
 
     protected $casts = [
