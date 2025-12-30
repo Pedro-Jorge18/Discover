@@ -82,7 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::withoutMiddleware(['auth:sanctum'])->post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
 
 // Rotas de autenticação com Google
-Route::prefix('auth/google')->group(function () {
+Route::prefix('auth/google')->middleware('throttle:60,1')->group(function () {
     Route::get('/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
     Route::get('/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 });

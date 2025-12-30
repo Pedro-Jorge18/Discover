@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Services\User\AuthService;
 use Exception;
+use GuzzleHttp\Client as GuzzleClient;
 
 class GoogleAuthController extends Controller
 {
@@ -25,16 +26,47 @@ class GoogleAuthController extends Controller
     public function redirectToGoogle(): JsonResponse
     {
         try {
-            $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+            // Configure Socialite with SSL settings for development
+            $driver = Socialite::driver('google')
+                ->stateless()
+                ->scopes(['openid', 'profile', 'email'])
+                ->with([
+                    'access_type' => 'offline',
+                    'prompt' => 'consent select_account'
+                ]);
+            
+            // Apply SSL fix for development environment
+            if (app()->environment('local') || config('app.debug')) {
+                $driver->setHttpClient(new GuzzleClient([
+                    'verify' => false, // Disable SSL verification in development
+                    'timeout' => 30,
+                ]));
+            }
+            
+            $url = $driver->redirect()->getTargetUrl();
+            
+            Log::info('Google OAuth redirect generated', [
+                'url' => $url,
+                'redirect_uri' => config('services.google.redirect')
+            ]);
             
             return response()->json([
                 'url' => $url
             ]);
         } catch (Exception $e) {
-            Log::error('Google redirect error', ['error' => $e->getMessage()]);
+            Log::error('Google OAuth redirect error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'config' => [
+                    'client_id' => config('services.google.client_id') ? 'set' : 'missing',
+                    'client_secret' => config('services.google.client_secret') ? 'set' : 'missing',  
+                    'redirect_uri' => config('services.google.redirect')
+                ]
+            ]);
             
             return response()->json([
-                'message' => 'Error redirecting to Google'
+                'message' => 'Failed to generate Google OAuth URL. Please try again later.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -45,7 +77,30 @@ class GoogleAuthController extends Controller
     public function handleGoogleCallback(Request $request): JsonResponse
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            // Configure Socialite with SSL settings for development
+            $driver = Socialite::driver('google')->stateless();
+            
+            // Apply SSL fix for development environment  
+            if (app()->environment('local') || config('app.debug')) {
+                $driver->setHttpClient(new GuzzleClient([
+                    'verify' => false, // Disable SSL verification in development
+                    'timeout' => 30,
+                ]));
+            }
+            
+            $googleUser = $driver->user();
+            
+            // Validate Google user data
+            if (!$googleUser->email || !filter_var($googleUser->email, FILTER_VALIDATE_EMAIL)) {
+                Log::warning('Invalid or missing email from Google OAuth', [
+                    'google_id' => $googleUser->id ?? 'unknown',
+                    'email' => $googleUser->email ?? 'null'
+                ]);
+                
+                return response()->json([
+                    'message' => 'Invalid email received from Google. Please try again.',
+                ], 400);
+            }
             
             // Check if user already exists with this Google ID
             $user = User::where('google_id', $googleUser->id)->first();
@@ -132,10 +187,16 @@ class GoogleAuthController extends Controller
         $parts = explode('@', $email);
         $username = $parts[0] ?? 'User';
         
-        // Remove numbers and special characters, capitalize
+        // Remove numbers and special characters
         $firstName = preg_replace('/[^a-zA-Z]/', '', $username);
-        
-        return ucfirst(strtolower($firstName)) ?: 'User';
+
+        // If no alphabetic characters remain or an error occurred, fall back to a generic name
+        if (!is_string($firstName) || $firstName === '') {
+            return 'User';
+        }
+        // Normalize case and capitalize first letter
+        $normalized = strtolower($firstName);
+        return ucfirst($normalized);
     }
     
     /**

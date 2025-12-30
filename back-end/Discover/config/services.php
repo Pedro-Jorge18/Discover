@@ -47,7 +47,12 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URL'),
-    ]
+    ],
+
+    // cURL configuration for development (SSL fix)
+    'curl' => [
+        'verify_ssl' => env('CURL_VERIFY_SSL', true),
+    ],
 
 
 ];
