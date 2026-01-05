@@ -3,7 +3,7 @@ import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 
-function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost }) {
+function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
 
   const handleLogout = async () => {
@@ -75,9 +75,13 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost }) {
                 Menu Host
               </button>
             ) : user.role === "admin" ? (
-              <Link to="/adminMenu" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
-                <Home className="w-5 h-5 text-gray-500" /> Menu Administração
-              </Link>
+              <button
+                onClick={onOpenSettingsAdmin}
+                className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+              >
+                <Cog className="w-5 h-5 text-gray-500" />
+                Menu Administração
+              </button>
             ) : (
               <>
               </>

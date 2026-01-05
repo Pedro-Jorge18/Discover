@@ -4,6 +4,7 @@ import AppRoutes from './Routes/AppRoutes.jsx';
 import api from './api/axios';
 import SettingsMain from './components/Settings/SettingsMain.jsx';
 import SettingsHost from './components/Settings/SettingsHost.jsx'; 
+import SettingsAdmin from './components/Settings/SettingsAdmin.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -11,6 +12,7 @@ function App() {
   const [termoPesquisa, setTermoPesquisa] = useState(""); 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsOpenHost, setSettingsOpenHost] = useState(false);
+  const [settingsOpenAdmin, setSettingsOpenAdmin] = useState(false);
 
   useEffect(() => {
     const sessionToken = sessionStorage.getItem("token");
@@ -39,10 +41,12 @@ function App() {
         setTermoPesquisa={setTermoPesquisa} 
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenSettingsHost={() => setSettingsOpenHost(true)}
+        onOpenSettingsAdmin={() => setSettingsOpenAdmin(true)}
       />
 
       {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} token={token} />}
       {settingsOpenHost && <SettingsHost onClose={() => setSettingsOpenHost(false)} />}
+      {settingsOpenAdmin && <SettingsAdmin onClose={() => setSettingsOpenAdmin(false)} user={user} token={token} />}
     </>
   );
 }
