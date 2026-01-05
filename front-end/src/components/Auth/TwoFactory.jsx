@@ -4,94 +4,168 @@ import api from "../../api/axios";
 export default function TwoFactorAuth() {
   const [enabled, setEnabled] = useState(false);
   const [showCodePopup, setShowCodePopup] = useState(false);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [showDisablePopup, setShowDisablePopup] = useState(false);
+  const [disableCode, setDisableCode] = useState("");
   const [secret, setSecret] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [password, setPassword] = useState("");
+  const [qrCode, setQrCode] = useState("");
 
-  // Verify if 2FA is active or inactive
+  /* Obter estado atual do 2FA do utilizador */
   useEffect(() => {
-    const fetch2FAStatus = async () => {
+    const fetchUser = async () => {
       try {
-        const response = await api.get("/2fa/status");
-        setEnabled(response.data.enabled);
-      } catch (err) {
-        console.error("Erro ao obter estado 2FA:", err);
+        const response = await api.get("/auth/me", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`,
+          },
+        });
+
+        const user = response.data.user;
+        setEnabled(user?.two_factor?.enabled ?? false);
+      } catch (error) {
+        console.error("Erro ao obter utilizador:", error);
       }
     };
 
-    fetch2FAStatus();
+    fetchUser();
   }, []);
 
+  /* Enable / Disable */
   const handleToggle = async () => {
     setErrorMessage("");
+
     if (!enabled) {
-      setLoading(true);
-      try {
-        const response = await api.post("/2fa/enable");
-        const result = response.data;
-
-        if (result.status) {
-          setSecret(result.data?.secret || "");
-          setShowCodePopup(true);
-        } else {
-          setErrorMessage(result.message || "Erro ao ativar 2FA");
-        }
-      } catch (err) {
-        console.error(err);
-        setErrorMessage("Erro ao ativar 2FA");
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Disable 2FA
-      setLoading(true);
-      try {
-        const response = await api.post("/2fa/disable");
-        const result = response.data;
-
-        if (result.status) {
-          setEnabled(false);
-        } else {
-          setErrorMessage(result.message || "Erro ao desativar 2FA");
-        }
-      } catch (err) {
-        console.error(err);
-        setErrorMessage("Erro ao desativar 2FA");
-      } finally {
-        setLoading(false);
-      }
+      if (loading) return;
+      setShowPasswordPopup(true);
+      return;
     }
+
+    // Se já está ativo, mostrar popup para inserir código para desativar
+    setShowDisablePopup(true);
   };
 
-  const handleConfirmCode = async (code) => {
+  /* Ativar 2FA com password */
+  const handlePasswordSubmit = async () => {
+    if (!password) {
+      setErrorMessage("Por favor, introduza a sua password.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await api.post("/2fa/verify", { code });
-      const result = response.data;
+      const res = await api.post(
+        "/auth/2fa/enable",
+        { password },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}` } }
+      );
 
-      if (result.status) {
-        setShowCodePopup(false);
-        setEnabled(true);
-        setSecret("");
+      if (res.data?.status) {
+        setSecret(res.data.data?.secret || "");
+        setQrCode(res.data.data?.qr_code || "");
+        setShowPasswordPopup(false);
+        setShowCodePopup(true);
+        setPassword("");
       } else {
-        setErrorMessage(result.message || "Código inválido");
+        setErrorMessage(res.data?.message || "Erro ao ativar 2FA");
       }
     } catch (err) {
       console.error(err);
-      setErrorMessage("Erro ao verificar código");
+      setErrorMessage("Erro de comunicação com o servidor");
+      setPassword("");
     } finally {
       setLoading(false);
     }
   };
 
+  /* Confirmar código para ativar 2FA */
+  const handleConfirmCode = async () => {
+    const code = document.getElementById("2fa-code-input")?.value;
+
+    if (!code || code.length < 6) {
+      setErrorMessage("Código inválido");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await api.post(
+        "/auth/2fa/verify",
+        { code },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.data?.status) {
+        setEnabled(true);
+        setShowCodePopup(false);
+        setSecret("");
+        setPassword("");
+      } else {
+        setErrorMessage(res.data.message || "Código incorreto");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Erro ao validar o código");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* Disable 2FA */
+  const handleDisable2FA = async () => {
+  if (!disableCode || disableCode.length < 6) {
+    setErrorMessage("Código inválido");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await api.post(
+      "/auth/2fa/disable",
+      { code: disableCode },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (res.data?.status) {
+      setEnabled(false);
+      setShowDisablePopup(false);
+      setDisableCode("");
+      setErrorMessage("");
+    } else {
+      setErrorMessage(res.data?.message || "Código incorreto");
+    }
+  } catch (err) {
+    if (err.response?.status === 422) {
+      setErrorMessage("Código de autenticação incorreto.");
+    } else {
+      setErrorMessage("Erro de comunicação com o servidor.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  /* Copy to clipboard */
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(secret);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      setErrorMessage("Erro ao copiar");
+    } catch {
+      setErrorMessage("Não foi possível copiar o código");
     }
   };
 
@@ -133,7 +207,33 @@ export default function TwoFactorAuth() {
             : "A autenticação de dois fatores está desativada."}
         </p>
 
-        {/* Pop-up */}
+        {/* Pop-up Password */}
+        {showPasswordPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+              <h4 className="text-white font-semibold mb-4 text-lg">
+                Introduza a sua Palavra-Passe
+              </h4>
+
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full mb-3 px-3 py-2 rounded-lg text-white-900 border"
+              />
+
+              <button
+                onClick={handlePasswordSubmit}
+                className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Pop-up Código */}
         {showCodePopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
@@ -141,7 +241,17 @@ export default function TwoFactorAuth() {
                 Código de Autenticação
               </h4>
 
-              <p className="text-indigo-400 text-2xl font-bold tracking-widest mb-4 select-text">
+              {qrCode && (
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrCode)}`}
+                    alt="QR Code 2FA"
+                    className="rounded-lg bg-white p-2"
+                  />
+                </div>
+              )}
+
+              <p className="text-gray-400 text-sm font-mono tracking-widest mb-4 select-text break-all">
                 {secret}
               </p>
 
@@ -150,7 +260,6 @@ export default function TwoFactorAuth() {
                 (Google Authenticator, Authy, etc.)
               </p>
 
-              {/* Copy Button */}
               <button
                 onClick={copyToClipboard}
                 className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600 transition duration-300 mb-3 w-full"
@@ -158,22 +267,55 @@ export default function TwoFactorAuth() {
                 {copied ? "Copiado ✔" : "Copiar código"}
               </button>
 
-              {/* Confirm */}
               <input
                 type="text"
                 placeholder="Código"
                 maxLength={6}
-                className="w-full mb-3 px-3 py-2 rounded-lg text-gray-900"
+                className="w-full mb-3 px-3 py-2 rounded-lg text-white-900 border"
                 id="2fa-code-input"
               />
               <button
-                onClick={() => {
-                  const code = document.getElementById("2fa-code-input").value;
-                  handleConfirmCode(code);
-                }}
+                onClick={handleConfirmCode}
                 className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
               >
                 Confirmar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Pop-up Código para desativar */}
+        {showDisablePopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+              <h4 className="text-white font-semibold mb-4 text-lg">
+                Código de Autenticação 2FA
+              </h4>
+
+              <p className="text-gray-300 text-sm mb-3">
+                Introduza o código da sua aplicação de autenticação para desativar o 2FA.
+              </p>
+
+              <input
+                type="text"
+                placeholder="Código"
+                maxLength={6}
+                value={disableCode}
+                onChange={(e) => setDisableCode(e.target.value)}
+                className="w-full mb-4 px-3 py-2 rounded-lg text-white-900 border"
+              />
+
+              {errorMessage && (
+                <p className="text-red-400 text-sm mb-3">
+                  {errorMessage}
+                </p>
+              )}
+
+              <button
+                onClick={handleDisable2FA}
+                className="rounded-lg bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-500 focus:ring-4 focus:ring-red-400 transition duration-300 w-full"
+              >
+                Desativar 2FA
               </button>
             </div>
           </div>

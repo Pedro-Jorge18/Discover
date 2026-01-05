@@ -3,7 +3,7 @@ import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 
-function Menu({ user, setUser }) {
+function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost }) {
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
 
   const handleLogout = async () => {
@@ -17,6 +17,16 @@ function Menu({ user, setUser }) {
       setUser(null);
 
     } catch (error) {
+      // If token is already revoked the server may return 401. In that case
+      // clear local token and user state anyway so the UI is consistent.
+      const status = error?.response?.status;
+      if (status === 401) {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        setUser(null);
+        return;
+      }
+
       console.error("Erro ao fazer logout:", error);
     }
   };
@@ -47,14 +57,23 @@ function Menu({ user, setUser }) {
         {user && user.role ? (
           <>
             <div className="border-t my-2"></div>
-            <Link to="/configuration" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
-              <Cog className="w-5 h-5 text-gray-500" /> Definições
-            </Link>
+            <button
+              onClick={onOpenSettings}
+              className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+            >
+              <Cog className="w-5 h-5 text-gray-500" />
+              Definições
+            </button>
+
           
             {user.role === "host" ? (
-              <Link to="/host" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
-                <Home className="w-5 h-5 text-gray-500" /> Menu Anfitrião
-              </Link>
+              <button
+                onClick={onOpenSettingsHost}
+                className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+              >
+                <Cog className="w-5 h-5 text-gray-500" />
+                Menu Host
+              </button>
             ) : user.role === "admin" ? (
               <Link to="/adminMenu" className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left">
                 <Home className="w-5 h-5 text-gray-500" /> Menu Administração

@@ -1,131 +1,130 @@
 import { useState } from "react";
+import api from "../../api/axios";
 
 export default function ResetPassword() {
-  const [emailSent, setEmailSent] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+  const [oldPasswordError, setOldPasswordError] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setEmailSent(true);
+    setError("");
+
+    if (newPassword !== confirmPassword) {
+      setNewPasswordError("A nova password e a confirmação não coincidem.");
+      return;
+    }
+    
+    // clear field errors before request
+    setOldPasswordError("");
+    setNewPasswordError("");
+
+    try {
+      // For authenticated users we call change-password endpoint
+      const res = await api.post("/auth/change-password", {
+        current_password: oldPassword,
+        password: newPassword,
+        password_confirmation: confirmPassword
+      });
+
+      console.log("Resposta:", res.data);
+      setSuccess(true);
+    } catch (err) {
+      console.error("Erro ao resetar password:", err);
+
+      const errors = err.response?.data?.errors;
+      if (errors) {
+        if (errors.current_password) {
+          setOldPasswordError(errors.current_password.join(' '));
+        }
+        if (errors.password) {
+          setNewPasswordError(errors.password.join(' '));
+        }
+        // if there is a general message, show it in the top-level error
+        if (err.response?.data?.message) {
+          setError(err.response.data.message);
+        }
+      } else {
+        setError(err.response?.data?.message || 'Erro interno do servidor');
+      }
+    }
   };
 
   return (
-    <div className="w-full max-w-xl bg-gray-800  p-6">
-
-      {/* Cabeçalho */}
+    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl mx-auto mt-10">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Reposição da palavra-passe
+        Alterar Palavra-passe
       </h3>
 
-      {/* Corpo */}
-      <div className="pt-6">
-        {!emailSent ? (
-          <form className="space-y-6" onSubmit={handleSubmit}>
-
-            {/* Nova password */}
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Nova Palavra-passe
-              </label>
-
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="newPassword"
-                  placeholder="Insira a sua nova palavra-passe"
-                  className="py-2.5 ps-4 pe-10 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-indigo-300"
-                >
-                  {showPassword ? (
-                    <svg className="size-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  ) : (
-                    <svg className="size-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path d="M17.94 17.94A10.06 10.06 0 0 1 12 19c-7 0-10-7-10-7a16.14 16.14 0 0 1 3.07-4.34" />
-                      <path d="M1 1l22 22" />
-                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirmar password */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Confirmar Palavra-passe
-              </label>
-
-              <div className="relative">
-                <input
-                  type={showPassword2 ? "text" : "password"}
-                  id="confirmPassword"
-                  placeholder="Confirme a sua nova palavra-passe"
-                  className="py-2.5 ps-4 pe-10 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword2(!showPassword2)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-indigo-300"
-                >
-                  {showPassword2 ? (
-                    <svg className="size-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  ) : (
-                    <svg className="size-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path d="M17.94 17.94A10.06 10.06 0 0 1 12 19c-7 0-10-7-10-7a16.14 16.14 0 0 1 3.07-4.34" />
-                      <path d="M1 1l22 22" />
-                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Botão Confirmar */}
-            <button
-              type="submit"
-              className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300"
-            >
-              Confirmar
-            </button>
-
-          </form>
-        ) : (
-          <div className="text-center space-y-6">
-
-            <p className="text-gray-300 text-sm">
-              A palavra-passe foi alterada com sucesso.       
-            </p>
-
-            {/* Botão Voltar */}
-            <button
-              onClick={() => setEmailSent(false)}
-              className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition duration-300"
-            >
-              Voltar
-            </button>
-
+      {!success ? (
+        <form className="space-y-6 mt-6" onSubmit={handleSubmit}>
+            {/* Password antiga */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Palavra-passe antiga
+            </label>
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={(e) => { setOldPassword(e.target.value); setOldPasswordError(""); setError(""); }}
+              placeholder="Insira a sua palavra-passe atual"
+              required
+              className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
+            />
+            {oldPasswordError && <p className="text-red-500 text-sm mt-1">{oldPasswordError}</p>}
           </div>
-        )}
-      </div>
+
+          {/* Nova password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Nova palavra-passe
+            </label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => { setNewPassword(e.target.value); setNewPasswordError(""); setError(""); }}
+              placeholder="Insira a sua nova palavra-passe"
+              required
+              className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
+            />
+            {newPasswordError && <p className="text-red-500 text-sm mt-1">{newPasswordError}</p>}
+          </div>
+
+          {/* Confirmar nova password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Confirmar nova palavra-passe
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirme a sua nova palavra-passe"
+              required
+              className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
+            />
+          </div>
+
+          {/* Mensagem de erro */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Botão */}
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 py-2 px-4 rounded-lg text-white font-semibold hover:bg-indigo-500 transition"
+          >
+            Confirmar
+          </button>
+        </form>
+      ) : (
+        <div className="text-center mt-6">
+          <p className="text-green-400">A palavra-passe foi alterada com sucesso!</p>
+        </div>
+      )}
     </div>
   );
 }

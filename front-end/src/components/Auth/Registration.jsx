@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
-export default function Registration({ setUser }) {
+export default function Registration() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
@@ -11,7 +11,6 @@ export default function Registration({ setUser }) {
     e.preventDefault();
     const form = e.target;
 
-    // Verify if the password is
     if (form.password.value !== form.password_confirmation.value) {
       alert("As passwords não coincidem.");
       return;
@@ -31,28 +30,21 @@ export default function Registration({ setUser }) {
     try {
       const response = await api.post("/auth/register", payload);
 
-      alert("Conta criada com sucesso!");
-      setUser(response.data.user);
-      navigate("/");
+      console.log("REGISTER RESPONSE:", response.data);
+
+      alert("Conta criada com sucesso! Faça o login.");
+      navigate("/login");
 
     } catch (error) {
-      if (error.response) {
-      const data = error.response.data;
+      console.error("REGISTER ERROR:", error);
 
-      if (data.errors) {        
-        const messages = Object.values(data.errors)
-          .flat()
-          .join("\n");
-        alert(messages);
-      } else if (data.message) {
-        
-        alert(data.message);
+      if (error.response?.data?.errors) {
+        alert(Object.values(error.response.data.errors).flat().join("\n"));
+      } else if (error.response?.data?.message) {
+        alert(error.response.data.message);
       } else {
-        alert("Erro desconhecido.");
+        alert("Erro de rede ou servidor.");
       }
-    } else {      
-      alert("Erro de rede ou servidor.");
-    }
     }
   };
 
@@ -66,6 +58,14 @@ export default function Registration({ setUser }) {
       <div className="relative w-full max-w-lg rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8 p-6">
         {/* Head */}
         <div className="pb-4 border-b border-gray-700">
+          <button
+            onClick={() => navigate("/")}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+          
           <h3 id="dialog-title" className="text-2xl font-semibold text-white text-center">
             Criar Conta
           </h3>

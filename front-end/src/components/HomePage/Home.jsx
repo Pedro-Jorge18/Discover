@@ -3,7 +3,7 @@ import Header from '../Nav/Header.jsx';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios'; 
 
-function Home({ user, setUser, onOpenLogin, termoPesquisa, setTermoPesquisa }) {
+function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost }) {
   const [alojamentos, setAlojamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,7 +44,7 @@ function Home({ user, setUser, onOpenLogin, termoPesquisa, setTermoPesquisa }) {
   if (loading) {
     return (
         <div className="min-h-screen pt-20 text-center">
-            <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa}/>
+            <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost}/>
             <div className="mt-20 text-2xl font-semibold text-gray-600">A carregar alojamentos...</div>
         </div>
     );
@@ -52,7 +52,7 @@ function Home({ user, setUser, onOpenLogin, termoPesquisa, setTermoPesquisa }) {
 
   return (
     <div className="min-h-screen pt-20"> 
-      <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa}/>
+      <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost}/>
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6">
         <div className="text-center py-5">

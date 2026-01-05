@@ -4,7 +4,7 @@ import { Globe, Menu as MenuIcon, User, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Added search props to handle global filtering
-function Header({ user, setUser, termoPesquisa, setTermoPesquisa }) {
+function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(prev => !prev);
 
@@ -50,7 +50,7 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa }) {
               <MenuIcon className="w-4 h-4 text-gray-600" />
               <User className="w-8 h-8 p-1 bg-gray-100 text-gray-500 rounded-full" />
             </button>
-            {isMenuOpen && <Menu user={user} setUser={setUser} />}
+            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} />}
           </div>
         </div>
 
