@@ -17,13 +17,22 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
         let dados = resposta.data?.data?.data || resposta.data?.data || resposta.data || [];
         setAlojamentos(dados);
       } catch (erro) {
-        console.error("Erro na API");
+        console.error("Erro na API", erro);
       } finally {
         setLoading(false);
       }
     };
     buscarAlojamentos();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 text-center">
+        <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost}/>
+        <div className="mt-20 text-2xl font-semibold text-gray-600">A carregar alojamentos...</div>
+      </div>
+    );
+  }
 
   const handleVerTudo = (keyword) => {
     setTermoPesquisa(keyword);
@@ -36,21 +45,30 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   // Filters using the Resource path: location.city.name
   const porto = alojamentos.filter(a => a.location?.city?.name?.toLowerCase().includes('porto'));
   const madrid = alojamentos.filter(a => a.location?.city?.name?.toLowerCase().includes('madri'));
-  const economicos = alojamentos.filter(a => a.price?.per_night <= 60);
-  const luxo = alojamentos.filter(a => a.price?.per_night >= 150);
+  const economicos = alojamentos.filter(a => Number(a.price?.per_night ?? Infinity) <= 60);
+  const luxo = alojamentos.filter(a => Number(a.price?.per_night ?? 0) >= 150);
+  // Search filter: if `termoPesquisa` is numeric treat as price filter (<= for small numbers, >= for large)
+  const filtrados = (() => {
+    if (!termoPesquisa) return alojamentos;
 
-  // Search filter updated for city name
-  const filtrados = alojamentos.filter(a => {
-    const busca = termoPesquisa?.toLowerCase() || "";
-    return (
-        <div className="min-h-screen pt-20 text-center">
-            <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost}/>
-            <div className="mt-20 text-2xl font-semibold text-gray-600">A carregar alojamentos...</div>
-        </div>
-      a.title?.toLowerCase().includes(busca) ||
-      a.location?.city?.name?.toLowerCase().includes(busca)
-    );
-  });
+    const q = String(termoPesquisa).trim().toLowerCase();
+    const qNum = Number(q);
+    const isNumber = !Number.isNaN(qNum);
+
+    if (isNumber) {
+      // heuristic: numbers <= 100 are economical filters (<=), larger numbers are luxury (>=)
+      if (qNum <= 100) {
+        return alojamentos.filter(a => Number(a.price?.per_night ?? Infinity) <= qNum);
+      }
+      return alojamentos.filter(a => Number(a.price?.per_night ?? 0) >= qNum);
+    }
+
+    return alojamentos.filter(a => {
+      const city = String(a.location?.city?.name ?? '').toLowerCase();
+      const title = String(a.title ?? '').toLowerCase();
+      return city.includes(q) || title.includes(q);
+    });
+  })();
 
   return (
     <div className="min-h-screen pt-20"> 
