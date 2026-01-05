@@ -10,7 +10,8 @@ import Footer from '../components/Layout/Footer.jsx';
 import SettingsMain from '../components/Settings/SettingsMain.jsx'; 
 import SearchPage from '../components/Nav/SearchPage.jsx';
 
-function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost }) {
+// Added search props to the arguments
+function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   return (
     <BrowserRouter>
       <Routes>
@@ -25,6 +26,7 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
               setTermoPesquisa={setTermoPesquisa}
               onOpenSettings={onOpenSettings}
               onOpenSettingsHost={onOpenSettingsHost}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
             />
           }
         />

@@ -4,7 +4,8 @@ import { Globe, Menu as MenuIcon, User, Search, Heart, SlidersHorizontal } from 
 import { Link, useNavigate } from 'react-router-dom';
 import FilterModal from './FilterModal.jsx'; // Vamos criar este ficheiro
 
-function Header({ user, setUser, onOpenSettings, onOpenSettingsHost }) {
+// Added search props to handle global filtering
+function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
@@ -82,7 +83,7 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsHost }) {
                 {user ? user.name.charAt(0) : <User className="w-5 h-5 text-gray-400" />}
               </div>
             </button>
-            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} />}
+            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />}
           </div>
         </div>
       </div>

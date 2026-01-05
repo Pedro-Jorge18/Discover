@@ -140,31 +140,32 @@ class GoogleAuthController extends Controller
                 ]);
             }
             
-            // Create new user
-            $user = User::create([
-                'name' => $googleUser->name ?? $this->extractFirstName($googleUser->email),
-                'last_name' => $this->extractLastName($googleUser->name) ?? 'User',
-                'email' => $googleUser->email,
+            // New user - return temporary token to choose account type
+            $tempToken = Str::random(64);
+            
+            // Store Google user data temporarily in cache (expires in 10 minutes)
+            cache()->put("google_signup_{$tempToken}", [
                 'google_id' => $googleUser->id,
-                'password' => bcrypt(Str::random(32)), // Random password
-                'email_verified_at' => now(),
-                'verified' => true,
-                'active' => true,
-                'phone' => '+000000000', // Default value required by schema
-                'birthday' => now()->subYears(25)->format('Y-m-d'), // Default age 25
-                'role' => 'guest'
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'avatar' => $googleUser->avatar ?? null,
+            ], now()->addMinutes(10));
+            
+            Log::info('New Google user needs account type selection', [
+                'email' => $googleUser->email,
+                'temp_token' => $tempToken
             ]);
             
-            $token = $this->authService->generateToken($user);
-            
-            Log::info('New user created via Google', ['user_id' => $user->id]);
-            
             return response()->json([
-                'user' => new UserResource($user),
-                'token' => $token,
-                'token_type' => 'Bearer',
-                'message' => 'Account created successfully via Google'
-            ], 201);
+                'requires_account_type' => true,
+                'temp_token' => $tempToken,
+                'user_info' => [
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'avatar' => $googleUser->avatar ?? null,
+                ],
+                'message' => 'Please select your account type to continue'
+            ]);
             
         } catch (Exception $e) {
             Log::error('Google authentication error', [
@@ -174,6 +175,92 @@ class GoogleAuthController extends Controller
             
             return response()->json([
                 'message' => 'Google authentication error',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
+    /**
+     * Complete Google signup with account type selection
+     */
+    public function completeGoogleSignup(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'temp_token' => 'required|string',
+                'account_type' => 'required|in:guest,host',
+            ]);
+
+            $tempToken = $request->input('temp_token');
+            $accountType = $request->input('account_type');
+
+            // Retrieve cached Google user data
+            $googleData = cache()->get("google_signup_{$tempToken}");
+
+            if (!$googleData) {
+                return response()->json([
+                    'message' => 'Invalid or expired token. Please try signing in with Google again.',
+                ], 400);
+            }
+
+            // Check if user was created in the meantime
+            $existingUser = User::where('google_id', $googleData['google_id'])->first();
+            
+            if ($existingUser) {
+                cache()->forget("google_signup_{$tempToken}");
+                
+                $token = $this->authService->generateToken($existingUser);
+                $this->authService->updateLastLogin($existingUser);
+                
+                return response()->json([
+                    'user' => new UserResource($existingUser),
+                    'token' => $token,
+                    'token_type' => 'Bearer',
+                    'message' => 'Successfully logged in'
+                ]);
+            }
+
+            // Create new user with selected account type
+            $user = User::create([
+                'name' => $googleData['name'] ?? $this->extractFirstName($googleData['email']),
+                'last_name' => $this->extractLastName($googleData['name']) ?? 'User',
+                'email' => $googleData['email'],
+                'google_id' => $googleData['google_id'],
+                'image' => $googleData['avatar'] ?? null,
+                'password' => bcrypt(Str::random(32)), 
+                'email_verified_at' => now(),
+                'verified' => true,
+                'active' => true,
+                'phone' => '+000000000', 
+                'birthday' => now()->subYears(25)->format('Y-m-d'), 
+                'role' => $accountType
+            ]);
+
+            // Clear the temporary cache
+            cache()->forget("google_signup_{$tempToken}");
+
+            $token = $this->authService->generateToken($user);
+            
+            Log::info('New user created via Google with account type', [
+                'user_id' => $user->id,
+                'role' => $accountType
+            ]);
+            
+            return response()->json([
+                'user' => new UserResource($user),
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'message' => 'Account created successfully'
+            ], 201);
+
+        } catch (Exception $e) {
+            Log::error('Google signup completion error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Failed to complete signup',
                 'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
