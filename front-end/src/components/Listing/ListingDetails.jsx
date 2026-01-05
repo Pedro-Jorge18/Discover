@@ -8,6 +8,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { pt } from 'date-fns/locale';
 import { differenceInDays } from 'date-fns';
+import { useNavigate } from "react-router-dom";
 
 function ListingDetails({ user, setUser, onOpenLogin }) {
   const { id } = useParams();
@@ -18,6 +19,7 @@ function ListingDetails({ user, setUser, onOpenLogin }) {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   // Reservation Form States
   const [startDate, setStartDate] = useState(null);
@@ -32,7 +34,7 @@ function ListingDetails({ user, setUser, onOpenLogin }) {
         const data = response.data?.data || response.data;
         setAlojamento(data);
       } catch (err) {
-        console.error("❌ API Error:", err);
+        console.error("API Error:", err);
       } finally {
         setLoading(false);
       }
@@ -60,6 +62,7 @@ function ListingDetails({ user, setUser, onOpenLogin }) {
     if (!user) {
       if (typeof onOpenLogin === 'function') onOpenLogin();
       else alert("Inicie sessão para reservar.");
+      navigate("/login");
       return;
     }
     setShowModal(true);
@@ -77,8 +80,6 @@ function ListingDetails({ user, setUser, onOpenLogin }) {
       });
       setBookingSuccess(true);
       setShowModal(false);
-    } catch (err) {
-      alert("Erro ao processar a reserva. Tente novamente.");
     } finally {
       setBookingLoading(false);
     }
