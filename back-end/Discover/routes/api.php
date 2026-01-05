@@ -24,11 +24,13 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 });
 
+
 Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas de Usuário
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
+            Route::post('change-password', [AuthController::class, 'changePassword']);
         Route::get('me', [AuthController::class, 'me']);
 
         // 2FA

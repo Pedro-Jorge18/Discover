@@ -4,7 +4,7 @@ import api from '../../api/axios';
 import PropertySlider from './PropertySlider.jsx';
 import PropertyCard from './PropertyCard.jsx';
 
-function Home({ user, setUser, termoPesquisa, setTermoPesquisa }) {
+function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost }) {
   const [alojamentos, setAlojamentos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +43,10 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa }) {
   const filtrados = alojamentos.filter(a => {
     const busca = termoPesquisa?.toLowerCase() || "";
     return (
+        <div className="min-h-screen pt-20 text-center">
+            <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost}/>
+            <div className="mt-20 text-2xl font-semibold text-gray-600">A carregar alojamentos...</div>
+        </div>
       a.title?.toLowerCase().includes(busca) ||
       a.location?.city?.name?.toLowerCase().includes(busca)
     );
@@ -50,7 +54,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa }) {
 
   return (
     <div className="min-h-screen pt-20"> 
-      <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa}/>
+      <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost}/>
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6">
         

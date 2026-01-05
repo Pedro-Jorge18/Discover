@@ -17,6 +17,7 @@ class ResetPasswordRequest extends FormRequest
             'email' => ['required', 'email', 'exists:users,email'],
             'token' => ['required', 'string'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required', 'string'],
         ];
     }
 
@@ -30,6 +31,7 @@ class ResetPasswordRequest extends FormRequest
             'password.required' => __('validation.required', ['attribute' => 'password']),
             'password.min' => __('validation.min.string', ['attribute' => 'password', 'min' => 8]),
             'password.confirmed' => __('validation.confirmed', ['attribute' => 'password']),
+            'password_confirmation.required' => __('validation.required', ['attribute' => 'password_confirmation']),
         ];
     }
 }

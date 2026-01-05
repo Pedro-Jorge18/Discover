@@ -11,7 +11,7 @@ class ChangePasswordRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,19 @@ class ChangePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'current_password.current_password' => __('validation.current_password', ['attribute' => 'password antiga']),
+            'current_password.required' => __('validation.required', ['attribute' => 'password antiga']),
+            'password.required' => __('validation.required', ['attribute' => 'password']),
+            'password.min' => __('validation.min.string', ['attribute' => 'password', 'min' => 8]),
+            'password.confirmed' => __('validation.confirmed', ['attribute' => 'password']),
         ];
     }
 }

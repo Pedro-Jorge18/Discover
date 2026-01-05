@@ -1,7 +1,9 @@
 import { useState } from "react";
+import api from "../../api/axios";
 
 export default function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -9,15 +11,17 @@ export default function ForgotPassword() {
     const email = e.target.userEmail.value;
 
     try {
-      await axios.post("/api/forgot-password", { email });
-
-      setEmailSent(true); 
+      await api.post("/auth/forgot-password", { email });
+      setEmailSent(true);
+      setErrorMessage(""); // clear errors
     } catch (error) {
       console.error("Erro ao enviar email:", error);
-      setEmailSent(true); // Show menssage same if have error 
+      setErrorMessage(
+        error.response?.data?.message || "Ocorreu um erro. Tente novamente."
+      );
+      setEmailSent(true); // still show the sent message to avoid email enumeration
     }
   };
-
 
   return (
     <div
@@ -27,15 +31,22 @@ export default function ForgotPassword() {
       aria-labelledby="dialog-title"
     >
       <div className="relative w-full max-w-md rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8">
-        
         {/* Head */}
-        <div className="px-6 pt-6 pb-4 border-b border-gray-700">
+        <div className="px-6 pt-6 pb-4 border-b border-gray-700 relative">
           <h3
             id="dialog-title"
             className="text-xl font-semibold text-white text-center"
           >
             Recuperar palavra-passe
           </h3>
+          {/* Close (X) button */}
+          <button
+            onClick={() => (window.location.href = "/login")}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Body */}
@@ -71,11 +82,15 @@ export default function ForgotPassword() {
                 Se o email existir na nossa base de dados, vais receber um link
                 para redefinir a tua palavra-passe em breve.
               </p>
+
+              {errorMessage && (
+                <div className="bg-red-700 text-white p-3 rounded-lg text-sm">
+                  {errorMessage}
+                </div>
+              )}
+
               <button
-                onClick={() => {
-                  setEmailSent(false);
-                  window.location.href = "/login"; // Redirect to login
-                }}
+                onClick={() => (window.location.href = "/login")}
                 className="w-full rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 focus:outline-none transition ease-in duration-500"
               >
                 Voltar
@@ -83,25 +98,6 @@ export default function ForgotPassword() {
             </div>
           )}
         </div>
-
-        {/* Border */}
-        <div className="flex items-center justify-center px-6 py-2">
-          <div className="flex-grow border-t border-gray-700"></div>
-          <span className="mx-3 text-gray-400 text-sm font-medium">ou</span>
-          <div className="flex-grow border-t border-gray-700"></div>
-        </div>
-
-        {/* Return to Login */}
-        <div className="px-6 pb-6 text-center">
-            <button
-              onClick={() => {
-                window.location.href = "/login"; // Redirect to login
-              }}
-              className="font-medium text-indigo-400 hover:text-indigo-300 text-sm"
-            >
-              Voltar ao início de sessão
-            </button>
-        </div>  
       </div>
     </div>
   );

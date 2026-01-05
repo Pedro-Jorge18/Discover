@@ -42,11 +42,26 @@ class UserMailService
     //send reset password email
     public function sendPasswordReset(string $email, string $resetUrl): bool
     {
-        return $this->sendWithRetry(
-            fn() => Mail::to($email)->send(new PasswordResetMail($resetUrl)),
-            "password_reset",
-            $email // just for logging
-        );
+        try {
+            SendEmailWithRetryJob::dispatch(
+                'PasswordResetMail',
+                $email,
+                ['resetUrl' => $resetUrl]
+            );
+
+            Log::info('Password reset email queued for sending', [
+                'target' => $email,
+            ]);
+
+            return true;
+        } catch (Throwable $e) {
+            Log::error('Failed to queue password reset email', [
+                'target' => $email,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     //send account banned email
@@ -65,9 +80,11 @@ class UserMailService
         $identifier = $target instanceof User ? $target->email : $target;
 
         try {
-            SendEmailWithRetryJob::dispatch($type, $identifier, $callback);
+            // The callback may be a Closure that cannot be serialized for queueing
+            // Execute the callback synchronously to avoid serialization issues.
+            $callback();
 
-            Log::info("Email queued for sending ({$type})", [
+            Log::info("Email sent synchronously ({$type})", [
                 'target' => $identifier,
             ]);
 

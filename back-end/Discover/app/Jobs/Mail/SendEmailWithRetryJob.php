@@ -28,14 +28,22 @@ class SendEmailWithRetryJob implements ShouldQueue
     public function handle(): void
     {
         try {
-
-            $mailableClass = "App\\Mail\\{$this->type}";
+            $mailableClass = "App\\Mail\\User\\{$this->type}";
 
             if (!class_exists($mailableClass)) {
                 throw new \Exception("Mailable class {$mailableClass} not found");
             }
 
-            Mail::to($this->target)->send(new $mailableClass($this->mailData));
+            // Create mailable instance based on type
+            $mailable = match($this->type) {
+                'PasswordResetMail' => new $mailableClass($this->mailData['resetUrl']),
+                'WelcomeUserMail' => new $mailableClass($this->mailData['user']),
+                'EmailVerificationMail' => new $mailableClass($this->mailData['user'], $this->mailData['verificationUrl']),
+                'AccountBannedMail' => new $mailableClass($this->mailData['user'], $this->mailData['reason'] ?? null),
+                default => new $mailableClass(...array_values($this->mailData))
+            };
+
+            Mail::to($this->target)->send($mailable);
 
             Log::info("Email sent successfully ({$this->type})", [
                 'target' => $this->target,

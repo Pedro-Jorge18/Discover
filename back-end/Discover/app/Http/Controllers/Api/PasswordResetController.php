@@ -59,15 +59,24 @@ class PasswordResetController extends Controller
             return response()->json([
                 'message' => $result['message'],
             ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Validation failed on password reset', [
+                'errors' => $e->errors(),
+            ]);
+
+            return response()->json([
+                'message' => __('validation.failed'),
+                'errors' => $e->errors(),
+            ], 422);
         } catch (Throwable $e) {
             Log::error('Erro ao redefinir senha', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-        }
 
-        return response()->json([
-            'message' => __('auth.password_reset_failed'),
-        ], 500);
+            return response()->json([
+                'message' => __('auth.password_reset_failed'),
+            ], 500);
+        }
     }
 }
