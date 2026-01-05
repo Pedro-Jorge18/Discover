@@ -23,5 +23,17 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         User::observe(UserObserver::class);
+        
+        // Fix SSL certificate issues in development
+        if (app()->environment('local') || config('app.debug')) {
+            $guzzleConfig = [
+                'verify' => false, // Disable SSL verification for development
+            ];
+            
+            // Apply to Socialite's Guzzle client
+            $this->app->bind('guzzle.config', function () use ($guzzleConfig) {
+                return $guzzleConfig;
+            });
+        }
     }
 }

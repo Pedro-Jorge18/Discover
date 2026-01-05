@@ -21,6 +21,7 @@ class User extends Authenticatable
         'birthday',
         'email',
         'password',
+        'google_id',
         'image',
         'gender',
         'about',
@@ -33,6 +34,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
     ];
 
     protected $casts = [
@@ -65,6 +67,25 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
+    public function hasRole(string $role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function assignRole(string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+
+        if ($role) {
+            $this->roles()->syncWithoutDetaching($role);
+        }
+    }
+
     public function favoriteProperties(): BelongsToMany
     {
         return $this->belongsToMany(Property::class, 'favorites');
@@ -86,19 +107,19 @@ class User extends Authenticatable
     }
 
 
-    public function isGuest(): bool
+    public function isClient(): bool
     {
-        return $this->role === 'guest';
+        return $this->hasRole(Role::CLIENT);
     }
 
     public function isHost(): bool
     {
-        return $this->role === 'host';
+        return $this->hasRole(Role::HOST);
     }
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->hasRole(Role::ADMIN);
     }
 
     public function getFullNameAttribute()

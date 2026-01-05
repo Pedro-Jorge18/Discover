@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorAuthController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 
 // Rotas públicas ----------------------------------------------------------
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
@@ -81,3 +82,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Webhook (sem autenticação)
 Route::withoutMiddleware(['auth:sanctum'])->post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
+
+// Rotas de autenticação com Google
+Route::prefix('auth/google')->middleware('throttle:60,1')->group(function () {
+    Route::get('/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
+    Route::get('/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+});
