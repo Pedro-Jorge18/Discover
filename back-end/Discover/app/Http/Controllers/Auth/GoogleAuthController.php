@@ -6,6 +6,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -74,7 +75,7 @@ class GoogleAuthController extends Controller
     /**
      * Handle Google OAuth callback
      */
-    public function handleGoogleCallback(Request $request): JsonResponse
+    public function handleGoogleCallback(Request $request): JsonResponse|RedirectResponse
     {
         try {
             // Configure Socialite with SSL settings for development
@@ -109,15 +110,13 @@ class GoogleAuthController extends Controller
                 // User exists with Google ID - login
                 $token = $this->authService->generateToken($user);
                 $this->authService->updateLastLogin($user);
-                
+
                 Log::info('User logged in via Google', ['user_id' => $user->id]);
-                
-                return response()->json([
-                    'user' => new UserResource($user),
-                    'token' => $token,
-                    'token_type' => 'Bearer',
-                    'message' => 'Successfully logged in via Google'
-                ]);
+
+                // Redirect to frontend with token
+                $frontend = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+                $url = $frontend . '/auth/google/callback?token=' . urlencode($token);
+                return redirect()->away($url);
             }
             
             // Check if user exists with same email
@@ -126,23 +125,21 @@ class GoogleAuthController extends Controller
             if ($existingUser) {
                 // Link Google account to existing user
                 $existingUser->update(['google_id' => $googleUser->id]);
-                
+
                 $token = $this->authService->generateToken($existingUser);
                 $this->authService->updateLastLogin($existingUser);
-                
+
                 Log::info('Google account linked to existing user', ['user_id' => $existingUser->id]);
-                
-                return response()->json([
-                    'user' => new UserResource($existingUser),
-                    'token' => $token,
-                    'token_type' => 'Bearer',
-                    'message' => 'Google account successfully linked'
-                ]);
+
+                // Redirect to frontend with token
+                $frontend = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+                $url = $frontend . '/auth/google/callback?token=' . urlencode($token);
+                return redirect()->away($url);
             }
             
-            // New user - return temporary token to choose account type
+            // New user - create temp token and redirect frontend to choose account type
             $tempToken = Str::random(64);
-            
+
             // Store Google user data temporarily in cache (expires in 10 minutes)
             cache()->put("google_signup_{$tempToken}", [
                 'google_id' => $googleUser->id,
@@ -150,22 +147,22 @@ class GoogleAuthController extends Controller
                 'email' => $googleUser->email,
                 'avatar' => $googleUser->avatar ?? null,
             ], now()->addMinutes(10));
-            
+
             Log::info('New Google user needs account type selection', [
                 'email' => $googleUser->email,
                 'temp_token' => $tempToken
             ]);
-            
-            return response()->json([
-                'requires_account_type' => true,
+
+            $frontend = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+            $query = http_build_query([
                 'temp_token' => $tempToken,
-                'user_info' => [
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email,
-                    'avatar' => $googleUser->avatar ?? null,
-                ],
-                'message' => 'Please select your account type to continue'
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'avatar' => $googleUser->avatar ?? null,
+                'requires_account_type' => 1,
             ]);
+
+            return redirect()->away($frontend . '/auth/google/callback?' . $query);
             
         } catch (Exception $e) {
             Log::error('Google authentication error', [
