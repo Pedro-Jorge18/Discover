@@ -32,7 +32,7 @@ export default function Registration() {
 
       console.log("REGISTER RESPONSE:", response.data);
 
-      alert("Conta criada com sucesso! Faça o login.");
+      //alert("Conta criada com sucesso! Faça o login.");
       navigate("/login");
 
     } catch (error) {
