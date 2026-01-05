@@ -9,6 +9,9 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [oldPasswordError, setOldPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,57 +65,87 @@ export default function ResetPassword() {
 
       {!success ? (
         <form className="space-y-6 mt-6" onSubmit={handleSubmit}>
-            {/* Password antiga */}
+            {/* Old password */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Palavra-passe antiga
             </label>
-            <input
-              type="password"
-              value={oldPassword}
-              onChange={(e) => { setOldPassword(e.target.value); setOldPasswordError(""); setError(""); }}
-              placeholder="Insira a sua palavra-passe atual"
-              required
-              className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
-            />
+            <div className="relative">
+              <input
+                type={showOldPassword ? 'text' : 'password'}
+                value={oldPassword}
+                onChange={(e) => { setOldPassword(e.target.value); setOldPasswordError(""); setError(""); }}
+                placeholder="Insira a sua palavra-passe atual"
+                required
+                className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
+              />
+              <button
+                type="button"
+                onClick={() => setShowOldPassword(v => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-300 hover:text-white"
+                aria-label={showOldPassword ? 'Ocultar palavra-passe antiga' : 'Mostrar palavra-passe antiga'}
+              >
+                {showOldPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
             {oldPasswordError && <p className="text-red-500 text-sm mt-1">{oldPasswordError}</p>}
           </div>
 
-          {/* Nova password */}
+          {/* New password */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Nova palavra-passe
             </label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => { setNewPassword(e.target.value); setNewPasswordError(""); setError(""); }}
-              placeholder="Insira a sua nova palavra-passe"
-              required
-              className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
-            />
+            <div className="relative">
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => { setNewPassword(e.target.value); setNewPasswordError(""); setError(""); }}
+                placeholder="Insira a sua nova palavra-passe"
+                required
+                className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(v => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-300 hover:text-white"
+                aria-label={showNewPassword ? 'Ocultar nova palavra-passe' : 'Mostrar nova palavra-passe'}
+              >
+                {showNewPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
             {newPasswordError && <p className="text-red-500 text-sm mt-1">{newPasswordError}</p>}
           </div>
 
-          {/* Confirmar nova password */}
+          {/* Confirm new password */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Confirmar nova palavra-passe
             </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirme a sua nova palavra-passe"
-              required
-              className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirme a sua nova palavra-passe"
+                required
+                className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(v => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-300 hover:text-white"
+                aria-label={showConfirmPassword ? 'Ocultar confirmação de palavra-passe' : 'Mostrar confirmação de palavra-passe'}
+              >
+                {showConfirmPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
-          {/* Mensagem de erro */}
+          {/* Error message */}
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Botão */}
+          {/* Button */}
           <button
             type="submit"
             className="w-full bg-indigo-600 py-2 px-4 rounded-lg text-white font-semibold hover:bg-indigo-500 transition"

@@ -13,13 +13,13 @@ export default function ForgotPassword() {
     try {
       await api.post("/auth/forgot-password", { email });
       setEmailSent(true);
-      setErrorMessage(""); // limpar erros
+      setErrorMessage(""); // clear errors
     } catch (error) {
       console.error("Erro ao enviar email:", error);
       setErrorMessage(
         error.response?.data?.message || "Ocorreu um erro. Tente novamente."
       );
-      setEmailSent(true); // mostra mensagem de confirmação mesmo que falhe
+      setEmailSent(true); // still show the sent message to avoid email enumeration
     }
   };
 
@@ -39,7 +39,7 @@ export default function ForgotPassword() {
           >
             Recuperar palavra-passe
           </h3>
-          {/* Botão X para fechar */}
+          {/* Close (X) button */}
           <button
             onClick={() => (window.location.href = "/login")}
             className="absolute top-4 right-4 text-gray-400 hover:text-white transition"

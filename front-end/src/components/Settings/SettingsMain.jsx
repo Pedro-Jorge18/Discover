@@ -10,17 +10,17 @@ export default function SettingsMain({ onClose , user, token }) {
   const menuItems = [
     { id: "perfil", label: "Perfil", icon: IconUser },
     { id: "seguranca", label: "Segurança", icon: IconShield },
-    { id: "notificacoes", label: "Notificações", icon: IconBell },
-    { id: "privacidade", label: "Privacidade", icon: IconLock },
+    //{ id: "notificacoes", label: "Notificações", icon: IconBell },
+    //{ id: "privacidade", label: "Privacidade", icon: IconLock },
   ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
 
-      {/* Card principal */}
+      {/* Card */}
       <div className="w-full max-w-5xl h-[80vh] bg-gray-900 text-white rounded-2xl shadow-2xl flex overflow-hidden">
 
-        {/* MENU LATERAL */}
+        {/* Left Menu  */}
         <aside className="w-64 bg-gray-800 p-6 flex flex-col gap-3">
           <h2 className="text-lg font-semibold mb-4 text-gray-200">
             Definições
@@ -47,10 +47,10 @@ export default function SettingsMain({ onClose , user, token }) {
           })}
         </aside>
 
-        {/* CONTEÚDO */}
+        {/* Content */}
         <main className="flex-1 p-8 relative overflow-y-auto">
 
-          {/* BOTÃO FECHAR */}
+          {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-white"
@@ -79,7 +79,7 @@ export default function SettingsMain({ onClose , user, token }) {
   );
 }
 
-/* ÍCONES */
+/* ICONS */
 function IconUser({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

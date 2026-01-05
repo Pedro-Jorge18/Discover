@@ -14,7 +14,7 @@ export default function TwoFactorAuth() {
   const [password, setPassword] = useState("");
   const [qrCode, setQrCode] = useState("");
 
-  /* Obter estado atual do 2FA do utilizador */
+  /* Get current 2FA status for the user */
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -44,11 +44,11 @@ export default function TwoFactorAuth() {
       return;
     }
 
-    // Se já está ativo, mostrar popup para inserir código para desativar
+    // If it's already enabled, show popup to enter code to disable
     setShowDisablePopup(true);
   };
 
-  /* Ativar 2FA com password */
+  /* Enable 2FA with password */
   const handlePasswordSubmit = async () => {
     if (!password) {
       setErrorMessage("Por favor, introduza a sua password.");
@@ -81,7 +81,7 @@ export default function TwoFactorAuth() {
     }
   };
 
-  /* Confirmar código para ativar 2FA */
+  /* Confirm code to enable 2FA */
   const handleConfirmCode = async () => {
     const code = document.getElementById("2fa-code-input")?.value;
 
@@ -233,7 +233,7 @@ export default function TwoFactorAuth() {
           </div>
         )}
 
-        {/* Pop-up Código */}
+        {/* Code popup */}
         {showCodePopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
@@ -284,7 +284,7 @@ export default function TwoFactorAuth() {
           </div>
         )}
 
-        {/* Pop-up Código para desativar */}
+        {/* Disable code popup */}
         {showDisablePopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">

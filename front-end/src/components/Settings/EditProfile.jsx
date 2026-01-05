@@ -45,7 +45,7 @@ export default function EditProfile() {
         {!saved ? (
           <form className="space-y-6" onSubmit={handleSubmit}>
 
-            {/* Nome */}
+            {/* First name */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Nome
@@ -60,7 +60,7 @@ export default function EditProfile() {
               />
             </div>
 
-            {/* Apelido */}
+            {/* Last name */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Apelido
@@ -75,7 +75,7 @@ export default function EditProfile() {
               />
             </div>
 
-            {/* Contacto */}
+            {/* Contact */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Contacto

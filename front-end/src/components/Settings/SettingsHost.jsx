@@ -14,10 +14,10 @@ export default function SettingsHost({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
 
-      {/* Card principal */}
+      {/* Main card */}
       <div className="w-full max-w-5xl h-[80vh] bg-gray-900 text-white rounded-2xl shadow-2xl flex overflow-hidden">
 
-        {/* MENU LATERAL */}
+        {/* SIDE MENU */}
         <aside className="w-64 bg-gray-800 p-6 flex flex-col gap-3">
           <h2 className="text-lg font-semibold mb-4 text-gray-200">
             Menu Host
@@ -44,10 +44,10 @@ export default function SettingsHost({ onClose }) {
           })}
         </aside>
 
-        {/* CONTEÚDO */}
+        {/* CONTENT */}
         <main className="flex-1 p-8 relative overflow-y-auto">
 
-          {/* BOTÃO FECHAR */}
+          {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-white"

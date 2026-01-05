@@ -135,7 +135,7 @@ export default function Registration() {
               </div>
             </div>
 
-            {/* Tipo de conta */}
+            {/* Account type */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Tipo de conta</label>
               <div className="flex gap-6 bg-gray-700 border border-gray-600 rounded-lg p-3">
