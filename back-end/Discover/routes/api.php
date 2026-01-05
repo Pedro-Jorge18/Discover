@@ -87,4 +87,5 @@ Route::withoutMiddleware(['auth:sanctum'])->post('/webhook/stripe', [StripeWebHo
 Route::prefix('auth/google')->middleware('throttle:60,1')->group(function () {
     Route::get('/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
     Route::get('/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+    Route::post('/complete-signup', [GoogleAuthController::class, 'completeGoogleSignup']);
 });
