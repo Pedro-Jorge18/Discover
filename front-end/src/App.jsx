@@ -7,7 +7,7 @@ import SettingsHost from './components/Settings/SettingsHost.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null); // estado para o token
+  const [token, setToken] = useState(null);
   const [termoPesquisa, setTermoPesquisa] = useState(""); 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsOpenHost, setSettingsOpenHost] = useState(false);
@@ -21,17 +21,17 @@ function App() {
       api.get("/auth/me", { headers: { Authorization: `Bearer ${currentToken}` } })
         .then(res => {
           setUser(res.data.user);
-          setToken(currentToken); // guardar token no estado
+          setToken(currentToken);
         })
         .catch(() => {
           sessionStorage.removeItem("token");
           localStorage.removeItem("token");
         });
     }
-  }, [localStorage.getItem("token"), sessionStorage.getItem("token")]);
+  }, []); // Dependência vazia para correr apenas no load
 
   return (
-    <>
+    <div className="App">
       <AppRoutes 
         user={user} 
         setUser={setUser} 
@@ -41,9 +41,22 @@ function App() {
         onOpenSettingsHost={() => setSettingsOpenHost(true)}
       />
 
-      {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} token={token} />}
-      {settingsOpenHost && <SettingsHost onClose={() => setSettingsOpenHost(false)} />}
-    </>
+      {/* Modals/Settings */}
+      {settingsOpen && (
+        <SettingsMain 
+          onClose={() => setSettingsOpen(false)} 
+          user={user} 
+          token={token} 
+        />
+      )}
+      
+      {settingsOpenHost && (
+        <SettingsHost 
+          onClose={() => setSettingsOpenHost(false)} 
+          user={user}
+        />
+      )}
+    </div>
   );
 }
 
