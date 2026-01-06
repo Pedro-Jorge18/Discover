@@ -3,6 +3,7 @@
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
@@ -14,6 +15,11 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 
 // Rotas públicas ----------------------------------------------------------
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
+
+// Rotas públicas de reviews (listar reviews de propriedades)
+Route::get('properties/{property}/reviews', [ReviewController::class, 'propertyReviews']);
+Route::get('reviews', [ReviewController::class, 'index']);
+Route::get('reviews/{review}', [ReviewController::class, 'show']);
 
 // Autenticação
 Route::prefix('auth')->group(function () {
@@ -78,6 +84,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{payment}', [PaymentController::class, 'show'])->name('payments.show');
         Route::post('/{payment}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
         Route::get('/', [PaymentController::class, 'index'])->name('payments.index');
+    });
+
+    // Rotas de REVIEWS (autenticadas)
+    Route::prefix('reviews')->group(function () {
+        Route::post('/', [ReviewController::class, 'store']); // Criar review
+        Route::get('/my-reviews', [ReviewController::class, 'userReviews']); // Reviews do usuário autenticado
+        Route::get('/can-review/{reservation}', [ReviewController::class, 'canReview']); // Verificar se pode avaliar
+        Route::put('/{review}', [ReviewController::class, 'update']); // Atualizar review ou adicionar resposta do host
+        Route::delete('/{review}', [ReviewController::class, 'destroy']); // Deletar review
     });
 });
 
