@@ -399,9 +399,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         </div>
       )}
 
-      
-
-      <Footer />
     </div>
   );
 }
