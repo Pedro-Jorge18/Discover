@@ -4,6 +4,7 @@ import Home from '../components/HomePage/Home.jsx';
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import SettingsHost from '../components/Settings/SettingsHost.jsx';
 import Login from '../components/Auth/Login.jsx';
+import GoogleCallback from '../components/Auth/GoogleCallback.jsx';
 import Registration from '../components/Auth/Registration.jsx';
 import ForgotPassword from '../components/Auth/ForgotPassword.jsx';
 import Footer from '../components/Layout/Footer.jsx';
@@ -64,6 +65,7 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login setUser={setUser}/>}/>
+        <Route path="/auth/google/callback" element={<GoogleCallback setUser={setUser} />}/>
         <Route path="/register" element={<Registration />}/>
         <Route path="/forgotpassword" element={<ForgotPassword />}/>
       </Routes>

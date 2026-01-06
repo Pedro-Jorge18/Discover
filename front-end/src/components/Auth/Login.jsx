@@ -226,12 +226,25 @@ export default function Login({ setUser }) {
 
         {/* Social logins */}
         <div className="px-6 py-4 max-w-sm mx-auto">
-          <div className="flex gap-4">
-            <a href="#" className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300">
-              <img src="https://img.icons8.com/color/48/google-logo.png" className="w-5 h-5" />
-              <span>Google</span>
-            </a>
-          </div>
+            <div className="flex gap-4">
+              <button onClick={async () => {
+                try {
+                  const resp = await api.get('/auth/google/redirect');
+                  const url = resp.data?.url;
+                  if (!url) {
+                    alert('Não foi possível iniciar autenticação Google.');
+                    return;
+                  }
+                  window.location.href = url;
+                } catch (err) {
+                  console.error('Erro Google redirect:', err);
+                  alert('Erro ao iniciar autenticação Google.');
+                }
+              }} className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300">
+                <img src="https://img.icons8.com/color/48/google-logo.png" className="w-5 h-5" />
+                <span>Google</span>
+              </button>
+            </div>
         </div>
       </div>
 
