@@ -10,8 +10,8 @@ import ForgotPassword from '../components/Auth/ForgotPassword.jsx';
 import Footer from '../components/Layout/Footer.jsx';
 import SettingsMain from '../components/Settings/SettingsMain.jsx'; 
 import SearchPage from '../components/Nav/SearchPage.jsx';
+import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
 
-// Added search props to the arguments
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   // Simple frontend guards. Server must also enforce auth/roles.
   const Protected = ({ children }) => {
@@ -27,7 +27,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
   return (
     <BrowserRouter>
       <Routes>
-        {/* Home Page */}
         <Route 
           path="/" 
           element={
@@ -43,7 +42,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           }
         />
 
-        {/* Search Results Page */}
         <Route 
           path="/search" 
           element={
@@ -56,7 +54,20 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           }
         />
 
-        {/* Property Details */}
+        {/* Dedicated Favorites Route */}
+        <Route 
+          path="/favoritos" 
+          element={
+            <FavoritesPage 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsHost={onOpenSettingsHost}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
         <Route 
           path="/property/:id" 
           element={
@@ -86,7 +97,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           </RoleProtected>
         } />
 
-        {/* Auth Routes */}
         <Route path="/login" element={<Login setUser={setUser}/>}/>
         <Route path="/auth/google/callback" element={<GoogleCallback setUser={setUser} />}/>
         <Route path="/register" element={<Registration />}/>
