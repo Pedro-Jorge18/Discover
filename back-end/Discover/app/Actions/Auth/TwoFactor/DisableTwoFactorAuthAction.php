@@ -27,6 +27,12 @@ class DisableTwoFactorAuthAction
                 return false;
             }
 
+            // Verify code before disabling
+            $isValid = $this->twoFactorAuthService->verify($user, $dto->code);
+            if (!$isValid) {
+                return false;
+            }
+
             $this->twoFactorAuthService->disable($user);
 
             return true;
