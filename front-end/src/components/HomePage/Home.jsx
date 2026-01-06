@@ -71,7 +71,8 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   })();
 
   return (
-    <div className="min-h-screen pt-20"> 
+    <div className="min-h-screen pt-20">
+      <title>Discover - Página Inicial</title>
       <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6">

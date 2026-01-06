@@ -12,7 +12,6 @@ export default function Login({ setUser }) {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
 
-
   // Load user if saved token exists
   useEffect(() => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -39,7 +38,7 @@ export default function Login({ setUser }) {
     try {
       const response = await api.post("/auth/login", { email, password, remember_me: remember });
 
-      // Se 2FA ativo, mostrar popup e guardar temp token
+      // If 2FA enabled, show popup and save temp token
       if (response.data.two_factor_required) {
           if (!response.data.temp_token) {
           console.error("Temp token não fornecido pelo backend.");
@@ -48,7 +47,7 @@ export default function Login({ setUser }) {
         }
         setTempToken(response.data.temp_token); 
         setShow2FAPopup(true);
-        return; // Não chamar setUser ainda!
+        return;
       }
 
       // Normal login
@@ -59,7 +58,7 @@ export default function Login({ setUser }) {
         return;
       }
 
-      // Guardar token
+      // Save token
       if (remember) {
         localStorage.setItem("token", token);
         sessionStorage.removeItem("token");
@@ -68,20 +67,20 @@ export default function Login({ setUser }) {
         localStorage.removeItem("token");
       }
 
-      // Atualizar user e navegar
+      // Update user and navigate
       setUser(response.data.user);
       navigate("/");
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        setErrorMessage("Credenciais inválidas. Verifica o email e a palavra-passe.");
+        setErrorMessage("Credenciais inválidas. Verifique o email e a palavra-passe.");
       } else {
         setErrorMessage("Erro de comunicação com o servidor.");
       }
     }
   };
 
-  // Confirmar 2FA
+  // Confirm 2FA
   const handleConfirm2FA = async () => {
     try {
       const res = await api.post("/auth/2fa/verify", { code: twoFACode }, {
@@ -163,7 +162,7 @@ export default function Login({ setUser }) {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
+                Palavra-passe
               </label>
               <div className="relative">
                 <input
@@ -196,7 +195,7 @@ export default function Login({ setUser }) {
                 Lembrar-me
               </label>
               <button type="button" onClick={() => window.location.href="/forgotpassword"} className="text-sm font-medium text-indigo-400 hover:text-indigo-300">
-                Esqueceste-te da palavra-passe?
+                Esqueceu-se da palavra-passe?
               </button>
             </div>
 
@@ -211,7 +210,7 @@ export default function Login({ setUser }) {
 
           {/* Link to register */}
           <p className="mt-6 text-center text-sm text-gray-400">
-            Ainda não tens conta?{" "}
+            Ainda não tem conta?{" "}
             <button type="button" onClick={() => window.location.href="/register"} className="font-medium text-indigo-400 hover:text-indigo-300">
               Crie uma agora
             </button>
@@ -252,14 +251,18 @@ export default function Login({ setUser }) {
       {/* Pop-up 2FA */}
       {show2FAPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
-            <h4 className="text-white font-semibold mb-4 text-lg">Código de Autenticação 2FA</h4>
+          <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-800 shadow-lg">
+            <h4 className="text-white font-semibold mb-4 text-lg">Código de Autenticação</h4>
             <input
               type="text"
               placeholder="Código"
+              maxLength={6}
+              id="2fa-code-input"
+              inputMode="numeric"
+              autoComplete="one-time-code"
               value={twoFACode}
               onChange={(e) => setTwoFACode(e.target.value)}
-              className="w-full mb-3 px-3 py-2 rounded-lg text-white-900 border"
+              className="w-full mb-3 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 border border-white"
             />
             <button
               onClick={handleConfirm2FA}
@@ -270,6 +273,7 @@ export default function Login({ setUser }) {
           </div>
         </div>
       )}
+      
       {errorMessage && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full text-center border border-gray-700 shadow-lg">

@@ -13,6 +13,7 @@ export default function TwoFactorAuth() {
   const [errorMessage, setErrorMessage] = useState("");
   const [password, setPassword] = useState("");
   const [qrCode, setQrCode] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
 
   /* Get current 2FA status for the user */
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function TwoFactorAuth() {
 
   /* Confirm code to enable 2FA */
   const handleConfirmCode = async () => {
-    const code = document.getElementById("2fa-code-input")?.value;
+    const code = confirmCode?.trim();
 
     if (!code || code.length < 6) {
       setErrorMessage("Código inválido");
@@ -108,6 +109,7 @@ export default function TwoFactorAuth() {
         setShowCodePopup(false);
         setSecret("");
         setPassword("");
+        setConfirmCode("");
       } else {
         setErrorMessage(res.data.message || "Código incorreto");
       }
@@ -121,41 +123,41 @@ export default function TwoFactorAuth() {
 
   /* Disable 2FA */
   const handleDisable2FA = async () => {
-  if (!disableCode || disableCode.length < 6) {
-    setErrorMessage("Código inválido");
-    return;
-  }
+    if (!disableCode || disableCode.length < 6) {
+      setErrorMessage("Código inválido");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const res = await api.post(
-      "/auth/2fa/disable",
-      { code: disableCode },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`,
-        },
+    setLoading(true);
+    try {
+      const res = await api.post(
+        "/auth/2fa/disable",
+        { code: disableCode },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.data?.status) {
+        setEnabled(false);
+        setShowDisablePopup(false);
+        setDisableCode("");
+        setErrorMessage("");
+      } else {
+        setErrorMessage(res.data?.message || "Código incorreto");
       }
-    );
-
-    if (res.data?.status) {
-      setEnabled(false);
-      setShowDisablePopup(false);
-      setDisableCode("");
-      setErrorMessage("");
-    } else {
-      setErrorMessage(res.data?.message || "Código incorreto");
+    } catch (err) {
+      if (err.response?.status === 422) {
+        setErrorMessage("Código de autenticação incorreto.");
+      } else {
+        setErrorMessage("Erro de comunicação com o servidor.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    if (err.response?.status === 422) {
-      setErrorMessage("Código de autenticação incorreto.");
-    } else {
-      setErrorMessage("Erro de comunicação com o servidor.");
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
   /* Copy to clipboard */
@@ -271,6 +273,8 @@ export default function TwoFactorAuth() {
                 type="text"
                 placeholder="Código"
                 maxLength={6}
+                value={confirmCode}
+                onChange={(e) => setConfirmCode(e.target.value)}
                 className="w-full mb-3 px-3 py-2 rounded-lg text-white-900 border"
                 id="2fa-code-input"
               />
