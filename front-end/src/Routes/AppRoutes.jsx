@@ -11,6 +11,7 @@ import Footer from '../components/Layout/Footer.jsx';
 import SettingsMain from '../components/Settings/SettingsMain.jsx'; 
 import SearchPage from '../components/Nav/SearchPage.jsx';
 import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
+import MyReviews from '../components/Review/MyReviews.jsx';
 
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   // Simple frontend guards. Server must also enforce auth/roles.
@@ -95,6 +96,19 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           <RoleProtected role="admin">
             <SettingsMain user={user} />
           </RoleProtected>
+        } />
+
+        {/* My Reviews Route */}
+        <Route path="/my-reviews" element={
+          <Protected>
+            <MyReviews 
+              user={user}
+              setUser={setUser}
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsHost={onOpenSettingsHost}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          </Protected>
         } />
 
         <Route path="/login" element={<Login setUser={setUser}/>}/>

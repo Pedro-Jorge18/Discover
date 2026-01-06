@@ -42,13 +42,15 @@ class ReviewController extends Controller
      */
     public function store(StoreReviewRequest $request): JsonResponse
     {
-        // Verifica se já existe uma avaliação para essa reserva
-        $existingReview = Review::where('reservation_id', $request->reservation_id)->first();
-        
-        if ($existingReview) {
-            return response()->json([
-                'message' => 'Já existe uma avaliação para esta reserva'
-            ], 422);
+        // Verifica se já existe uma avaliação para essa reserva (apenas se reservation_id não for null)
+        if ($request->reservation_id) {
+            $existingReview = Review::where('reservation_id', $request->reservation_id)->first();
+            
+            if ($existingReview) {
+                return response()->json([
+                    'message' => 'Já existe uma avaliação para esta reserva'
+                ], 422);
+            }
         }
 
         // Calcula a nota geral

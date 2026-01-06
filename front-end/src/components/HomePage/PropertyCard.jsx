@@ -9,6 +9,23 @@ function PropertyCard({ property, user }) {
   // Safety check: only create storage key if user and user.id exist
   const storageKey = user && user.id ? `favoritos_user_${user.id}` : null;
 
+  // Renderizar as estrelas baseado no rating
+  const renderStars = (rating) => {
+    return (
+      <div className="flex gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            size={12}
+            className={`${
+              star <= (rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   const checkFavoriteStatus = () => {
     // If no user is logged in, item cannot be a favorite
     if (!storageKey) {
@@ -98,8 +115,8 @@ function PropertyCard({ property, user }) {
             {property.title}
           </h3>
           <div className="flex items-center gap-1 text-[10px] font-black text-gray-900">
-            <Star className="w-3 h-3 fill-blue-600 text-blue-600" />
-            <span>{property.rating || '4.9'}</span>
+            {renderStars(property.metrics?.rating ? parseFloat(property.metrics.rating) : 0)}
+            <span>{property.metrics?.rating ? parseFloat(property.metrics.rating).toFixed(1) : "0"}</span>
           </div>
         </div>
         

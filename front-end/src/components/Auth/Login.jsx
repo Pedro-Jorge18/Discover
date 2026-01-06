@@ -19,6 +19,7 @@ export default function Login({ setUser }) {
       api.get("/auth/me", { headers: { Authorization: `Bearer ${token}` } })
         .then(res => {
           setUser(res.data.user);
+          // O App.jsx vai cuidar do redirect se houver propertyRedirect
           navigate("/");
         })
         .catch(err => {
@@ -69,7 +70,15 @@ export default function Login({ setUser }) {
 
       // Update user and navigate
       setUser(response.data.user);
-      navigate("/");
+      
+      // Se há um redirect pendente, faz o redirect
+      const redirectPath = localStorage.getItem('propertyRedirect');
+      if (redirectPath) {
+        localStorage.removeItem('propertyRedirect');
+        navigate(redirectPath);
+      } else {
+        navigate("/");
+      }
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
@@ -112,7 +121,15 @@ export default function Login({ setUser }) {
 
       setUser(res.data.user);
       setShow2FAPopup(false);
-      navigate("/");
+      
+      // Se há um redirect pendente, faz o redirect
+      const redirectPath = localStorage.getItem('propertyRedirect');
+      if (redirectPath) {
+        localStorage.removeItem('propertyRedirect');
+        navigate(redirectPath);
+      } else {
+        navigate("/");
+      }
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {

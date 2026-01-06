@@ -40,7 +40,7 @@ return new class extends Migration
             // Índices
             $table->index(['property_id', 'published']);
             $table->index(['user_id', 'published']);
-            $table->unique(['reservation_id']); // Uma avaliação por reserva
+            $table->unique(['property_id', 'user_id']); // Um utilizador só avalia uma propriedade uma vez
         });
     }
 
