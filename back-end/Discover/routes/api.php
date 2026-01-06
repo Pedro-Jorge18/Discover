@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorAuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 
@@ -47,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/disable', [TwoFactorAuthController::class, 'disable']);
         });
     });
+
+    // Rotas de utilizadores (admin only)
+    Route::get('users', [UserController::class, 'index']);
+    Route::delete('users/{id}', [UserController::class, 'destroy']);
 
     // Rotas protegidas de properties
     Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);

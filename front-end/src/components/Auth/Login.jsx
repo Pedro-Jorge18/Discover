@@ -126,6 +126,7 @@ export default function Login({ setUser }) {
   return (
     <div className="fixed inset-0 z-[40] flex items-center justify-center bg-black/60 backdrop-blur-sm" role="dialog">
       <div className="relative w-full max-w-md rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8">
+        <title>Discover - Login</title>
         {/* Head */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-700">
           <button

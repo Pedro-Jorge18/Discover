@@ -44,7 +44,14 @@ class TwoFactorAuthService
             return false;
         }
 
-        return $this->google2FA->verifyKey($secret, $code);
+        $valid = $this->google2FA->verifyKey($secret, $code);
+
+        if ($valid) {
+            // mark user as fully enabled only after successful verification
+            $this->repository->markEnabled($user);
+        }
+
+        return $valid;
     }
 
     //disable the 2FA and remove the user secret

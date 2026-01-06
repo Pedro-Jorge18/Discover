@@ -13,7 +13,8 @@ class TwoFactorRepository
     {
         $user->forceFill([
             'two_factor_secret' => encrypt($secret->value()),
-            'two_factor_enabled' => true,
+            // keep disabled until user confirms with a valid code
+            'two_factor_enabled' => false,
         ])->save();
     }
 
@@ -40,5 +41,13 @@ class TwoFactorRepository
     public function isEnabled(User $user): bool
     {
         return (bool) $user->two_factor_enabled;
+    }
+
+    // mark 2FA as enabled after successful verification
+    public function markEnabled(User $user): void
+    {
+        $user->forceFill([
+            'two_factor_enabled' => true,
+        ])->save();
     }
 }

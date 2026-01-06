@@ -92,12 +92,19 @@ class TwoFactorAuthController extends Controller
     {
         try {
             $user = Auth::user();
-            $dto = new DisableTwoFactorDto($user->id);
+            $dto = new DisableTwoFactorDto($user->id, $request->input('code'));
 
             $disabled = $this->disableTwoFactorAuthAction->execute($dto);
 
+            if (!$disabled) {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('auth.2fa.invalid_code'),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             return response()->json([
-                'status' => $disabled,
+                'status' => true,
                 'message' => __('auth.2fa.disabled_success'),
             ], Response::HTTP_OK);
         } catch (Throwable $e) {

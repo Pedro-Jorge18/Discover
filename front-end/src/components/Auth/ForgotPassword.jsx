@@ -31,6 +31,7 @@ export default function ForgotPassword() {
       aria-labelledby="dialog-title"
     >
       <div className="relative w-full max-w-md rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8">
+        <title>Discover - Recuperar Palavra-Passe</title>
         {/* Head */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-700 relative">
           <h3

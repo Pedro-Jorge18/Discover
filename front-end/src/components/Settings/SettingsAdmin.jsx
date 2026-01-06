@@ -4,6 +4,7 @@ import ResetPassword from "../Auth/ResetPassword";
 import TwoFactorAuth from "../Auth/TwoFactory";
 import AddAdmin from "./AddAdmin";
 import RemovePost from "./RemovePost";
+import RemUser from "./RemUser";
 
 export default function SettingsAdmin({ onClose }) {
   const [selected, setSelected] = useState("utilizador");
@@ -64,7 +65,12 @@ export default function SettingsAdmin({ onClose }) {
           </h1>
 
           <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-            {selected === "utilizador" && <AddAdmin />}
+            {selected === "utilizador" && (
+              <div className="flex flex-col gap-6">
+                <AddAdmin />
+                <RemUser />
+              </div>
+              )}
             {selected === "imovel" && (
               <div className="flex flex-col gap-6">
                 <RemovePost />

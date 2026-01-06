@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import api from "../../api/axios";
 
 export default function AddAdmin({ onSuccess } = {}) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [form, setForm] = useState({
     name: "",
     last_name: "",
@@ -35,6 +37,37 @@ export default function AddAdmin({ onSuccess } = {}) {
     e.preventDefault();
     setLoading(true);
     setErrors({});
+
+    // Validate birthday: not today/future and minimum age 18
+    const birthValue = form.birthday;
+    const birthDate = new Date(birthValue);
+    if (isNaN(birthDate.getTime())) {
+      setErrors({ birthday: ["Data de nascimento inválida."] });
+      setLoading(false);
+      return;
+    }
+    const today = new Date();
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const birthOnly = new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+
+    if (birthOnly >= todayOnly) {
+      setErrors({ birthday: ["A data de nascimento não pode ser hoje nem uma data futura."] });
+      setLoading(false);
+      return;
+    }
+
+    // Calculate age
+    let age = todayOnly.getFullYear() - birthOnly.getFullYear();
+    const m = todayOnly.getMonth() - birthOnly.getMonth();
+    if (m < 0 || (m === 0 && todayOnly.getDate() < birthOnly.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      setErrors({ birthday: ["Deve ter pelo menos 18 anos para se registar."] });
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await api.post("/auth/register", form);
@@ -170,30 +203,48 @@ export default function AddAdmin({ onSuccess } = {}) {
         {/* Palavra-passe */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Palavra-passe</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            placeholder="Introduza a palavra-passe"
-            className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              placeholder="Introduza a palavra-passe"
+              className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 cursor-pointer"
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
           {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password[0]}</div>}
         </div>
 
         {/* Confirmar palavra-passe */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Confirmar palavra-passe</label>
-          <input
-            type="password"
-            name="password_confirmation"
-            value={form.password_confirmation}
-            onChange={handleChange}
-            required
-            placeholder="Repita a palavra-passe"
-            className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
-          />
+          <div className="relative">
+            <input
+              type={showPasswordConfirm ? "text" : "password"}
+              name="password_confirmation"
+              value={form.password_confirmation}
+              onChange={handleChange}
+              required
+              placeholder="Repita a palavra-passe"
+              className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+              className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 cursor-pointer"
+            >
+              {showPasswordConfirm ? "🙈" : "👁️"}
+            </button>
+          </div>
         </div>
 
         {/* Botão */}

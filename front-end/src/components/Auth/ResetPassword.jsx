@@ -36,6 +36,13 @@ export default function ResetPassword() {
 
       console.log("Resposta:", res.data);
       setSuccess(true);
+      
+      // Clear tokens and redirect to login
+      setTimeout(() => {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        window.location.href = "/login";
+      }, 2000);
     } catch (err) {
       console.error("Erro ao resetar password:", err);
 
