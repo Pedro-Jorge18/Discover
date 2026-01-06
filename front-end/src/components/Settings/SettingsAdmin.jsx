@@ -5,7 +5,7 @@ import TwoFactorAuth from "../Auth/TwoFactory";
 import AddAdmin from "./AddAdmin";
 import RemovePost from "./RemovePost";
 
-export default function SettingsAdmin({ onClose , user, token }) {
+export default function SettingsAdmin({ onClose }) {
   const [selected, setSelected] = useState("utilizador");
 
   const menuItems = [
