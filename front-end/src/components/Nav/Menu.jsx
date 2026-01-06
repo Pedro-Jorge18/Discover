@@ -3,7 +3,7 @@ import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 
-function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin, onCloseMenu }) {
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
 
   const handleLogout = async () => {
@@ -16,6 +16,10 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
       sessionStorage.removeItem("token");
       setUser(null);
 
+      // close menu and refresh page to reset UI
+      if (typeof onCloseMenu === 'function') onCloseMenu();
+      window.location.reload();
+
     } catch (error) {
       // If token is already revoked the server may return 401. In that case
       // clear local token and user state anyway so the UI is consistent.
@@ -24,6 +28,8 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
         setUser(null);
+        if (typeof onCloseMenu === 'function') onCloseMenu();
+        window.location.reload();
         return;
       }
 
@@ -58,7 +64,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
           <>
             <div className="border-t my-2"></div>
             <button
-              onClick={onOpenSettings}
+              onClick={() => { onOpenSettings(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
               className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
             >
               <Cog className="w-5 h-5 text-gray-500" />
@@ -68,7 +74,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
           
             {user.role === "host" ? (
               <button
-                onClick={onOpenSettingsHost}
+                onClick={() => { onOpenSettingsHost(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
                 <Cog className="w-5 h-5 text-gray-500" />
@@ -76,7 +82,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
               </button>
             ) : user.role === "admin" ? (
               <button
-                onClick={onOpenSettingsAdmin}
+                onClick={() => { onOpenSettingsAdmin(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
                 <Cog className="w-5 h-5 text-gray-500" />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../components/HomePage/Home.jsx'; 
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import SettingsHost from '../components/Settings/SettingsHost.jsx';
@@ -13,6 +13,17 @@ import SearchPage from '../components/Nav/SearchPage.jsx';
 
 // Added search props to the arguments
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+  // Simple frontend guards. Server must also enforce auth/roles.
+  const Protected = ({ children }) => {
+    if (!user) return <Navigate to="/login" replace />;
+    return children;
+  };
+
+  const RoleProtected = ({ role, children }) => {
+    if (!user) return <Navigate to="/login" replace />;
+    if (role && user.role !== role) return <Navigate to="/" replace />;
+    return children;
+  };
   return (
     <BrowserRouter>
       <Routes>
@@ -59,9 +70,21 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
         />
 
         {/* User & Settings Routes */}
-        <Route path="/host" element={<SettingsHost />} />
-        <Route path="/configuration" element={<SettingsMain />} />
-        <Route path="/adminMenu" element={<SettingsMain />} />
+        <Route path="/host" element={
+          <RoleProtected role="host">
+            <SettingsHost user={user} />
+          </RoleProtected>
+        } />
+        <Route path="/configuration" element={
+          <Protected>
+            <SettingsMain user={user} />
+          </Protected>
+        } />
+        <Route path="/adminMenu" element={
+          <RoleProtected role="admin">
+            <SettingsMain user={user} />
+          </RoleProtected>
+        } />
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login setUser={setUser}/>}/>

@@ -30,7 +30,7 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-100 bg-white border-b border-gray-100 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-[1790px] mx-auto px-5 sm:px-10 py-3 flex items-center justify-between h-20">
         
         <Link to="/" className="w-1/4 flex items-center shrink-0"> 
@@ -83,7 +83,7 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings
                 {user ? user.name.charAt(0) : <User className="w-5 h-5 text-gray-400" />}
               </div>
             </button>
-            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />}
+            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} onCloseMenu={() => setIsMenuOpen(false)} />}
           </div>
         </div>
       </div>

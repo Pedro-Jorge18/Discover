@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import AppRoutes from './Routes/AppRoutes.jsx';
+import ToastContainer from './components/Ui/ToastContainer.jsx';
 import api from './api/axios';
 import SettingsMain from './components/Settings/SettingsMain.jsx';
 import SettingsHost from './components/Settings/SettingsHost.jsx'; 
@@ -34,6 +35,7 @@ function App() {
 
   return (    
     <div className="App">
+      <ToastContainer />
       <AppRoutes 
         user={user} 
         setUser={setUser} 
