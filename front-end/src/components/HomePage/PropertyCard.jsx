@@ -1,57 +1,88 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Heart, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const PropertyCard = ({ property, isSliderItem = false }) => {
-  const cardClass = isSliderItem 
-    ? "min-w-[320px] md:min-w-[360px] snap-start group animate-fadeIn" 
-    : "group cursor-pointer animate-fadeIn card-shadow-hover";
+function PropertyCard({ property }) {
+  const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = useState(false);
 
-  // Using the Resource image structure
-  const imagem = property?.images?.[0]?.url || 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800';
+  useEffect(() => {
+    const favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
+    setIsFavorite(favs.some(f => f.id === property.id));
+  }, [property.id]);
+
+  // Handle favorite toggle with storage event for header update
+  const toggleFavorite = (e) => {
+    e.stopPropagation();
+    let favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
+    
+    if (isFavorite) {
+      favs = favs.filter(f => f.id !== property.id);
+    } else {
+      favs.push(property);
+    }
+    
+    localStorage.setItem('favoritos', JSON.stringify(favs));
+    setIsFavorite(!isFavorite);
+    window.dispatchEvent(new Event('storage'));
+  };
+
+  // Helper to get the correct image URL (Fix for image_d1d869)
+  const getImageUrl = (img) => {
+    const url = img?.url || property.images?.[0]?.url;
+    if (!url) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800';
+    if (url.startsWith('http')) return url;
+    return `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/storage/${url}`;
+  };
 
   return (
-    <Link to={`/alojamento/${property?.id}`} className={cardClass}>
-      <div className={`${isSliderItem ? 'h-64' : 'h-72'} bg-gray-100 rounded-3xl mb-4 overflow-hidden relative`}>
-        {/* Image with smooth zoom effect */}
+    <div 
+      onClick={() => navigate(`/property/${property.id}`)}
+      className="group cursor-pointer text-left"
+    >
+      <div className="relative aspect-square overflow-hidden rounded-[2.5rem] mb-4 shadow-sm group-hover:shadow-xl transition-all duration-500">
         <img 
-          src={imagem} 
-          className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110" 
-          alt={property?.title}
-          loading="lazy"
+          src={getImageUrl()} 
+          className="h-full w-full object-cover group-hover:scale-110 transition duration-700" 
+          alt={property.title}
+          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800'; }}
         />
         
-        {/* Subtle overlay for better text contrast if needed */}
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-        {/* Favorite badge */}
-        {isSliderItem && (
-          <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-2xl shadow-sm border border-gray-100">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Premium</span>
-          </div>
-        )}
-
-        {/* Floating Heart Icon */}
-        <button className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors duration-300">
-          <svg className="w-6 h-6 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
+        <button 
+          onClick={toggleFavorite}
+          className="absolute top-5 right-5 p-2.5 rounded-full bg-black/10 backdrop-blur-md hover:scale-110 transition active:scale-90"
+        >
+          <Heart 
+            className={`w-5 h-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+            strokeWidth={isFavorite ? 0 : 2.5}
+          />
         </button>
       </div>
 
-      <div className="text-left space-y-1">
-        <h3 className="font-bold text-gray-900 text-[17px] truncate leading-tight group-hover:text-blue-600 transition-colors">
-          {property?.title || 'Alojamento'}
-        </h3>
-        <p className="text-sm text-gray-500 font-medium flex items-center gap-1">
-          <span className="opacity-70">📍</span> {property?.location?.city?.name || property?.location?.neighborhood || 'Portugal'}
+      <div className="px-2">
+        <div className="flex justify-between items-center mb-1">
+          <h3 className="font-black text-gray-900 truncate uppercase tracking-tighter italic text-sm">
+            {property.title}
+          </h3>
+          <div className="flex items-center gap-1 text-[10px] font-black">
+            <Star className="w-3 h-3 fill-blue-600 text-blue-600" />
+            <span>{property.rating || '4.9'}</span>
+          </div>
+        </div>
+        
+        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">
+          {property.location?.city?.name || "Portugal"}
         </p>
-        <div className="pt-1">
-          <span className="text-[18px] font-black text-gray-900">€{property?.price?.per_night}</span>
-          <span className="text-gray-500 text-sm font-normal"> / noite</span>
+
+        <div className="flex items-baseline gap-1">
+          <span className="text-lg font-black text-gray-900 italic">
+            €{Math.round(property.price?.per_night || property.price_per_night || 0)}
+          </span>
+          <span className="text-gray-400 text-[9px] font-black uppercase tracking-tighter">/ noite</span>
         </div>
       </div>
-    </Link>
+    </div>
   );
-};
+}
 
 export default PropertyCard;

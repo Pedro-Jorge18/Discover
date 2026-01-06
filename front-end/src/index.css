@@ -3,10 +3,20 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+.animate-slideUp {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- SCROLLBAR MANAGEMENT --- */
 /* Hide scrollbar but keep functionality */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -16,11 +26,55 @@
   scrollbar-width: none;
 }
 
-/* Smooth hover for cards */
+/* --- UI HELPERS --- */
 .card-shadow-hover {
   transition: all 0.3s ease;
 }
 .card-shadow-hover:hover {
   transform: translateY(-4px);
   filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+}
+
+/* --- DATEPICKER FIXES (image_d231ee) --- */
+/* Fixes the broken layout shown in your screenshot */
+.react-datepicker-wrapper {
+  width: 100% !important;
+}
+
+.react-datepicker {
+  font-family: inherit !important;
+  border-radius: 2rem !important;
+  border: none !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  padding: 15px !important;
+  background-color: white !important;
+}
+
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  padding-top: 10px !important;
+}
+
+.react-datepicker__day-name, .react-datepicker__day {
+  width: 2.5rem !important;
+  line-height: 2.5rem !important;
+  margin: 0.2rem !important;
+  font-weight: 600 !important;
+}
+
+.react-datepicker__day--selected, 
+.react-datepicker__day--keyboard-selected {
+  background-color: #2563eb !important; /* Discover Blue */
+  color: white !important;
+  border-radius: 9999px !important;
+}
+
+.react-datepicker__day:hover {
+  border-radius: 9999px !important;
+  background-color: #f3f4f6 !important;
+}
+
+.react-datepicker__navigation {
+  top: 20px !important;
 }

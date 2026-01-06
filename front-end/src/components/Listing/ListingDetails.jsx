@@ -221,13 +221,13 @@ function ListingDetails({ user, setUser, onOpenLogin }) {
 
       {/* --- CONFIRMATION POP-UP (MODAL) --- */}
       {showModal && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-1000 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setShowModal(false)}></div>
           <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] shadow-2xl p-10 animate-fadeIn text-left">
             <button onClick={() => setShowModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-black transition"><X size={28}/></button>
             <h2 className="text-3xl font-black italic mb-2 tracking-tighter uppercase">Confirmar Estadia</h2>
             <div className="space-y-4 my-8 font-bold">
-              <div className="bg-gray-50 p-6 rounded-[2rem] flex justify-between">
+              <div className="bg-gray-50 p-6 rounded-4xl flex justify-between">
                 <div><p className="text-[10px] font-black text-blue-500 uppercase mb-1">Datas</p><p className="text-sm">{startDate?.toLocaleDateString()} - {endDate?.toLocaleDateString()}</p></div>
                 <div className="text-right"><p className="text-[10px] font-black text-blue-500 uppercase mb-1">Hóspedes</p><p className="text-sm">{hospedes}</p></div>
               </div>
@@ -246,7 +246,7 @@ function ListingDetails({ user, setUser, onOpenLogin }) {
 
       {/* SUCCESS MESSAGE */}
       {bookingSuccess && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-10 py-5 rounded-full shadow-2xl flex items-center gap-4 animate-slideUp z-[1001]">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-10 py-5 rounded-full shadow-2xl flex items-center gap-4 animate-slideUp z-1001">
           <CheckCircle2 className="text-green-400" />
           <span className="font-black uppercase tracking-widest text-[10px]">Reserva confirmada com sucesso!</span>
         </div>

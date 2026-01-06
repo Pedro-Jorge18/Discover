@@ -7,14 +7,15 @@ import Login from '../components/Auth/Login.jsx';
 import Registration from '../components/Auth/Registration.jsx';
 import ForgotPassword from '../components/Auth/ForgotPassword.jsx';
 import Footer from '../components/Layout/Footer.jsx';
-import SettingsMain from '../components/Settings/SettingsHost.jsx'; 
+import SettingsMain from '../components/Settings/SettingsMain.jsx'; 
+import SearchPage from '../components/Nav/SearchPage.jsx';
 
 // Added search props to the arguments
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Pass search props to Home */}
+        {/* Home Page */}
         <Route 
           path="/" 
           element={
@@ -30,20 +31,33 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           }
         />
 
-        {/* Pass search props to ListingDetails so the Header stays functional there */}
+        {/* Search Results Page */}
         <Route 
-          path="/alojamento/:id" 
+          path="/search" 
           element={
-            <ListingDetails 
+            <SearchPage 
               user={user} 
               setUser={setUser} 
-              termoPesquisa={termoPesquisa} 
-              setTermoPesquisa={setTermoPesquisa}
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsHost={onOpenSettingsHost}
             />
           }
         />
 
-        {/* User Routes */}
+        {/* Property Details */}
+        <Route 
+          path="/property/:id" 
+          element={
+            <ListingDetails 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsHost={onOpenSettingsHost}
+            />
+          }
+        />
+
+        {/* User & Settings Routes */}
         <Route path="/host" element={<SettingsHost />} />
         <Route path="/configuration" element={<SettingsMain />} />
         <Route path="/adminMenu" element={<SettingsMain />} />
