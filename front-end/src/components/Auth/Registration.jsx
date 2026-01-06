@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import notify from "../../utils/notify";
 
 export default function Registration() {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,7 +13,35 @@ export default function Registration() {
     const form = e.target;
 
     if (form.password.value !== form.password_confirmation.value) {
-      alert("As passwords não coincidem.");
+      notify("As palavra-passes não coincidem.", "error");
+      return;
+    }
+
+    // Validate birthday: not today or future, and must be at least 18 years old
+    const birthValue = form.birthday.value;
+    const birthDate = new Date(birthValue);
+    if (isNaN(birthDate.getTime())) {
+      notify("Data de nascimento inválida.", "error");
+      return;
+    }
+    const today = new Date();
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const birthOnly = new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+
+    if (birthOnly >= todayOnly) {
+      notify("A data de nascimento não pode ser hoje nem uma data futura.", "error");
+      return;
+    }
+
+    // Calculate age
+    let age = todayOnly.getFullYear() - birthOnly.getFullYear();
+    const m = todayOnly.getMonth() - birthOnly.getMonth();
+    if (m < 0 || (m === 0 && todayOnly.getDate() < birthOnly.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      notify("Deve ter pelo menos 18 anos para se registar.", "error");
       return;
     }
 
@@ -32,18 +61,18 @@ export default function Registration() {
 
       console.log("REGISTER RESPONSE:", response.data);
 
-      //alert("Conta criada com sucesso! Faça o login.");
+      notify("Conta criada com sucesso! Faça o login.", "success");
       navigate("/login");
 
     } catch (error) {
       console.error("REGISTER ERROR:", error);
 
       if (error.response?.data?.errors) {
-        alert(Object.values(error.response.data.errors).flat().join("\n"));
+        notify(Object.values(error.response.data.errors).flat().join("\n"), "error");
       } else if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        notify(error.response.data.message, "error");
       } else {
-        alert("Erro de rede ou servidor.");
+        notify("Erro de rede ou servidor.", "error");
       }
     }
   };
@@ -51,7 +80,7 @@ export default function Registration() {
   return (
     <div
       id="dialog"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[40] flex items-center justify-center bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-labelledby="dialog-title"
     >

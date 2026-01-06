@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../Nav/Header.jsx';
 import { Star, Loader2, Users, Bed, Bath, CheckCircle2, X, CreditCard, Share2, Heart, Info } from 'lucide-react';
 import api from '../../api/axios';
+import notify from '../../utils/notify';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { pt } from 'date-fns/locale';
@@ -16,7 +17,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   const [alojamento, setAlojamento] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -94,10 +94,12 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
   const handleOpenModal = () => {
     if (!startDate || !endDate || nights <= 0) {
-      alert("Por favor, selecione datas válidas de entrada e saída.");
+      notify("Por favor, selecione datas válidas de entrada e saída.", 'error');
       return;
     }
     if (!user) {
+      if (typeof onOpenLogin === 'function') onOpenLogin();
+      else notify("Inicie sessão para reservar.", 'error');
       navigate("/login");
       return;
     }
@@ -114,10 +116,8 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         guests: hospedes,
         total_price: totalPrice
       });
-      setBookingSuccess(true);
       setShowModal(false);
-    } catch (err) {
-        console.error("Booking failed:", err);
+      notify('Reserva confirmada com sucesso!', 'success');
     } finally {
       setBookingLoading(false);
     }
@@ -290,13 +290,9 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         </div>
       )}
 
-      {/* Success Notification */}
-      {bookingSuccess && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-10 py-5 rounded-full shadow-2xl flex items-center gap-4 animate-slideUp z-300">
-          <CheckCircle2 className="text-green-400" />
-          <span className="font-black uppercase tracking-widest text-[10px] italic">Reserva confirmada com sucesso!</span>
-        </div>
-      )}
+      
+
+      <Footer />
     </div>
   );
 }
