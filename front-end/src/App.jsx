@@ -32,7 +32,7 @@ function App() {
     }
   }, []); // Dependência vazia para correr apenas no load
 
-  return (
+  return (    
     <div className="App">
       <AppRoutes 
         user={user} 
@@ -47,7 +47,7 @@ function App() {
       {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} token={token} />}
       {settingsOpenHost && <SettingsHost onClose={() => setSettingsOpenHost(false)} />}
       {settingsOpenAdmin && <SettingsAdmin onClose={() => setSettingsOpenAdmin(false)} user={user} token={token} />}
-    </>
+    </div>
   );
 }
 
