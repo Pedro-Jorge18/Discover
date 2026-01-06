@@ -2,30 +2,49 @@ import React, { useState, useEffect } from 'react';
 import Menu from './Menu.jsx';
 import { Globe, Menu as MenuIcon, User, Search, Heart, SlidersHorizontal } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import FilterModal from './FilterModal.jsx'; // Vamos criar este ficheiro
+import FilterModal from './FilterModal.jsx';
 
-// Added search props to handle global filtering
-function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function Header({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
   const [favCount, setFavCount] = useState(0);
   const navigate = useNavigate();
 
+  // Updates the favorite counter based on the specific logged-in user
   const updateFavCount = () => {
-    const favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
+    if (!user) {
+      setFavCount(0);
+      return;
+    }
+    const storageKey = `favoritos_user_${user.id}`;
+    const favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
     setFavCount(favs.length);
   };
 
   useEffect(() => {
     updateFavCount();
+    // Listen for changes in localStorage and custom events for real-time sync
     window.addEventListener('storage', updateFavCount);
-    return () => window.removeEventListener('storage', updateFavCount);
-  }, []);
+    window.addEventListener('favoritesUpdated', updateFavCount);
+    
+    return () => {
+      window.removeEventListener('storage', updateFavCount);
+      window.removeEventListener('favoritesUpdated', updateFavCount);
+    };
+  }, [user]); // Re-sync if user logs in or out
 
   const handleSearch = () => {
     if (localSearch.trim()) {
       navigate(`/search?q=${encodeURIComponent(localSearch)}`);
+    }
+  };
+
+  const handleFavoriteClick = () => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      navigate('/favoritos');
     }
   };
 
@@ -38,7 +57,6 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings
           <span className="hidden xl:block font-black text-2xl text-blue-600 ml-2 tracking-tighter uppercase italic"></span>
         </Link>
 
-        {/* SEARCH BAR & FILTERS BUTTON */}
         <div className="hidden lg:flex items-center justify-center w-2/4 gap-3">
           <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-md hover:shadow-lg transition-all pl-6 pr-2 py-1.5 w-full max-w-md group">
             <input 
@@ -54,7 +72,6 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings
             </div>
           </div>
 
-          {/* NOVO BOTÃO DE FILTROS */}
           <button 
             onClick={() => setIsFilterOpen(true)}
             className="flex items-center gap-2 border border-gray-300 bg-white p-3.5 rounded-full shadow-md hover:shadow-lg transition-all active:scale-95"
@@ -64,14 +81,15 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings
         </div>
 
         <div className="flex items-center space-x-2 w-1/4 justify-end">
-          <button onClick={() => navigate('/search?filter=favorites')} className="relative p-3 text-gray-700 rounded-full hover:bg-gray-100">
-            <Heart className={`w-5 h-5 ${favCount > 0 ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
-            {favCount > 0 && (
+          <button onClick={handleFavoriteClick} className="relative p-3 text-gray-700 rounded-full hover:bg-gray-100 transition-all">
+            <Heart className={`w-5 h-5 ${favCount > 0 && user ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+            {user && favCount > 0 && (
               <span className="absolute top-1.5 right-1.5 bg-blue-600 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full">
                 {favCount}
               </span>
             )}
           </button>
+
           <button className="hidden sm:flex items-center gap-1.5 p-3 text-gray-700 rounded-full hover:bg-gray-100 font-bold text-xs uppercase">
             <Globe className="w-4 h-4" /> PT
           </button>
@@ -88,7 +106,6 @@ function Header({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings
         </div>
       </div>
 
-      {/* MODAL DE FILTROS */}
       {isFilterOpen && <FilterModal onClose={() => setIsFilterOpen(false)} />}
     </header>
   );

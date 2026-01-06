@@ -2,34 +2,67 @@ import React, { useState, useEffect } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-function PropertyCard({ property }) {
+function PropertyCard({ property, user }) {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
 
-  useEffect(() => {
-    const favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
-    setIsFavorite(favs.some(f => f.id === property.id));
-  }, [property.id]);
+  // Safety check: only create storage key if user and user.id exist
+  const storageKey = user && user.id ? `favoritos_user_${user.id}` : null;
 
-  // Handle favorite toggle with storage event for header update
+  const checkFavoriteStatus = () => {
+    // If no user is logged in, item cannot be a favorite
+    if (!storageKey) {
+      setIsFavorite(false);
+      return;
+    }
+    const favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const exists = favs.some(f => String(f.id) === String(property.id));
+    setIsFavorite(exists);
+  };
+
+  useEffect(() => {
+    checkFavoriteStatus();
+    
+    // Listen for updates from other cards or header
+    window.addEventListener('storage', checkFavoriteStatus);
+    window.addEventListener('favoritesUpdated', checkFavoriteStatus);
+    
+    return () => {
+      window.removeEventListener('storage', checkFavoriteStatus);
+      window.removeEventListener('favoritesUpdated', checkFavoriteStatus);
+    };
+  }, [property.id, user]); // Re-run whenever the user logs in/out
+
   const toggleFavorite = (e) => {
     e.stopPropagation();
-    let favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
-    
-    if (isFavorite) {
-      favs = favs.filter(f => f.id !== property.id);
+
+    // BUG FIX: Strict check for user session
+    // If user is null, undefined or has no ID, redirect to login
+    if (!user || !user.id) {
+      console.log("No user session found, redirecting to login...");
+      navigate('/login');
+      return;
+    }
+
+    let favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const exists = favs.find(f => String(f.id) === String(property.id));
+
+    if (exists) {
+      favs = favs.filter(f => String(f.id) !== String(property.id));
     } else {
       favs.push(property);
     }
     
-    localStorage.setItem('favoritos', JSON.stringify(favs));
-    setIsFavorite(!isFavorite);
+    localStorage.setItem(storageKey, JSON.stringify(favs));
+    setIsFavorite(!exists);
+    
+    // Notify other components for real-time update
     window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   };
 
-  // Helper to get the correct image URL (Fix for image_d1d869)
-  const getImageUrl = (img) => {
-    const url = img?.url || property.images?.[0]?.url;
+  const getImageUrl = () => {
+    const url = property.images?.[0]?.url;
     if (!url) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800';
     if (url.startsWith('http')) return url;
     return `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/storage/${url}`;
@@ -64,7 +97,7 @@ function PropertyCard({ property }) {
           <h3 className="font-black text-gray-900 truncate uppercase tracking-tighter italic text-sm">
             {property.title}
           </h3>
-          <div className="flex items-center gap-1 text-[10px] font-black">
+          <div className="flex items-center gap-1 text-[10px] font-black text-gray-900">
             <Star className="w-3 h-3 fill-blue-600 text-blue-600" />
             <span>{property.rating || '4.9'}</span>
           </div>
@@ -74,8 +107,8 @@ function PropertyCard({ property }) {
           {property.location?.city?.name || "Portugal"}
         </p>
 
-        <div className="flex items-baseline gap-1">
-          <span className="text-lg font-black text-gray-900 italic">
+        <div className="flex items-baseline gap-1 text-gray-900">
+          <span className="text-lg font-black italic">
             €{Math.round(property.price?.per_night || property.price_per_night || 0)}
           </span>
           <span className="text-gray-400 text-[9px] font-black uppercase tracking-tighter">/ noite</span>
