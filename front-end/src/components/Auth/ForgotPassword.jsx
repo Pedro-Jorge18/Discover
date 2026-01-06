@@ -39,7 +39,7 @@ export default function ForgotPassword() {
           >
             Recuperar palavra-passe
           </h3>
-          {/* Close (X) button */}
+          {/* Close button */}
           <button
             onClick={() => (window.location.href = "/login")}
             className="absolute top-4 right-4 text-gray-400 hover:text-white transition"

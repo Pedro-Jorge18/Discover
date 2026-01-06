@@ -4,7 +4,7 @@ import ResetPassword from "../Auth/ResetPassword";
 import TwoFactorAuth from "../Auth/TwoFactory";
 import EditProfile from "./EditProfile";
 
-export default function SettingsMain({ onClose , user, token }) {
+export default function SettingsMain({ onClose}) {
   const [selected, setSelected] = useState("perfil");
 
   const menuItems = [

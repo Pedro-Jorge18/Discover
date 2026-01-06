@@ -100,8 +100,8 @@ export default function GoogleCallback({ setUser }) {
               </div>
 
               <div className="flex gap-3 justify-center mb-4">
-                <button onClick={() => setAccountType('guest')} className={`px-4 py-2 rounded ${accountType==='guest' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>Guest</button>
-                <button onClick={() => setAccountType('host')} className={`px-4 py-2 rounded ${accountType==='host' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>Host</button>
+                <button onClick={() => setAccountType('guest')} className={`px-4 py-2 rounded ${accountType==='guest' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>Cliente</button>
+                <button onClick={() => setAccountType('host')} className={`px-4 py-2 rounded ${accountType==='host' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>Anfiltrião</button>
               </div>
 
               <div className="flex gap-3 justify-center">
@@ -111,7 +111,7 @@ export default function GoogleCallback({ setUser }) {
             </div>
           ) : (
             <div>
-              <p className="text-gray-200">Autenticação concluída. Se não for redirecionado, tenta novamente.</p>
+              <p className="text-gray-200">Autenticação concluída. Se não for redirecionado, tente novamente.</p>
             </div>
           )}
         </div>
@@ -143,8 +143,8 @@ export default function GoogleCallback({ setUser }) {
             <div className="flex gap-3">
               <button onClick={async () => {
                 setPasswordError(null);
-                if (password.length < 8) { setPasswordError('A password deve ter pelo menos 8 caracteres.'); return; }
-                if (password !== passwordConfirm) { setPasswordError('Passwords não coincidem.'); return; }
+                if (password.length < 8) { setPasswordError('A palavra-passe deve ter pelo menos 8 caracteres.'); return; }
+                if (password !== passwordConfirm) { setPasswordError('As palavra-passes não coincidem.'); return; }
                 try {
                   const token = sessionStorage.getItem('token');
                   await api.post('/auth/set-password', { password, password_confirmation: passwordConfirm }, { headers: { Authorization: `Bearer ${token}` } });
