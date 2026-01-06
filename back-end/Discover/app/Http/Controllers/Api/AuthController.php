@@ -130,4 +130,28 @@ class AuthController extends Controller
             'message' => __('passwords.changed'),
         ], 200);
     }
+
+    /* Set a password for the authenticated user without requiring the current password.*/
+    public function setPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $request->user();
+
+        $user->password = Hash::make($request->input('password'));
+        $user->save();
+
+        // Revoke other tokens for safety (keep current session token)
+        if (method_exists($user, 'tokens')) {
+            $user->tokens()->where('id', '!=', $user->currentAccessToken()?->id)->delete();
+        }
+
+        Log::info('User set password via setPassword endpoint', ['user_id' => $user->id]);
+
+        return response()->json([
+            'message' => __('passwords.changed'),
+        ], 200);
+    }
 }

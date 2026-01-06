@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
             Route::post('change-password', [AuthController::class, 'changePassword']);
+        Route::post('set-password', [AuthController::class, 'setPassword']);
         Route::get('me', [AuthController::class, 'me']);
 
         // 2FA
