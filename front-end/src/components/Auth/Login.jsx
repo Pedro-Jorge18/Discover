@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import notify from "../../utils/notify";
 
 export default function Login({ setUser }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -40,9 +41,9 @@ export default function Login({ setUser }) {
 
       // Se 2FA ativo, mostrar popup e guardar temp token
       if (response.data.two_factor_required) {
-        if (!response.data.temp_token) {
+          if (!response.data.temp_token) {
           console.error("Temp token não fornecido pelo backend.");
-          alert("Erro ao iniciar 2FA. Tente novamente.");
+          notify("Erro ao iniciar 2FA. Tente novamente.", "error");
           return;
         }
         setTempToken(response.data.temp_token); 
@@ -54,7 +55,7 @@ export default function Login({ setUser }) {
       const token = response.data.token;
       if (!token) {
         console.error("Token não fornecido pelo backend.");
-        alert("Erro no login. Tente novamente.");
+        notify("Erro no login. Tente novamente.", "error");
         return;
       }
 
@@ -90,7 +91,7 @@ export default function Login({ setUser }) {
       console.log("Resposta 2FA:", res.data);
 
       if (!res.data.status) {
-        alert("Erro ao autenticar 2FA. Tente novamente.");
+        notify("Erro ao autenticar 2FA. Tente novamente.", "error");
         return;
       }
 
@@ -98,7 +99,7 @@ export default function Login({ setUser }) {
 
       if (!token) {
         console.error("Token não fornecido pelo backend após 2FA.");
-        alert("Erro ao autenticar 2FA. Tente novamente.");
+        notify("Erro ao autenticar 2FA. Tente novamente.", "error");
         return;
       }
 
@@ -124,7 +125,7 @@ export default function Login({ setUser }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" role="dialog">
+    <div className="fixed inset-0 z-[40] flex items-center justify-center bg-black/60 backdrop-blur-sm" role="dialog">
       <div className="relative w-full max-w-md rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8">
         {/* Head */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-700">
@@ -232,13 +233,13 @@ export default function Login({ setUser }) {
                   const resp = await api.get('/auth/google/redirect');
                   const url = resp.data?.url;
                   if (!url) {
-                    alert('Não foi possível iniciar autenticação Google.');
+                      notify('Não foi possível iniciar autenticação Google.', 'error');
                     return;
                   }
                   window.location.href = url;
                 } catch (err) {
                   console.error('Erro Google redirect:', err);
-                  alert('Erro ao iniciar autenticação Google.');
+                  notify('Erro ao iniciar autenticação Google.', 'error');
                 }
               }} className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-gray-500 text-sm font-medium hover:border-gray-900 hover:bg-gray-900 transition duration-300">
                 <img src="https://img.icons8.com/color/48/google-logo.png" className="w-5 h-5" />

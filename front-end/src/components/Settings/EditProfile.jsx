@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../../api/axios";
+import notify from "../../utils/notify";
 
 export default function EditProfile() {
   const [saved, setSaved] = useState(false);
@@ -21,15 +22,16 @@ export default function EditProfile() {
       const response = await api.put("/auth/me", form);
       console.log("Update response:", response.data);
       setSaved(true);
+      notify("Os dados foram atualizados com sucesso.", "success");
     } catch (error) {
       console.error("UPDATE ERROR:", error);
 
       if (error.response?.data?.errors) {
-        alert(Object.values(error.response.data.errors).flat().join("\n"));
+        notify(Object.values(error.response.data.errors).flat().join("\n"), "error");
       } else if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        notify(error.response.data.message, "error");
       } else {
-        alert("Erro de rede ou servidor.");
+        notify("Erro de rede ou servidor.", "error");
       }
     }
   };
