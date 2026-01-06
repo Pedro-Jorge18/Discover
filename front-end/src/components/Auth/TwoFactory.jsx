@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../api/axios";
+import notify from "../../utils/notify";
 
 export default function TwoFactorAuth() {
   const [enabled, setEnabled] = useState(false);
@@ -10,10 +11,11 @@ export default function TwoFactorAuth() {
   const [secret, setSecret] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [password, setPassword] = useState("");
   const [qrCode, setQrCode] = useState("");
   const [confirmCode, setConfirmCode] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const copiedTimeoutRef = useRef(null);
 
   /* Get current 2FA status for the user */
   useEffect(() => {
@@ -29,6 +31,7 @@ export default function TwoFactorAuth() {
         setEnabled(user?.two_factor?.enabled ?? false);
       } catch (error) {
         console.error("Erro ao obter utilizador:", error);
+        notify("Erro ao obter utilizador.", "error");
       }
     };
 
@@ -37,8 +40,6 @@ export default function TwoFactorAuth() {
 
   /* Enable / Disable */
   const handleToggle = async () => {
-    setErrorMessage("");
-
     if (!enabled) {
       if (loading) return;
       setShowPasswordPopup(true);
@@ -52,7 +53,7 @@ export default function TwoFactorAuth() {
   /* Enable 2FA with password */
   const handlePasswordSubmit = async () => {
     if (!password) {
-      setErrorMessage("Por favor, introduza a sua password.");
+      notify("Por favor, introduza a sua palavra-passe.", "error");
       return;
     }
 
@@ -70,13 +71,17 @@ export default function TwoFactorAuth() {
         setShowPasswordPopup(false);
         setShowCodePopup(true);
         setPassword("");
+        notify("Palavra-passe confirmada. Configure o 2FA.", "info");
       } else {
-        setErrorMessage(res.data?.message || "Erro ao ativar 2FA");
+        notify(res.data?.message || "Erro ao ativar 2FA", "error");
       }
     } catch (err) {
-      console.error(err);
-      setErrorMessage("Erro de comunicação com o servidor");
-      setPassword("");
+      if (err?.response?.status === 422) {
+        notify("Palavra-passe incorreta! Tente novamente.", "error");
+      } else {
+        console.error(err);
+        notify("Erro de comunicação com o servidor.", "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -87,7 +92,7 @@ export default function TwoFactorAuth() {
     const code = confirmCode?.trim();
 
     if (!code || code.length < 6) {
-      setErrorMessage("Código inválido");
+      notify("Código inválido.", "error");
       return;
     }
 
@@ -110,12 +115,13 @@ export default function TwoFactorAuth() {
         setSecret("");
         setPassword("");
         setConfirmCode("");
+        notify("Autenticação de dois fatores ativada.", "success");
       } else {
-        setErrorMessage(res.data.message || "Código incorreto");
+        notify(res.data.message || "Código incorreto.", "error");
       }
     } catch (err) {
       console.error(err);
-      setErrorMessage("Erro ao validar o código");
+      notify("Erro ao validar o código.", "error");
     } finally {
       setLoading(false);
     }
@@ -124,7 +130,7 @@ export default function TwoFactorAuth() {
   /* Disable 2FA */
   const handleDisable2FA = async () => {
     if (!disableCode || disableCode.length < 6) {
-      setErrorMessage("Código inválido");
+      notify("Código inválido.", "error");
       return;
     }
 
@@ -144,15 +150,15 @@ export default function TwoFactorAuth() {
         setEnabled(false);
         setShowDisablePopup(false);
         setDisableCode("");
-        setErrorMessage("");
+        notify("Autenticação de dois fatores desativada.", "success");
       } else {
-        setErrorMessage(res.data?.message || "Código incorreto");
+        notify(res.data?.message || "Código incorreto.", "error");
       }
     } catch (err) {
       if (err.response?.status === 422) {
-        setErrorMessage("Código de autenticação incorreto.");
+        notify("Código de autenticação incorreto.", "error");
       } else {
-        setErrorMessage("Erro de comunicação com o servidor.");
+        notify("Erro de comunicação com o servidor.", "error");
       }
     } finally {
       setLoading(false);
@@ -165,11 +171,19 @@ export default function TwoFactorAuth() {
     try {
       await navigator.clipboard.writeText(secret);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+      copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      notify("Código copiado para a área de transferência.", "success");
     } catch {
-      setErrorMessage("Não foi possível copiar o código");
+      notify("Não foi possível copiar o código.", "error");
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
@@ -191,6 +205,7 @@ export default function TwoFactorAuth() {
           <button
             onClick={handleToggle}
             disabled={loading}
+            aria-pressed={enabled}
             className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 outline-none cursor-pointer ${
               enabled ? "bg-indigo-600" : "bg-gray-700"
             }`}
@@ -212,19 +227,45 @@ export default function TwoFactorAuth() {
         {/* Pop-up Password */}
         {showPasswordPopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+            <div className="relative bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+              {/* Botão fechar */}
+              <button
+                onClick={() => {
+                  setShowPasswordPopup(false);
+                  setPassword("");
+                }}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                aria-label="Fechar"
+              >
+                ✕
+              </button>
+
               <h4 className="text-white font-semibold mb-4 text-lg">
                 Introduza a sua Palavra-Passe
               </h4>
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full mb-3 px-3 py-2 rounded-lg text-white-900 border"
-              />
+              {/* Input com show/hide password */}
+              <div className="relative mb-3">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Palavra-Passe"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 hover:text-gray-100 transition cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
 
+              {/* Confirmar */}
               <button
                 onClick={handlePasswordSubmit}
                 className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
@@ -238,7 +279,17 @@ export default function TwoFactorAuth() {
         {/* Code popup */}
         {showCodePopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+            <div className="relative bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+              <button
+                  onClick={() => {
+                    setShowCodePopup(false);
+                    setConfirmCode("");
+                  }}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                  aria-label="Fechar"
+                >
+                  ✕
+                </button>
               <h4 className="text-white font-semibold mb-4 text-lg">
                 Código de Autenticação
               </h4>
@@ -273,14 +324,25 @@ export default function TwoFactorAuth() {
                 type="text"
                 placeholder="Código"
                 maxLength={6}
+                inputMode="numeric"
+                pattern="\\d*"
                 value={confirmCode}
-                onChange={(e) => setConfirmCode(e.target.value)}
-                className="w-full mb-3 px-3 py-2 rounded-lg text-white-900 border"
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "").slice(0, 6);
+                  setConfirmCode(v);
+                }}
+                className="w-full mb-3 px-3 py-2 rounded-lg text-white border"
                 id="2fa-code-input"
+                aria-label="Código de autenticação"
               />
               <button
                 onClick={handleConfirmCode}
-                className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
+                disabled={loading || confirmCode.length !== 6}
+                className={`rounded-lg px-6 py-2 text-sm font-semibold text-white focus:ring-4 transition duration-300 w-full ${
+                  loading || confirmCode.length !== 6
+                    ? "bg-indigo-600/60 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-400"
+                }`}
               >
                 Confirmar
               </button>
@@ -291,7 +353,17 @@ export default function TwoFactorAuth() {
         {/* Disable code popup */}
         {showDisablePopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+            <div className="relative bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+              <button
+                onClick={() => {
+                  setShowDisablePopup(false);
+                  setDisableCode("");
+                }}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                aria-label="Fechar"
+              >
+                ✕
+              </button>
               <h4 className="text-white font-semibold mb-4 text-lg">
                 Código de Autenticação 2FA
               </h4>
@@ -304,20 +376,26 @@ export default function TwoFactorAuth() {
                 type="text"
                 placeholder="Código"
                 maxLength={6}
+                inputMode="numeric"
+                pattern="\\d*"
                 value={disableCode}
-                onChange={(e) => setDisableCode(e.target.value)}
-                className="w-full mb-4 px-3 py-2 rounded-lg text-white-900 border"
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "").slice(0, 6);
+                  setDisableCode(v);
+                }}
+                className="w-full mb-4 px-3 py-2 rounded-lg text-white border"
+                aria-label="Código para desativar 2FA"
               />
 
-              {errorMessage && (
-                <p className="text-red-400 text-sm mb-3">
-                  {errorMessage}
-                </p>
-              )}
 
               <button
                 onClick={handleDisable2FA}
-                className="rounded-lg bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-500 focus:ring-4 focus:ring-red-400 transition duration-300 w-full"
+                disabled={loading || disableCode.length !== 6}
+                className={`rounded-lg px-6 py-2 text-sm font-semibold text-white transition duration-300 w-full ${
+                  loading || disableCode.length !== 6
+                    ? "bg-red-600/60 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-red-400"
+                }`}
               >
                 Desativar 2FA
               </button>
@@ -325,21 +403,7 @@ export default function TwoFactorAuth() {
           </div>
         )}
 
-        {/* Error */}
-        {errorMessage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full text-center border border-gray-700 shadow-lg">
-              <h4 className="text-white font-semibold mb-3 text-lg">Ocorreu um erro</h4>
-              <p className="text-gray-300 text-sm mb-6">{errorMessage}</p>
-              <button
-                onClick={() => setErrorMessage("")}
-                className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition duration-300 w-full"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        )}
+        
       </div>
     </div>
   );

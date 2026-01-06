@@ -85,6 +85,7 @@ export default function Registration() {
       aria-labelledby="dialog-title"
     >
       <div className="relative w-full max-w-lg rounded-2xl bg-gray-800 shadow-2xl transition-all sm:my-8 p-6">
+        <title>Discover - Registo</title>
         {/* Head */}
         <div className="pb-4 border-b border-gray-700">
           <button
