@@ -12,6 +12,7 @@ import { differenceInDays, addDays, startOfDay } from 'date-fns';
 import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
 import ListingInfo from './ListingInfo.jsx';
+import PaymentModal from '../Booking/PaymentModal.jsx';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {
   const { id } = useParams();
@@ -22,6 +23,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Reservation dates state
@@ -200,25 +202,35 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     setShowModal(true);
   };
 
-  const handleConfirmBooking = async () => {
+  const handleOpenPayment = () => {
+    setShowModal(false);
+    setShowPaymentModal(true);
+  };
+
+  const handleFinalPayment = async (paymentData) => {
     try {
       setBookingLoading(true);
-      await api.post('reservations', {
+      await api.post('/payments', {
         property_id: id,
         check_in: startDate.toISOString().split('T')[0],
         check_out: endDate.toISOString().split('T')[0],
         guests: hospedes,
-        total_price: totalPrice
+        total_price: totalPrice,
+        customer_info: paymentData
       });
-      setShowModal(false);
-      notify('Reserva efetuada com sucesso!', 'success');
+
+      notify('Reserva e pagamento concluídos!', 'success');
+      setShowPaymentModal(false);
+      navigate('/payment/success');
     } catch (error) {
-      console.error('Booking error:', error);
-      notify('Erro ao processar reserva.', 'error');
+      console.error('Payment error:', error);
+      notify('Erro ao processar pagamento.', 'error');
     } finally {
       setBookingLoading(false);
     }
   };
+
+
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-white">
@@ -231,7 +243,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   return (
     <div className="min-h-screen bg-white text-left font-sans text-gray-900">
       <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
-      <main className={`max-w-[1200px] mx-auto px-6 pt-28 pb-20 transition-all duration-700 ${showModal ? 'blur-xl scale-95 opacity-40 pointer-events-none' : ''}`}>
+      <main className={`max-w-[1200px] mx-auto px-6 pt-28 pb-20 transition-all duration-700 ${(showModal || showPaymentModal) ? 'blur-xl scale-95 opacity-40 pointer-events-none' : ''}`}>
         
         {/* Header Section */}
         <div className="mb-8 flex justify-between items-end">
@@ -453,11 +465,20 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                 </div>
               </div>
             </div>
-            <button onClick={handleConfirmBooking} disabled={bookingLoading} className="w-full bg-blue-600 text-white font-black py-6 rounded-[2.2rem] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs italic">
-                {bookingLoading ? <Loader2 className="animate-spin"/> : <><CreditCard size={18}/> Confirmar e Pagar</>}
+            <button onClick={handleOpenPayment} disabled={bookingLoading} className="w-full bg-blue-600 text-white font-black py-6 rounded-[2.2rem] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs italic">
+                {bookingLoading ? <Loader2 className="animate-spin"/> : <><CreditCard size={18}/> Prosseguir para Pagamento</>}
             </button>
           </div>
         </div>
+      )}
+
+      {showPaymentModal && (
+        <PaymentModal 
+            totalPrice={totalPrice} 
+            onClose={() => setShowPaymentModal(false)} 
+            onConfirm={handleFinalPayment}
+            bookingLoading={bookingLoading}
+        />
       )}
 
       <Footer />
