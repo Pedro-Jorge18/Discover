@@ -13,6 +13,10 @@ import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
 import MyReviews from '../components/Review/MyReviews.jsx';
 import HostDashboard from '../components/Host/HostDashboard.jsx';
 import BookingSuccess from '../components/Booking/BookingSuccess.jsx';
+import CompanyInfo from '../components/Layout/CompanyInfo.jsx';
+import TermsPage from '../components/Layout/TermsPage.jsx';
+import PrivacyPage from '../components/Layout/PrivacyPage.jsx';
+import HelpCenter from '../components/Layout/HelpCenter.jsx';
 
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
     
@@ -72,6 +76,69 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
                         />
                     } 
                 />
+        {/* Company Information Route */}
+        <Route 
+          path="/empresa" 
+          element={
+            <CompanyInfo 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Terms and Conditions Route */}
+        <Route 
+          path="/termos" 
+          element={
+            <TermsPage 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Privacy Policy Route */}
+        <Route 
+          path="/privacidade" 
+          element={
+            <PrivacyPage 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Help Center Route */}
+        <Route 
+          path="/ajuda" 
+          element={
+            <HelpCenter 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        <Route 
+          path="/property/:id" 
+          element={
+            <ListingDetails 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
 
                 {/* Stripe Success Redirect */}
                 <Route path="/payment/success" element={<BookingSuccess />} />

@@ -23,6 +23,9 @@ class PropertyResource extends JsonResource
             'description' => $this->description,
             'summary' => $this->summary,
 
+            'check_in_time' => $this->check_in_time ? $this->check_in_time->format('H:i') : null,
+            'check_out_time' => $this->check_out_time ? $this->check_out_time->format('H:i') : null,
+
             // definição dos preços
             'price' => [
                 'per_night' => (float)$this->price_per_night,

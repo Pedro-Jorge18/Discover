@@ -15,19 +15,19 @@ class CityController extends Controller
     {
         $query = City::where('active', true);
 
-        // Filtrar por país se fornecido
+        // Filter by country if provided
         if ($request->has('country_id')) {
             $query->whereHas('state', function ($q) use ($request) {
                 $q->where('country_id', $request->country_id);
             });
         }
 
-        // Filtrar por estado se fornecido
+        // Filter by state if provided
         if ($request->has('state_id')) {
             $query->where('state_id', $request->state_id);
         }
 
-        // Pesquisa por nome
+        // Search by name
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }

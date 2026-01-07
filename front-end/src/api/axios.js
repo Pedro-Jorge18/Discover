@@ -11,13 +11,18 @@ const api = axios.create({
 });
 
 /**
- * Interceptor para enviar automaticamente o token
+ * Interceptor para enviar automaticamente o token e idioma
  */
 api.interceptors.request.use(config => {
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Add language header
+  const language = localStorage.getItem("language") || 'pt';
+  config.headers['Accept-Language'] = language;
+  
   return config;
 });
  

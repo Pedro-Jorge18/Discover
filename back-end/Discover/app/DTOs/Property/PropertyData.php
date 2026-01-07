@@ -40,6 +40,8 @@ class PropertyData
         public string $check_out_time = '11:00',
         public ?int $min_nights = 1,
         public ?int $max_nights = 30,
+        public ?bool $published = false,
+        public ?string $published_at = null,
 
         public array $amenities = []
 
@@ -84,6 +86,8 @@ class PropertyData
             check_out_time: $data['check_out_time'] ?? '11:00',
             min_nights: $data['min_nights'] ?? 1,
             max_nights: $data['max_nights'] ?? 30,
+            published: $data['published'] ?? false,
+            published_at: $data['published_at'] ?? null,
 
             amenities: $data['amenities'] ?? [],
 
@@ -119,6 +123,8 @@ class PropertyData
             'check_out_time' => $this->check_out_time,
             'min_nights' => $this->min_nights,
             'max_nights' => $this->max_nights,
+            'published' => $this->published,
+            'published_at' => $this->published_at,
 
             'amenities' => $this->amenities,
 

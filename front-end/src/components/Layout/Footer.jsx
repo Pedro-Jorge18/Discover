@@ -1,17 +1,18 @@
 import React from 'react';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 /**
  * Simple footer component displaying legal links and copyright information.
  */
 function Footer() {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
   
   // Array for footer links (Portuguese of Portugal)
   const links = [
-    { name: "Privacidade", href: "#" },
-    { name: "Termos", href: "#" },
-    { name: "Mapa do Site", href: "#" },
-    { name: "Informações da empresa", href: "#" }
+    { name: t('footer.privacy'), href: "/privacidade" },
+    { name: t('footer.terms'), href: "/termos" },
+    { name: t('footer.companyInfo'), href: "/empresa" }
   ];
 
   return (
@@ -20,7 +21,7 @@ function Footer() {
         
         {/* Copyright Section */}
         <p className="mb-2">
-          © {year} Descobrir, Inc.
+          © {year} {t('footer.brand')}
         </p>
 
         {/* Links Section */}

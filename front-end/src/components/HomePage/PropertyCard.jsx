@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function PropertyCard({ property, user }) {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
+  const { t } = useTranslation();
 
   // Safety check: only create storage key if user and user.id exist
   const storageKey = user && user.id ? `favoritos_user_${user.id}` : null;
@@ -53,7 +55,6 @@ function PropertyCard({ property, user }) {
   const toggleFavorite = (e) => {
     e.stopPropagation();
 
-    // BUG FIX: Strict check for user session
     // If user is null, undefined or has no ID, redirect to login
     if (!user || !user.id) {
       console.log("No user session found, redirecting to login...");
@@ -79,10 +80,12 @@ function PropertyCard({ property, user }) {
   };
 
   const getImageUrl = () => {
-    const url = property.images?.[0]?.url;
-    if (!url) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800';
-    if (url.startsWith('http')) return url;
-    return `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/storage/${url}`;
+    const image = property.images?.[0];
+    const raw = image?.thumbnail_url || image?.image_url || image?.url || image?.image_path || image?.path;
+    if (!raw) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800';
+    if (raw.startsWith('http')) return raw;
+    const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    return `${base}/storage/${raw.replace(/^\/storage\//, '')}`;
   };
 
   return (
@@ -128,7 +131,7 @@ function PropertyCard({ property, user }) {
           <span className="text-lg font-black italic">
             €{Math.round(property.price?.per_night || property.price_per_night || 0)}
           </span>
-          <span className="text-gray-400 text-[9px] font-black uppercase tracking-tighter">/ noite</span>
+          <span className="text-gray-400 text-[9px] font-black uppercase tracking-tighter">/ {t('common.night')}</span>
         </div>
       </div>
     </div>

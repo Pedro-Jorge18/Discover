@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../api/axios";
 import notify from "../../utils/notify";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function TwoFactorAuth() {
+  const { t } = useTranslation();
   const [enabled, setEnabled] = useState(false);
   const [showCodePopup, setShowCodePopup] = useState(false);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
@@ -31,7 +33,7 @@ export default function TwoFactorAuth() {
         setEnabled(user?.two_factor?.enabled ?? false);
       } catch (error) {
         console.error("Erro ao obter utilizador:", error);
-        notify("Erro ao obter utilizador.", "error");
+        notify(t('auth.errorGettingUser'), "error");
       }
     };
 
@@ -53,7 +55,7 @@ export default function TwoFactorAuth() {
   /* Enable 2FA with password */
   const handlePasswordSubmit = async () => {
     if (!password) {
-      notify("Por favor, introduza a sua palavra-passe.", "error");
+      notify(t('auth.enterPassword'), "error");
       return;
     }
 
@@ -71,16 +73,16 @@ export default function TwoFactorAuth() {
         setShowPasswordPopup(false);
         setShowCodePopup(true);
         setPassword("");
-        notify("Palavra-passe confirmada. Configure o 2FA.", "info");
+        notify(t('auth.passwordConfirmed2FA'), "info");
       } else {
-        notify(res.data?.message || "Erro ao ativar 2FA", "error");
+        notify(res.data?.message || t('auth.twoFactorAuthError'), "error");
       }
     } catch (err) {
       if (err?.response?.status === 422) {
-        notify("Palavra-passe incorreta! Tente novamente.", "error");
+        notify(t('auth.incorrectPassword'), "error");
       } else {
         console.error(err);
-        notify("Erro de comunicação com o servidor.", "error");
+        notify(t('auth.serverError'), "error");
       }
     } finally {
       setLoading(false);
@@ -92,7 +94,7 @@ export default function TwoFactorAuth() {
     const code = confirmCode?.trim();
 
     if (!code || code.length < 6) {
-      notify("Código inválido.", "error");
+      notify(t('auth.invalidCode'), "error");
       return;
     }
 
@@ -115,13 +117,13 @@ export default function TwoFactorAuth() {
         setSecret("");
         setPassword("");
         setConfirmCode("");
-        notify("Autenticação de dois fatores ativada.", "success");
+        notify(t('auth.twoFactorEnabled'), "success");
       } else {
-        notify(res.data.message || "Código incorreto.", "error");
+        notify(res.data.message || t('auth.authIncorrect'), "error");
       }
     } catch (err) {
       console.error(err);
-      notify("Erro ao validar o código.", "error");
+      notify(t('auth.errorValidatingCode'), "error");
     } finally {
       setLoading(false);
     }
@@ -130,7 +132,7 @@ export default function TwoFactorAuth() {
   /* Disable 2FA */
   const handleDisable2FA = async () => {
     if (!disableCode || disableCode.length < 6) {
-      notify("Código inválido.", "error");
+      notify(t('auth.invalidCode'), "error");
       return;
     }
 
@@ -150,15 +152,15 @@ export default function TwoFactorAuth() {
         setEnabled(false);
         setShowDisablePopup(false);
         setDisableCode("");
-        notify("Autenticação de dois fatores desativada.", "success");
+        notify(t('auth.twoFactorDisabled'), "success");
       } else {
-        notify(res.data?.message || "Código incorreto.", "error");
+        notify(res.data?.message || t('auth.authIncorrect'), "error");
       }
     } catch (err) {
       if (err.response?.status === 422) {
-        notify("Código de autenticação incorreto.", "error");
+        notify(t('auth.authIncorrect'), "error");
       } else {
-        notify("Erro de comunicação com o servidor.", "error");
+        notify(t('auth.serverError'), "error");
       }
     } finally {
       setLoading(false);
@@ -173,9 +175,9 @@ export default function TwoFactorAuth() {
       setCopied(true);
       if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
       copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
-      notify("Código copiado para a área de transferência.", "success");
+      notify(t('auth.codesCopied'), "success");
     } catch {
-      notify("Não foi possível copiar o código.", "error");
+      notify(t('auth.copyFailed'), "error");
     }
   };
 
@@ -187,19 +189,19 @@ export default function TwoFactorAuth() {
 
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
-      <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Autenticação de Dois Fatores (2FA)
-      </h3>
 
+      <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
+        {t('auth.twoFactorAuth')}
+      </h3>
       <div className="pt-6 space-y-6">
         <p className="text-gray-300 text-sm">
-          Adicione uma camada extra de segurança ativando a autenticação de dois fatores.
+          {t('auth.twoFactorDesc')}
         </p>
 
         {/* Toggle */}
         <div className="flex items-center justify-between">
           <span className="text-gray-200 font-medium">
-            Ativar Autenticação de 2 fatores
+            {t('auth.enableTwoFactor')}
           </span>
 
           <button
@@ -219,9 +221,7 @@ export default function TwoFactorAuth() {
         </div>
 
         <p className="text-gray-300 text-sm">
-          {enabled
-            ? "A autenticação de dois fatores está ativada."
-            : "A autenticação de dois fatores está desativada."}
+          {enabled ? t('auth.twoFactorEnabled') : t('auth.twoFactorDisabled')}
         </p>
 
         {/* Pop-up Password */}
@@ -241,14 +241,14 @@ export default function TwoFactorAuth() {
               </button>
 
               <h4 className="text-white font-semibold mb-4 text-lg">
-                Introduza a sua Palavra-Passe
+                {t('auth.enterPassword')}
               </h4>
 
               {/* Input com show/hide password */}
               <div className="relative mb-3">
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Palavra-Passe"
+                  placeholder={t('auth.passwordPlaceholder')}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -291,7 +291,7 @@ export default function TwoFactorAuth() {
                   ✕
                 </button>
               <h4 className="text-white font-semibold mb-4 text-lg">
-                Código de Autenticação
+                {t('auth.authCodeTitle')}
               </h4>
 
               {qrCode && (
@@ -309,7 +309,7 @@ export default function TwoFactorAuth() {
               </p>
 
               <p className="text-gray-400 text-sm mb-4">
-                Introduza este código na sua aplicação de autenticação
+                {t('auth.authCodeHelp')}
                 (Google Authenticator, Authy, etc.)
               </p>
 
@@ -317,12 +317,12 @@ export default function TwoFactorAuth() {
                 onClick={copyToClipboard}
                 className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600 transition duration-300 mb-3 w-full"
               >
-                {copied ? "Copiado ✔" : "Copiar código"}
+                {copied ? t('auth.copied') : t('auth.copyCode')}
               </button>
 
               <input
                 type="text"
-                placeholder="Código"
+                placeholder={t('auth.enterCode')}
                 maxLength={6}
                 inputMode="numeric"
                 pattern="\\d*"
@@ -333,7 +333,7 @@ export default function TwoFactorAuth() {
                 }}
                 className="w-full mb-3 px-3 py-2 rounded-lg text-white border"
                 id="2fa-code-input"
-                aria-label="Código de autenticação"
+                aria-label={t('auth.authCodeTitle')}
               />
               <button
                 onClick={handleConfirmCode}
@@ -365,16 +365,16 @@ export default function TwoFactorAuth() {
                 ✕
               </button>
               <h4 className="text-white font-semibold mb-4 text-lg">
-                Código de Autenticação 2FA
+                {t('auth.disable2faTitle')}
               </h4>
 
               <p className="text-gray-300 text-sm mb-3">
-                Introduza o código da sua aplicação de autenticação para desativar o 2FA.
+                {t('auth.disable2faHelp')}
               </p>
 
               <input
                 type="text"
-                placeholder="Código"
+                placeholder={t('auth.enterCode')}
                 maxLength={6}
                 inputMode="numeric"
                 pattern="\\d*"
@@ -384,7 +384,7 @@ export default function TwoFactorAuth() {
                   setDisableCode(v);
                 }}
                 className="w-full mb-4 px-3 py-2 rounded-lg text-white border"
-                aria-label="Código para desativar 2FA"
+                aria-label={t('auth.disable2faTitle')}
               />
 
 
@@ -397,7 +397,7 @@ export default function TwoFactorAuth() {
                     : "bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-red-400"
                 }`}
               >
-                Desativar 2FA
+                {t('auth.disable2FA')}
               </button>
             </div>
           </div>

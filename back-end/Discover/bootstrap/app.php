@@ -13,8 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Caso precises de middleware global, podes usar:
-        // $middleware->append(\App\Http\Middleware\SomeGlobalMiddleware::class);
+        // Add locale middleware globally
+        $middleware->append(\App\Http\Middleware\SetLocale::class);
 
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,

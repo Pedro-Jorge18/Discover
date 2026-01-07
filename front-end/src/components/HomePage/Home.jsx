@@ -4,10 +4,12 @@ import api from '../../api/axios';
 import PropertySlider from './PropertySlider.jsx';
 import PropertyCard from './PropertyCard.jsx';
 import PropertySkeleton from './PropertySkeleton.jsx';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
   const [alojamentos, setAlojamentos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
   const buscarAlojamentos = async () => {
@@ -60,24 +62,25 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   };
 
   // Pre-filtering logic for UI sections
-  const porto = alojamentos.filter(a => a.location?.city?.name?.toLowerCase().includes('porto'));
-  const madrid = alojamentos.filter(a => a.location?.city?.name?.toLowerCase().includes('madri'));
-  const economicos = alojamentos.filter(a => Number(a.price?.per_night ?? Infinity) <= 60);
-  const luxo = alojamentos.filter(a => Number(a.price?.per_night ?? 0) >= 150);
+  const publicados = alojamentos.filter(a => (a.settings?.published ?? a.published ?? false));
+  const porto = publicados.filter(a => a.location?.city?.name?.toLowerCase().includes('porto'));
+  const madrid = publicados.filter(a => a.location?.city?.name?.toLowerCase().includes('madri'));
+  const economicos = publicados.filter(a => Number(a.price?.per_night ?? Infinity) <= 60);
+  const luxo = publicados.filter(a => Number(a.price?.per_night ?? 0) >= 150);
 
   // Dynamic search logic for global listings
   const filtrados = (() => {
-    if (!termoPesquisa) return alojamentos;
+    if (!termoPesquisa) return publicados;
     const q = String(termoPesquisa).trim().toLowerCase();
     const qNum = Number(q);
     const isNumber = !Number.isNaN(qNum);
 
     if (isNumber) {
-      if (qNum <= 100) return alojamentos.filter(a => Number(a.price?.per_night ?? Infinity) <= qNum);
-      return alojamentos.filter(a => Number(a.price?.per_night ?? 0) >= qNum);
+      if (qNum <= 100) return publicados.filter(a => Number(a.price?.per_night ?? Infinity) <= qNum);
+      return publicados.filter(a => Number(a.price?.per_night ?? 0) >= qNum);
     }
 
-    return alojamentos.filter(a => {
+    return publicados.filter(a => {
       const city = String(a.location?.city?.name ?? '').toLowerCase();
       const title = String(a.title ?? '').toLowerCase();
       return city.includes(q) || title.includes(q);
@@ -90,19 +93,19 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
       <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6 text-left">
-        <PropertySlider user={user} title="Destaques Porto" subtitle="O melhor da Invicta" properties={porto} onVerTudo={() => handleVerTudo('Porto')} />
-        <PropertySlider user={user} title="Estadias Económicas" subtitle="Viagens Low Cost" properties={economicos} onVerTudo={() => handleVerTudo('60')} />
-        <PropertySlider user={user} title="Destaques Madrid" subtitle="Cultura e diversão" properties={madrid} onVerTudo={() => handleVerTudo('Madri')} />
-        <PropertySlider user={user} title="Experiências de Luxo" subtitle="Estadias exclusivas" properties={luxo} onVerTudo={() => handleVerTudo('150')} />
+        <PropertySlider user={user} title={t('home.featuredPorto')} subtitle={t('home.featuredPortoSubtitle')} properties={porto} onVerTudo={() => handleVerTudo('Porto')} />
+        <PropertySlider user={user} title={t('home.economicalStays')} subtitle={t('home.economicalStaysSubtitle')} properties={economicos} onVerTudo={() => handleVerTudo('60')} />
+        <PropertySlider user={user} title={t('home.featuredMadrid')} subtitle={t('home.featuredMadridSubtitle')} properties={madrid} onVerTudo={() => handleVerTudo('Madri')} />
+        <PropertySlider user={user} title={t('home.luxuryExperiences')} subtitle={t('home.luxuryExperiencesSubtitle')} properties={luxo} onVerTudo={() => handleVerTudo('150')} />
 
         <hr className="my-16 border-gray-100" />
         
         <div id="resultados-pesquisa" className="mb-8 flex justify-between items-center">
           <h2 className="text-3xl font-black text-gray-900 tracking-tighter uppercase italic">
-            {termoPesquisa ? `A mostrar alojamentos para "${termoPesquisa}"` : 'Todos os Alojamentos'}
+            {termoPesquisa ? `${t('common.search')} "${termoPesquisa}"` : t('home.allProperties')}
           </h2>
           {termoPesquisa && (
-            <button onClick={() => setTermoPesquisa('')} className="text-blue-600 font-black uppercase text-xs tracking-widest hover:underline cursor-pointer transition">Ver tudo de novo</button>
+            <button onClick={() => setTermoPesquisa('')} className="text-blue-600 font-black uppercase text-xs tracking-widest hover:underline cursor-pointer transition">{t('common.viewAll')}</button>
           )}
         </div>
         
@@ -110,7 +113,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
           {filtrados.length > 0 ? (
             filtrados.map((a) => <PropertyCard key={a.id} property={a} user={user} />)
           ) : (
-            <p className="col-span-full text-center text-gray-400 font-bold uppercase italic tracking-widest py-20">Nenhum alojamento encontrado.</p>
+            <p className="col-span-full text-center text-gray-400 font-bold uppercase italic tracking-widest py-20">{t('home.noResults')}</p>
           )}
         </div>
       </main>

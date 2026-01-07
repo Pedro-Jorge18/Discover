@@ -2,9 +2,11 @@ import React from 'react';
 import { LogIn, HelpCircle, Gift, House, Cog, MessageSquare, UserStar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu }) {
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     try {
@@ -40,7 +42,6 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
   return (
     <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right">
 
-      {user && <p>Bem-vindo, {user.role}</p>}
       <div className="py-2">
 
         {user && user.id ? (
@@ -48,14 +49,14 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
             onClick={handleLogout} //Calls Backend
             className="px-4 py-3 font-semibold text-red-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
           >
-            Terminar Sessão
+            {t('common.logout')}
           </button>
         ) : (
           <Link 
             to="/login"
             className="px-4 py-3 font-semibold text-gray-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
           >
-            Entrar ou Registar-se
+            {t('common.login')}
           </Link>
         )}
 
@@ -70,6 +71,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
             >
               <MessageSquare className="w-5 h-5 text-gray-500" />
               Avaliações
+              {t('header.myReviews')}
             </Link>          
             
             <button
@@ -77,7 +79,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
               className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
             >
               <Cog className="w-5 h-5 text-gray-500" />
-              Definições
+              {t('header.settings')}
             </button>
           
             {user.role === "host" ? (
@@ -88,6 +90,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
               >
                 <House className="w-5 h-5 text-gray-500" />
                 Anfitrião
+                {t('header.hostMode')}
               </Link>
             ) : user.role === "admin" ? (
               <button
@@ -95,7 +98,9 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
                 <UserStar className="w-5 h-5 text-gray-500" />
+                {t('header.adminPanel')}
                 Menu Administração
+                Admin Panel
               </button>
             ) : (
               <>
@@ -109,8 +114,8 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
 
         <div className="border-t my-2"></div>
 
-        <Link to="/help" className={itemClasses}>
-          <HelpCircle className="w-5 h-5 text-gray-500" /> Centro de Ajuda
+        <Link to="/ajuda" className={itemClasses}>
+          <HelpCircle className="w-5 h-5 text-gray-500" /> {t('header.helpCenter')}
         </Link>
       </div>
     </div>

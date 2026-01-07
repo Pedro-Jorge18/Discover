@@ -4,8 +4,10 @@ import { Star, Trash2, Edit, MessageSquare } from 'lucide-react';
 import Header from '../Nav/Header.jsx';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function MyReviews({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,11 +31,11 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
     } catch (err) {
       console.error('Error fetching reviews:', err?.response || err);
       if (err?.response?.status === 401) {
-        notify('Sessão expirada. Por favor, faça login novamente.', 'error');
+        notify(t('auth.sessionExpired'), 'error');
       } else if (err?.response?.status === 404) {
-        notify('Rota de avaliações não encontrada. Verifique o backend.', 'error');
+        notify(t('review.routeNotFound'), 'error');
       } else {
-        notify('Erro ao carregar suas avaliações', 'error');
+        notify(t('review.errorLoadingYourReviews'), 'error');
       }
       setReviews([]);
     } finally {
@@ -42,14 +44,14 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir esta avaliação?')) return;
+    if (!confirm(t('review.confirmDelete'))) return;
 
     try {
       await api.delete(`/reviews/${id}`);
       setReviews(reviews.filter(r => r.id !== id));
-      notify('Avaliação excluída com sucesso', 'success');
+      notify(t('review.deletedSuccessfully'), 'success');
     } catch (err) {
-      notify('Erro ao excluir avaliação', 'error');
+      notify(t('review.errorDeleting'), 'error');
     }
   };
 
@@ -68,7 +70,7 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
 
   const handleUpdate = async (id) => {
     if (editForm.comment.length < 10) {
-      notify('O comentário deve ter pelo menos 10 caracteres', 'error');
+      notify(t('review.commentMinimumLength'), 'error');
       return;
     }
 
@@ -76,9 +78,9 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
       const response = await api.put(`/reviews/${id}`, editForm);
       setReviews(reviews.map(r => r.id === id ? response.data.review : r));
       setEditingReview(null);
-      notify('Avaliação atualizada com sucesso', 'success');
+      notify(t('review.updatedSuccessfully'), 'success');
     } catch (err) {
-      notify('Erro ao atualizar avaliação', 'error');
+      notify(t('review.errorUpdating'), 'error');
     }
   };
 
@@ -108,7 +110,7 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
           onOpenSettingsAdmin={onOpenSettingsAdmin}
         />
         <div className="max-w-4xl mx-auto px-4 py-8 pt-28">
-          <p className="text-center text-gray-500">A carregar suas avaliações...</p>
+          <p className="text-center text-gray-500">{t('review.loadingYourReviews')}</p>
         </div>
       </>
     );
@@ -123,12 +125,12 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
         onOpenSettingsAdmin={onOpenSettingsAdmin}
       />
       <div className="max-w-4xl mx-auto px-4 py-8 pt-28">
-        <h2 className="text-3xl font-bold mb-6 text-gray-900">Minhas Avaliações</h2>
+        <h2 className="text-3xl font-bold mb-6 text-gray-900">{t('review.myReviews')}</h2>
 
       {reviews.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-xl">
           <MessageSquare className="mx-auto mb-4 text-gray-400" size={64} />
-          <p className="text-gray-500">Você ainda não fez nenhuma avaliação</p>
+          <p className="text-gray-500">{t('review.noReviewsYet')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -138,10 +140,10 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg text-gray-900">
-                    {review.property?.title || review.property?.name || 'Propriedade'}
+                    {review.property?.title || review.property?.name || t('property.property')}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    {new Date(review.created_at).toLocaleDateString('pt-PT')} às {new Date(review.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(review.created_at).toLocaleDateString()} {t('common.at')} {new Date(review.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -157,7 +159,7 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
                     onClick={() => navigate(`/property/${review.property.id}`)}
                     className="text-sm px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition font-semibold"
                   >
-                    Ver Propriedade
+                    {t('property.viewProperty')}
                   </button>
                 </div>
               )}
@@ -182,7 +184,7 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
                       className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                     />
                     <label htmlFor={`recommend-${review.id}`} className="text-sm font-medium text-gray-700">
-                      Recomendaria esta propriedade
+                      {t('review.recommendThisProperty')}
                     </label>
                   </div>
                   <div className="flex gap-2">
@@ -190,13 +192,13 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
                       onClick={() => handleUpdate(review.id)}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
                     >
-                      Salvar
+                      {t('common.save')}
                     </button>
                     <button
                       onClick={cancelEdit}
                       className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                     >
-                      Cancelar
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </div>
@@ -221,19 +223,19 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
 
                   {/* Actions */}
                   <div className="flex gap-2 mt-4">
-                    <button
-                      onClick={() => startEdit(review)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                    >
-                      <Edit size={16} />
-                      Editar
-                    </button>
+                      <button
+                        onClick={() => startEdit(review)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <Edit size={16} />
+                        {t('common.edit')}
+                      </button>
                     <button
                       onClick={() => handleDelete(review.id)}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition"
                     >
-                      <Trash2 size={16} />
-                      Excluir
+                        <Trash2 size={16} />
+                        {t('common.delete')}
                     </button>
                   </div>
                 </>

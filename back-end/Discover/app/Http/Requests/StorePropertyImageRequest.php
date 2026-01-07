@@ -24,7 +24,7 @@ class StorePropertyImageRequest extends FormRequest
         $imageCount = count($this->images ?? []);
         return [
             'images' => 'required|array|min:1|max:10',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
             'primary_index' => 'sometimes|integer|min:0|max:' . ($imageCount > 0 ? $imageCount -1 : 0),
             'captions' => 'sometimes|array',
             'captions.*' => 'sometimes|string|max:255',
@@ -38,8 +38,8 @@ class StorePropertyImageRequest extends FormRequest
         return [
             'images.required' => 'At least one image is required.',
             'images.*.image' => 'Each file must be a valid image.',
-            'images.*.mimes' => 'Only JPEG, PNG, and JPG formats are allowed.',
-            'images.*.max' => 'Max file size is 5MB.',
+            'images.*.mimes' => 'Only JPEG, PNG, JPG and WebP formats are allowed.',
+            'images.*.max' => 'Each image must be smaller than 2MB. Please compress your images.',
 
         ];
     }
