@@ -10,10 +10,9 @@ function Footer() {
   
   // Array for footer links (Portuguese of Portugal)
   const links = [
-    { name: t('footer.privacy'), href: "#" },
-    { name: t('footer.terms'), href: "#" },
-    { name: t('footer.sitemap'), href: "#" },
-    { name: t('footer.companyInfo'), href: "#" }
+    { name: t('footer.privacy'), href: "/privacidade" },
+    { name: t('footer.terms'), href: "/termos" },
+    { name: t('footer.companyInfo'), href: "/empresa" }
   ];
 
   return (

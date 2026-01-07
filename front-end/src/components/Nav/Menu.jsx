@@ -96,7 +96,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
                 <UserStar className="w-5 h-5 text-gray-500" />
-                Admin Panel
+                {t('header.adminPanel')}
               </button>
             ) : (
               <>
@@ -110,8 +110,8 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
 
         <div className="border-t my-2"></div>
 
-        <Link to="/help" className={itemClasses}>
-          <HelpCircle className="w-5 h-5 text-gray-500" /> Help Center
+        <Link to="/ajuda" className={itemClasses}>
+          <HelpCircle className="w-5 h-5 text-gray-500" /> {t('header.helpCenter')}
         </Link>
       </div>
     </div>

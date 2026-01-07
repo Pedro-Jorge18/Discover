@@ -12,6 +12,10 @@ import SearchPage from '../components/Nav/SearchPage.jsx';
 import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
 import MyReviews from '../components/Review/MyReviews.jsx';
 import HostDashboard from '../components/Host/HostDashboard.jsx';
+import CompanyInfo from '../components/Layout/CompanyInfo.jsx';
+import TermsPage from '../components/Layout/TermsPage.jsx';
+import PrivacyPage from '../components/Layout/PrivacyPage.jsx';
+import HelpCenter from '../components/Layout/HelpCenter.jsx';
 
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
   // Simple frontend guards. Server must also enforce auth/roles.
@@ -59,6 +63,58 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           path="/favoritos" 
           element={
             <FavoritesPage 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Company Information Route */}
+        <Route 
+          path="/empresa" 
+          element={
+            <CompanyInfo 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Terms and Conditions Route */}
+        <Route 
+          path="/termos" 
+          element={
+            <TermsPage 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Privacy Policy Route */}
+        <Route 
+          path="/privacidade" 
+          element={
+            <PrivacyPage 
+              user={user} 
+              setUser={setUser} 
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
+          }
+        />
+
+        {/* Help Center Route */}
+        <Route 
+          path="/ajuda" 
+          element={
+            <HelpCenter 
               user={user} 
               setUser={setUser} 
               onOpenSettings={onOpenSettings}
@@ -118,7 +174,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
         <Route path="/register" element={<Registration />}/>
         <Route path="/forgotpassword" element={<ForgotPassword />}/>
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }
