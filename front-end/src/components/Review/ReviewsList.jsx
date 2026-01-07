@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Star, MessageSquare, Trash2, AlertCircle, X } from 'lucide-react';
+import { Star, MessageSquare, Trash2, AlertCircle, X, Edit2 } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 
@@ -9,6 +9,11 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editComment, setEditComment] = useState('');
+  const [editRecommend, setEditRecommend] = useState(false);
+  const [saving, setSaving] = useState(null);
+  const MAX_CHARACTERS = 1000;
 
   const fetchReviews = useCallback(async () => {
     try {
@@ -56,7 +61,10 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
       setDeleting(reviewId);
       await api.delete(`/reviews/${reviewId}`);
       notify('Avaliação apagada com sucesso', 'success');
-      fetchReviews(); // Reload reviews
+      // Refresh page to update all components
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err) {
       console.error('Error deleting review:', err);
       notify(err.response?.data?.message || 'Erro ao apagar avaliação', 'error');
@@ -67,10 +75,64 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
 
   const canDeleteReview = (review) => {
     if (!user) return false;
-    // Can delete if: owner, admin, or property host
+    // Can delete if: owner of review, admin, or property host
     return review.user?.id === user.id || 
            user.role === 'admin' || 
            propertyHostId === user.id;
+  };
+
+  const canEditReview = (review) => {
+    if (!user) return false;
+    // Only the review owner can edit their comment
+    return review.user?.id === user.id;
+  };
+
+  const handleEditReview = (review) => {
+    setEditingId(review.id);
+    setEditComment(review.comment);
+    setEditRecommend(review.recommend || false);
+  };
+
+  const handleCommentChange = (e) => {
+    const text = e.target.value;
+    if (text.length <= MAX_CHARACTERS) {
+      setEditComment(text);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editComment.trim()) {
+      notify('Comentário não pode estar vazio', 'error');
+      return;
+    }
+
+    try {
+      setSaving(editingId);
+      await api.put(`/reviews/${editingId}`, {
+        comment: editComment,
+        recommend: editRecommend
+      });
+      
+      notify('Comentário atualizado com sucesso', 'success');
+      // Update the review in the list
+      setReviews(reviews.map(r => 
+        r.id === editingId ? { ...r, comment: editComment, recommend: editRecommend } : r
+      ));
+      setEditingId(null);
+      setEditComment('');
+      setEditRecommend(false);
+    } catch (err) {
+      console.error('Error updating review:', err);
+      notify(err.response?.data?.message || 'Erro ao atualizar comentário', 'error');
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditComment('');
+    setEditRecommend(false);
   };
 
   const renderStars = (rating) => {
@@ -158,17 +220,29 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
       <div className="space-y-4">
         {reviews.map((review) => (
           <div key={review.id} className="bg-white border border-gray-200 rounded-xl p-6 relative">
-            {/* Delete Button - Only visible for admin, host, or review owner */}
-            {canDeleteReview(review) && (
-              <button
-                onClick={() => handleDeleteReview(review.id)}
-                disabled={deleting === review.id}
-                className="absolute top-4 right-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
-                title="Apagar avaliação"
-              >
-                <Trash2 size={18} />
-              </button>
-            )}
+            {/* Edit and Delete Buttons */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              {canEditReview(review) && (
+                <button
+                  onClick={() => handleEditReview(review)}
+                  disabled={editingId === review.id || saving === review.id}
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition disabled:opacity-50"
+                  title="Editar comentário"
+                >
+                  <Edit2 size={18} />
+                </button>
+              )}
+              {canDeleteReview(review) && (
+                <button
+                  onClick={() => handleDeleteReview(review.id)}
+                  disabled={deleting === review.id}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                  title="Apagar avaliação"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
+            </div>
 
             {/* User Info */}
             <div className="flex items-center gap-3 mb-3">
@@ -191,8 +265,55 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
               <span className="text-sm font-semibold text-gray-700">{review.rating_overall}</span>
             </div>
 
-            {/* Comment */}
-            <p className="text-gray-700 mb-3">{review.comment}</p>
+            {/* Comment - Edit or Display */}
+            {editingId === review.id ? (
+              <div className="mb-4 space-y-3">
+                <div>
+                  <textarea
+                    value={editComment}
+                    onChange={handleCommentChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg font-sans text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="4"
+                    maxLength={MAX_CHARACTERS}
+                  />
+                  <div className="mt-1 text-xs text-gray-500 text-right">
+                    {editComment.length}/{MAX_CHARACTERS}
+                  </div>
+                </div>
+
+                {/* Recommend Checkbox */}
+                <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <input
+                    type="checkbox"
+                    id={`recommend-${editingId}`}
+                    checked={editRecommend}
+                    onChange={(e) => setEditRecommend(e.target.checked)}
+                    className="w-4 h-4 rounded cursor-pointer"
+                  />
+                  <label htmlFor={`recommend-${editingId}`} className="text-sm font-semibold text-green-700 cursor-pointer">
+                    ✓ Recomendo esta propriedade
+                  </label>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={saving === editingId}
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                  >
+                    {saving === editingId ? 'A guardar...' : 'Guardar'}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-700 mb-3">{review.comment}</p>
+            )}
 
             {/* Recommend Badge */}
             {review.recommend && (
