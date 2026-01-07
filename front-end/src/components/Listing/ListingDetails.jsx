@@ -218,18 +218,70 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-    </div>
-  );
+    const handleImgError = (e, index) => {
+        e.target.onerror = null; 
+        e.target.src = fallbacks[index % 4];
+    };
 
-  if (!alojamento) return null;
+    const toggleFavorite = () => {
+        if (!user?.id) { navigate("/login"); return; }
+        const storageKey = `favoritos_user_${user.id}`;
+        let favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const exists = favs.some(f => String(f.id) === String(id));
 
-  return (
-    <div className="min-h-screen bg-white text-left font-sans text-gray-900">
-      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+        if (exists) {
+            favs = favs.filter(f => String(f.id) !== String(id));
+            setIsFavorite(false);
+        } else {
+            favs.push(alojamento);
+            setIsFavorite(true);
+        }
+        localStorage.setItem(storageKey, JSON.stringify(favs));
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new CustomEvent('favoritesUpdated'));
+    };
 
+    // Calculation logic for stay costs
+    const pricePerNight = Number(alojamento?.price_per_night || 0);
+    const cleaningFee = Number(alojamento?.cleaning_fee || 0);
+    const serviceFee = 20; 
+    const nights = (startDate && endDate) ? Math.max(0, differenceInDays(startOfDay(endDate), startOfDay(startDate))) : 0;
+    const nightsPrice = nights * pricePerNight;
+    const totalPrice = nights > 0 ? (nightsPrice + cleaningFee + serviceFee) : 0;
+
+    // Transition from summary modal to payment modal
+    const handleOpenPayment = () => {
+        setShowModal(false);
+        setShowPaymentModal(true);
+    };
+
+    // Final API call to process payment and reservation
+    const handleFinalPayment = async () => {
+        try {
+            setBookingLoading(true);
+            const response = await api.post('/payments', {
+                property_id: id,
+                check_in: startDate.toISOString().split('T')[0],
+                check_out: endDate.toISOString().split('T')[0],
+                guests: hospedes,
+                total_price: totalPrice
+            });
+
+            notify('Pagamento processado com sucesso!', 'success');
+            setShowPaymentModal(false);
+            navigate('/payment/success');
+
+        } catch (error) {
+            console.error("Payment submission error:", error);
+            notify(error.response?.data?.error || 'Erro ao processar o pagamento.', 'error');
+        } finally {
+            setBookingLoading(false);
+        }
+    };
+
+    if (loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-white font-sans">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
       <main className={`max-w-[1200px] mx-auto px-6 pt-28 pb-20 transition-all duration-700 ${showModal ? 'blur-xl scale-95 opacity-40 pointer-events-none' : ''}`}>
         
         {/* Header Section */}
@@ -283,6 +335,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
             />
           </div>
         </div>
+    );
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2">
@@ -457,10 +510,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
             </button>
           </div>
         </div>
-      )}
-
-    </div>
-  );
+    );
 }
 
 export default ListingDetails;

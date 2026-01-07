@@ -12,65 +12,70 @@ import SearchPage from '../components/Nav/SearchPage.jsx';
 import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
 import MyReviews from '../components/Review/MyReviews.jsx';
 import HostDashboard from '../components/Host/HostDashboard.jsx';
+import BookingSuccess from '../components/Booking/BookingSuccess.jsx';
 import CompanyInfo from '../components/Layout/CompanyInfo.jsx';
 import TermsPage from '../components/Layout/TermsPage.jsx';
 import PrivacyPage from '../components/Layout/PrivacyPage.jsx';
 import HelpCenter from '../components/Layout/HelpCenter.jsx';
 
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
-  // Simple frontend guards. Server must also enforce auth/roles.
-  const Protected = ({ children }) => {
-    if (!user) return <Navigate to="/login" replace />;
-    return children;
-  };
+    
+    // Auth guard for protected routes
+    const Protected = ({ children }) => {
+        if (!user) return <Navigate to="/login" replace />;
+        return children;
+    };
 
-  const RoleProtected = ({ role, children }) => {
-    if (!user) return <Navigate to="/login" replace />;
-    if (role && user.role !== role) return <Navigate to="/" replace />;
-    return children;
-  };
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route 
-          path="/" 
-          element={
-            <Home 
-              user={user} 
-              setUser={setUser} 
-              termoPesquisa={termoPesquisa} 
-              setTermoPesquisa={setTermoPesquisa}
-              onOpenSettings={onOpenSettings}
-              onOpenSettingsAdmin={onOpenSettingsAdmin}
-            />
-          }
-        />
+    // Role-based guard (admin/host)
+    const RoleProtected = ({ role, children }) => {
+        if (!user) return <Navigate to="/login" replace />;
+        if (role && user.role !== role) return <Navigate to="/" replace />;
+        return children;
+    };
 
-        <Route 
-          path="/search" 
-          element={
-            <SearchPage 
-              user={user} 
-              setUser={setUser} 
-              onOpenSettings={onOpenSettings}
-              onOpenSettingsAdmin={onOpenSettingsAdmin}
-            />
-          }
-        />
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Home Route */}
+                <Route 
+                    path="/" 
+                    element={
+                        <Home 
+                            user={user} 
+                            setUser={setUser} 
+                            termoPesquisa={termoPesquisa} 
+                            setTermoPesquisa={setTermoPesquisa}
+                            onOpenSettings={onOpenSettings}
+                            onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    } 
+                />
 
-        {/* Dedicated Favorites Route */}
-        <Route 
-          path="/favoritos" 
-          element={
-            <FavoritesPage 
-              user={user} 
-              setUser={setUser} 
-              onOpenSettings={onOpenSettings}
-              onOpenSettingsAdmin={onOpenSettingsAdmin}
-            />
-          }
-        />
+                {/* Search Route */}
+                <Route 
+                    path="/search" 
+                    element={
+                        <SearchPage 
+                            user={user} 
+                            setUser={setUser} 
+                            onOpenSettings={onOpenSettings}
+                            onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    } 
+                />
 
+                {/* Property Details Route */}
+                <Route 
+                    path="/property/:id" 
+                    element={
+                        <ListingDetails 
+                            user={user} 
+                            setUser={setUser} 
+                            onOpenSettings={onOpenSettings}
+                            onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    } 
+                />
         {/* Company Information Route */}
         <Route 
           path="/empresa" 
@@ -135,47 +140,69 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
           }
         />
 
-        {/* User & Settings Routes */}
-        <Route path="/host" element={
-          <RoleProtected role="host">
-            <HostDashboard 
-              user={user} 
-              setUser={setUser}
-              onOpenSettings={onOpenSettings}
-              onOpenSettingsAdmin={onOpenSettingsAdmin}
-            />
-          </RoleProtected>
-        } />
-        <Route path="/configuration" element={
-          <Protected>
-            <SettingsMain user={user} />
-          </Protected>
-        } />
-        <Route path="/adminMenu" element={
-          <RoleProtected role="admin">
-            <SettingsMain user={user} />
-          </RoleProtected>
-        } />
+                {/* Stripe Success Redirect */}
+                <Route path="/payment/success" element={<BookingSuccess />} />
 
-        {/* My Reviews Route */}
-        <Route path="/my-reviews" element={
-          <Protected>
-            <MyReviews 
-              user={user}
-              setUser={setUser}
-              onOpenSettings={onOpenSettings}
-              onOpenSettingsAdmin={onOpenSettingsAdmin}
-            />
-          </Protected>
-        } />
+                {/* Favorites Route */}
+                <Route 
+                    path="/favoritos" 
+                    element={
+                        <FavoritesPage 
+                            user={user} 
+                            setUser={setUser} 
+                            onOpenSettings={onOpenSettings}
+                            onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    } 
+                />
 
-        <Route path="/login" element={<Login setUser={setUser}/>}/>
-        <Route path="/auth/google/callback" element={<GoogleCallback setUser={setUser} />}/>
-        <Route path="/register" element={<Registration />}/>
-        <Route path="/forgotpassword" element={<ForgotPassword />}/>
-      </Routes>
-    </BrowserRouter>
-  );
+                {/* Host Dashboard */}
+                <Route path="/host" element={
+                    <RoleProtected role="host">
+                        <HostDashboard 
+                            user={user} 
+                            setUser={setUser}
+                            onOpenSettings={onOpenSettings}
+                            onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    </RoleProtected>
+                } />
+
+                {/* Configuration / Settings */}
+                <Route path="/configuration" element={
+                    <Protected>
+                        <SettingsMain user={user} />
+                    </Protected>
+                } />
+
+                {/* Admin Menu */}
+                <Route path="/adminMenu" element={
+                    <RoleProtected role="admin">
+                        <SettingsMain user={user} />
+                    </RoleProtected>
+                } />
+
+                {/* Reviews Management */}
+                <Route path="/my-reviews" element={
+                    <Protected>
+                        <MyReviews 
+                            user={user}
+                            setUser={setUser}
+                            onOpenSettings={onOpenSettings}
+                            onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    </Protected>
+                } />
+
+                {/* Authentication Routes */}
+                <Route path="/login" element={<Login setUser={setUser}/>}/>
+                <Route path="/auth/google/callback" element={<GoogleCallback setUser={setUser} />}/>
+                <Route path="/register" element={<Registration />}/>
+                <Route path="/forgotpassword" element={<ForgotPassword />}/>
+            </Routes>
+            <Footer />
+        </BrowserRouter>
+    );
 }
 
 export default AppRoutes;
