@@ -45,6 +45,9 @@ class PropertyService
         try {
 
             $data['host_id'] = Auth::id();
+            $data['published'] = true; // Imediatlely published
+            $data['published_at'] = now(); // Published timestamp
+            
             // DTO data
             $propertyData = PropertyData::fromArray($data);
 
@@ -106,7 +109,7 @@ class PropertyService
     public function listService(): JsonResponse
     {
         try {
-            $property = Property::with(['propertyType', 'listingType', 'images', 'city'])
+            $property = Property::with(['host', 'propertyType', 'listingType', 'images', 'city'])
                 ->leftJoin('reviews', 'properties.id', '=', 'reviews.property_id')
                 ->where('properties.published', true)
                 ->groupBy('properties.id')

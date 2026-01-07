@@ -30,18 +30,28 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [newProperty, setNewProperty] = useState({
     title: '',
     description: '',
+    summary: '',
     price_per_night: '',
     cleaning_fee: '',
     max_guests: '',
     bedrooms: '',
     bathrooms: '',
+    beds: '',
     city_id: '',
     address: '',
-    property_type: 'apartment'
+    neighborhood: '',
+    postal_code: '',
+    latitude: '',
+    longitude: '',
+    property_type: 'apartment',
+    listing_type: 'entire_place',
+    check_in_time: '15:00',
+    check_out_time: '11:00'
   });
 
-  // Estados para cidades
+  // Estados para cidades e imagens
   const [cities, setCities] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
 
   useEffect(() => {
     if (!user || user.role !== 'host') {
@@ -60,8 +70,29 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       // Busca todas as propriedades e filtra pelo usuário atual
       const response = await api.get('/properties');
       const allProperties = response.data?.data?.data || response.data?.data || response.data || [];
+      
+      console.log('All properties:', allProperties);
+      console.log('Current user ID:', user?.id);
+      
+      // Debug: log each property's host info
+      allProperties.forEach((prop, index) => {
+        console.log(`Property ${index + 1}:`, {
+          id: prop.id,
+          title: prop.title,
+          host: prop.host,
+          'host?.id': prop.host?.id,
+          'matches user': prop.host?.id === user?.id
+        });
+      });
+      
       // Filtra apenas as propriedades do usuário atual (host)
-      const myProperties = allProperties.filter(prop => prop.host_id === user?.id || prop.user_id === user?.id);
+      // A API retorna o host como um objeto, não como host_id
+      const myProperties = allProperties.filter(prop => {
+        return prop.host?.id === user?.id;
+      });
+      
+      console.log('My properties:', myProperties);
+      console.log('Filter matched:', myProperties.length, 'properties');
       setProperties(myProperties);
     } catch (error) {
       console.error('Error fetching properties:', error);
@@ -90,42 +121,138 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     setNewProperty(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 5) {
+      notify('Máximo de 5 imagens permitidas', 'warning');
+      return;
+    }
+    setSelectedImages(files);
+  };
+
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     
-    // Validação básica
-    if (!newProperty.title || !newProperty.price_per_night || !newProperty.city_id) {
-      notify('Por favor, preencha os campos obrigatórios', 'error');
-      return;
+    // Validação completa
+    const requiredFields = [
+      { field: 'title', message: 'Título' },
+      { field: 'summary', message: 'Resumo' },
+      { field: 'price_per_night', message: 'Preço por noite' },
+      { field: 'city_id', message: 'Cidade' },
+      { field: 'neighborhood', message: 'Bairro' },
+      { field: 'postal_code', message: 'Código Postal' },
+      { field: 'latitude', message: 'Latitude' },
+      { field: 'longitude', message: 'Longitude' },
+      { field: 'beds', message: 'Número de camas' }
+    ];
+
+    for (const { field, message } of requiredFields) {
+      if (!newProperty[field]) {
+        notify(`${message} é obrigatório`, 'error');
+        return;
+      }
     }
 
     try {
       setSubmitting(true);
-      await api.post('/properties', {
-        ...newProperty,
+      
+      // Mapear property_type para property_type_id
+      const propertyTypeMap = {
+        'apartment': 1,
+        'house': 2,
+        'villa': 3,
+        'studio': 4,
+        'room': 5
+      };
+
+      // Mapear listing_type para listing_type_id
+      const listingTypeMap = {
+        'entire_place': 1,
+        'private_room': 2,
+        'shared_room': 3
+      };
+
+      // Converter horários para formato Y-m-d H:i:s
+      const today = new Date().toISOString().split('T')[0]; // Data atual no formato Y-m-d
+      const checkInDateTime = `${today} ${newProperty.check_in_time}:00`;
+      const checkOutDateTime = `${today} ${newProperty.check_out_time}:00`;
+      
+      // Cria a propriedade
+      const response = await api.post('/properties', {
+        title: newProperty.title,
+        description: newProperty.description || 'Descrição da propriedade',
+        summary: newProperty.summary,
         price_per_night: parseFloat(newProperty.price_per_night),
-        cleaning_fee: parseFloat(newProperty.cleaning_fee || 0),
+        host_id: user.id,
+        check_in_time: checkInDateTime,
+        check_out_time: checkOutDateTime,
+        address: newProperty.address || 'Endereço não especificado',
+        neighborhood: newProperty.neighborhood,
+        postal_code: newProperty.postal_code,
+        city_id: parseInt(newProperty.city_id),
+        latitude: parseFloat(newProperty.latitude),
+        longitude: parseFloat(newProperty.longitude),
+        property_type_id: propertyTypeMap[newProperty.property_type] || 1,
+        listing_type_id: listingTypeMap[newProperty.listing_type] || 1,
         max_guests: parseInt(newProperty.max_guests || 1),
         bedrooms: parseInt(newProperty.bedrooms || 1),
+        beds: parseInt(newProperty.beds),
         bathrooms: parseInt(newProperty.bathrooms || 1),
-        city_id: parseInt(newProperty.city_id)
+        cleaning_fee: parseFloat(newProperty.cleaning_fee || 0)
       });
+
+      const propertyId = response.data?.data?.id || response.data?.id;
+
+      console.log('Property created - Full response:', response.data);
+      console.log('Property created - Property ID:', propertyId);
+      console.log('Property created - Has host?:', response.data?.data?.host || response.data?.host);
+
+      // Upload de imagens se houver
+      if (selectedImages.length > 0 && propertyId) {
+        const formData = new FormData();
+        selectedImages.forEach((image, index) => {
+          formData.append('images[]', image);
+        });
+
+        try {
+          await api.post(`/properties/${propertyId}/images`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        } catch (imgError) {
+          console.error('Error uploading images:', imgError);
+          notify('Propriedade criada, mas erro ao fazer upload das imagens', 'warning');
+        }
+      }
 
       notify('Propriedade publicada com sucesso!', 'success');
       setShowAddModal(false);
       setNewProperty({
         title: '',
         description: '',
+        summary: '',
         price_per_night: '',
         cleaning_fee: '',
         max_guests: '',
         bedrooms: '',
         bathrooms: '',
+        beds: '',
         city_id: '',
         address: '',
-        property_type: 'apartment'
+        neighborhood: '',
+        postal_code: '',
+        latitude: '',
+        longitude: '',
+        property_type: 'apartment',
+        listing_type: 'entire_place',
+        check_in_time: '15:00',
+        check_out_time: '11:00'
       });
-      fetchHostProperties();
+      setSelectedImages([]);
+      
+      // Aguarda um pouco antes de recarregar para garantir que a propriedade foi salva
+      setTimeout(() => {
+        fetchHostProperties();
+      }, 500);
     } catch (error) {
       console.error('Error creating property:', error);
       if (error.response?.data?.errors) {
@@ -174,8 +301,9 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         {/* Header Section */}
         <div className="flex justify-between items-center mb-12">
           <div>
+            <title>Discover - Painel Anfitrião</title>
             <h1 className="text-4xl font-black text-gray-900 mb-2 uppercase tracking-tight">
-              Painel de Anfitrião
+              Painel Anfitrião
             </h1>
             <p className="text-gray-600 font-medium">
               Gerir as suas propriedades publicadas
@@ -215,7 +343,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   Propriedades Ativas
                 </p>
                 <p className="text-3xl font-black text-green-600">
-                  {properties.filter(p => p.status === 'available').length}
+                  {properties.filter(p => p.settings?.published || p.status === 'available').length}
                 </p>
               </div>
               <div className="bg-green-100 p-4 rounded-xl">
@@ -231,7 +359,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   Receita Potencial
                 </p>
                 <p className="text-3xl font-black text-purple-600">
-                  €{properties.reduce((sum, p) => sum + (parseFloat(p.price_per_night) || 0), 0).toFixed(0)}
+                  €{properties.reduce((sum, p) => sum + (parseFloat(p.price?.per_night || p.price_per_night) || 0), 0).toFixed(0)}
                 </p>
               </div>
               <div className="bg-purple-100 p-4 rounded-xl">
@@ -256,7 +384,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
             >
               <Plus size={20} />
-              Publicar Primeira Propriedade
+              Primeira Publicação
             </button>
           </div>
         ) : (
@@ -298,17 +426,17 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                     <MapPin size={14} />
-                    <span className="line-clamp-1">{property.city?.name || 'Localização'}</span>
+                    <span className="line-clamp-1">{property.location?.city?.name || 'Localização'}</span>
                   </div>
 
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                     <span className="flex items-center gap-1">
                       <Users size={14} />
-                      {property.max_guests}
+                      {property.capacity?.max_guests || property.max_guests}
                     </span>
                     <span>•</span>
                     <span className="font-bold text-blue-600 text-lg">
-                      €{property.price_per_night}/noite
+                      €{property.price?.per_night || property.price_per_night}/noite
                     </span>
                   </div>
 
@@ -386,8 +514,24 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   value={newProperty.description}
                   onChange={handleInputChange}
                   placeholder="Descreva a sua propriedade..."
-                  rows="4"
+                  rows="3"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
+                />
+              </div>
+
+              {/* Resumo */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Resumo *
+                </label>
+                <textarea
+                  name="summary"
+                  value={newProperty.summary}
+                  onChange={handleInputChange}
+                  placeholder="Breve resumo da propriedade..."
+                  rows="2"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
+                  required
                 />
               </div>
 
@@ -428,7 +572,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               </div>
 
               {/* Grid para capacidades */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     Hóspedes
@@ -461,6 +605,22 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Camas *
+                  </label>
+                  <input
+                    type="number"
+                    name="beds"
+                    value={newProperty.beds}
+                    onChange={handleInputChange}
+                    placeholder="2"
+                    min="1"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
                     Casas de Banho
                   </label>
                   <input
@@ -475,59 +635,209 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                 </div>
               </div>
 
-              {/* Tipo de Propriedade */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Tipo de Propriedade
-                </label>
-                <select
-                  name="property_type"
-                  value={newProperty.property_type}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                >
-                  <option value="apartment">Apartamento</option>
-                  <option value="house">Casa</option>
-                  <option value="villa">Moradia</option>
-                  <option value="studio">Estúdio</option>
-                  <option value="room">Quarto</option>
-                </select>
+              {/* Tipo de Propriedade e Listing Type */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Tipo de Propriedade *
+                  </label>
+                  <select
+                    name="property_type"
+                    value={newProperty.property_type}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  >
+                    <option value="apartment">Apartamento</option>
+                    <option value="house">Casa</option>
+                    <option value="villa">Moradia</option>
+                    <option value="studio">Estúdio</option>
+                    <option value="room">Quarto</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Tipo de Alojamento *
+                  </label>
+                  <select
+                    name="listing_type"
+                    value={newProperty.listing_type}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  >
+                    <option value="entire_place">Local Inteiro</option>
+                    <option value="private_room">Quarto Privado</option>
+                    <option value="shared_room">Quarto Partilhado</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Cidade */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Cidade *
-                </label>
-                <select
-                  name="city_id"
-                  value={newProperty.city_id}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                  required
-                >
-                  <option value="">Selecione uma cidade</option>
-                  {cities.map(city => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
+              {/* Check-in e Check-out Times */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Hora Check-in *
+                  </label>
+                  <input
+                    type="time"
+                    name="check_in_time"
+                    value={newProperty.check_in_time}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Hora Check-out *
+                  </label>
+                  <input
+                    type="time"
+                    name="check_out_time"
+                    value={newProperty.check_out_time}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
               </div>
 
-              {/* Morada */}
+              {/* Cidade, Bairro e Código Postal */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Cidade *
+                  </label>
+                  <select
+                    name="city_id"
+                    value={newProperty.city_id}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  >
+                    <option value="">Selecione</option>
+                    {cities.map(city => (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Vizinhança *
+                  </label>
+                  <input
+                    type="text"
+                    name="neighborhood"
+                    value={newProperty.neighborhood}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Centro Histórico"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Código Postal *
+                  </label>
+                  <input
+                    type="text"
+                    name="postal_code"
+                    value={newProperty.postal_code}
+                    onChange={handleInputChange}
+                    placeholder="1000-001"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Morada, Latitude e Longitude */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Morada
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={newProperty.address}
+                    onChange={handleInputChange}
+                    placeholder="Rua, número..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Latitude *
+                  </label>
+                  <input
+                    type="number"
+                    name="latitude"
+                    value={newProperty.latitude}
+                    onChange={handleInputChange}
+                    placeholder="38.7223"
+                    step="0.000001"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Longitude *
+                  </label>
+                  <input
+                    type="number"
+                    name="longitude"
+                    value={newProperty.longitude}
+                    onChange={handleInputChange}
+                    placeholder="-9.1393"
+                    step="0.000001"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Upload de Imagens */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Morada
+                  Imagens da Propriedade
                 </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={newProperty.address}
-                  onChange={handleInputChange}
-                  placeholder="Rua, número, código postal..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                />
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <ImageIcon className="w-10 h-10 mb-3 text-gray-400" />
+                      <p className="mb-2 text-sm text-gray-500">
+                        <span className="font-semibold">Clique para fazer upload</span> ou arraste imagens
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG (máx. 5 imagens)</p>
+                      {selectedImages.length > 0 && (
+                        <p className="mt-2 text-xs text-blue-600 font-semibold">
+                          {selectedImages.length} imagem(ns) selecionada(s)
+                        </p>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  * Se não adicionar imagens, serão utilizadas imagens padrão
+                </p>
               </div>
 
               {/* Botões de ação */}
