@@ -48,6 +48,22 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     }
   };
 
+  const formatTime = (value, fallback = '--:--') => {
+    if (!value) return fallback;
+    if (typeof value === 'string') {
+      // Strict HH:MM
+      if (/^\d{2}:\d{2}$/.test(value)) return value;
+      // ISO date strings with T separator
+      if (value.includes('T')) {
+        const timePart = value.split('T')[1];
+        if (timePart && timePart.length >= 5) return timePart.slice(0, 5);
+      }
+      // Datetime with space separator
+      if (value.includes(' ')) return value.split(' ')[1]?.slice(0, 5) || fallback;
+    }
+    return fallback;
+  };
+
   // Check if user can review this property (only needs to be authenticated)
   const checkReviewEligibility = () => {
     if (user && user.id) {
@@ -251,6 +267,17 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Users size={16}/> {alojamento.max_guests} hóspedes</span>
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={16}/> {alojamento.bedrooms} quartos</span>
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={16}/> {alojamento.bathrooms || 1} banho</span>
+            </div>
+
+            <div className="flex flex-wrap gap-3 mb-10 text-xs font-black uppercase text-gray-500 tracking-widest">
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+                <span className="text-gray-400">Check-in</span>
+                <span className="text-gray-800">{formatTime(alojamento.check_in_time, '15:00')}</span>
+              </span>
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+                <span className="text-gray-400">Check-out</span>
+                <span className="text-gray-800">{formatTime(alojamento.check_out_time, '11:00')}</span>
+              </span>
             </div>
 
             <ListingInfo
