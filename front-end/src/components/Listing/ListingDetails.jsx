@@ -170,7 +170,12 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
     // Return the valid photo if available at this index
     if (validPhotos[index]) {
-      return validPhotos[index].image_path || validPhotos[index].url || validPhotos[index].path;
+      const image = validPhotos[index];
+      const raw = image.image_url || image.url || image.image_path || image.path;
+      if (!raw) return backupPlaceholders[index % backupPlaceholders.length];
+      if (raw.startsWith('http')) return raw;
+      const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      return `${base}/storage/${raw.replace(/^\/storage\//, '')}`;
     }
 
     // Otherwise, use a placeholder from the list based on the slot index
@@ -286,6 +291,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               guests={alojamento.max_guests}
               bedrooms={alojamento.bedrooms}
               bathrooms={alojamento.bathrooms || 1}
+              address={alojamento.location?.address || alojamento.address}
             />
 
             {/* Reviews Section */}

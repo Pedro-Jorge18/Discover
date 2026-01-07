@@ -355,39 +355,40 @@ function PropertyFormModal({
           </div>
 
           {/* Upload de Imagens */}
-          {!isEditing && (
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Imagens da Propriedade
-              </label>
-              <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <ImageIcon className="w-10 h-10 mb-3 text-gray-400" />
-                    <p className="mb-2 text-sm text-gray-500">
-                      <span className="font-semibold">Clique para fazer upload</span> ou arraste imagens
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              {isEditing ? 'Adicionar Novas Imagens' : 'Imagens da Propriedade'}
+            </label>
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <ImageIcon className="w-10 h-10 mb-3 text-gray-400" />
+                  <p className="mb-2 text-sm text-gray-500">
+                    <span className="font-semibold">Clique para fazer upload</span> ou arraste imagens
+                  </p>
+                  <p className="text-xs text-gray-500">PNG, JPG, WebP (máx. 5 imagens, 2MB cada)</p>
+                  {selectedImages.length > 0 && (
+                    <p className="mt-2 text-xs text-blue-600 font-semibold">
+                      {selectedImages.length} imagem(ns) selecionada(s)
                     </p>
-                    <p className="text-xs text-gray-500">PNG, JPG (máx. 5 imagens)</p>
-                    {selectedImages.length > 0 && (
-                      <p className="mt-2 text-xs text-blue-600 font-semibold">
-                        {selectedImages.length} imagem(ns) selecionada(s)
-                      </p>
-                    )}
-                  </div>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    multiple
-                    onChange={onImageChange}
-                  />
-                </label>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                * Se não adicionar imagens, serão utilizadas imagens padrão
-              </p>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  multiple
+                  onChange={onImageChange}
+                />
+              </label>
             </div>
-          )}
+            <p className="text-xs text-gray-500 mt-2">
+              {isEditing 
+                ? '* Adicione novas imagens (as existentes serão mantidas)'
+                : '* Se não adicionar imagens, serão utilizadas imagens padrão'
+              }
+            </p>
+          </div>
 
           {/* Botões de ação */}
           <div className="flex gap-3 pt-4">

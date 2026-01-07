@@ -31,6 +31,7 @@ function FavoritesPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
   return (
     <div className="min-h-screen bg-white text-left">
+      <title>Discover - Favoritos</title>
       <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 pt-44 pb-20">
         <div className="flex items-center gap-4 mb-12">

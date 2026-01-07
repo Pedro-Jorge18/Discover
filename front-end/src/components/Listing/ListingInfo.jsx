@@ -1,7 +1,7 @@
 import React from 'react';
-import { Users, Bed, Bath } from 'lucide-react';
+import { Users, Bed, Bath, MapPin } from 'lucide-react';
 
-const ListingInfo = ({ city, description, guests, bedrooms, bathrooms }) => {
+const ListingInfo = ({ city, description, guests, bedrooms, bathrooms, address }) => {
   return (
     <div className="lg:col-span-2">
       <div className="border-b border-gray-100 pb-10 mb-10">
@@ -10,6 +10,10 @@ const ListingInfo = ({ city, description, guests, bedrooms, bathrooms }) => {
           <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Users size={20}/> {guests} hóspedes</span>
           <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={20}/> {bedrooms} quartos</span>
           <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={20}/> {bathrooms} banho</span>
+        </div>
+        <div className="mt-6 flex items-start gap-2 text-gray-600 text-base font-semibold">
+          <MapPin size={18} className="text-blue-600 mt-0.5" />
+          <span className="leading-snug">{address || 'Morada não definida'}</span>
         </div>
       </div>
       <div className="mb-12">

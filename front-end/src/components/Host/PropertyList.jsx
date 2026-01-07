@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Users, Eye, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
+import { MapPin, Users, Eye, Edit, Trash2 } from 'lucide-react';
 
 function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) {
   if (!properties || properties.length === 0) {
@@ -13,23 +13,14 @@ function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) 
           key={property.id}
           className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition group"
         >
-          {/* Image */}
-          <div className="relative h-48 bg-gray-200 overflow-hidden">
-            {property.images && property.images[0] ? (
-              <img
-                src={property.images[0].image_path || property.images[0].url}
-                alt={property.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ImageIcon size={48} className="text-gray-400" />
-              </div>
-            )}
-            <div className="absolute top-3 right-3">
+          <div className="p-5">
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-lg font-black text-gray-900 line-clamp-1">
+                {property.title}
+              </h3>
               <button
                 onClick={() => onToggleStatus(property.id, property.published)}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition ${
+                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide transition ${
                   property.published
                     ? 'bg-green-500 text-white hover:bg-green-600' 
                     : 'bg-gray-500 text-white hover:bg-gray-600'
@@ -38,18 +29,15 @@ function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) 
                 {property.published ? 'Ativo' : 'Inativo'}
               </button>
             </div>
-          </div>
 
-          {/* Info */}
-          <div className="p-5">
-            <h3 className="text-lg font-black text-gray-900 mb-2 line-clamp-1">
-              {property.title}
-            </h3>
-            
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
               <MapPin size={14} />
               <span className="line-clamp-1">{property.location?.city?.name || 'Localização'}</span>
             </div>
+
+            <p className="text-xs font-semibold text-gray-500 mb-3 line-clamp-2">
+              {property.location?.address || property.address || 'Morada não definida'}
+            </p>
 
             <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
               <span className="flex items-center gap-1">

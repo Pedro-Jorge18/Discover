@@ -103,6 +103,16 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       notify('Máximo de 5 imagens permitidas', 'warning');
       return;
     }
+    
+    // Check file sizes (2MB = 2 * 1024 * 1024 bytes)
+    const maxSize = 2 * 1024 * 1024;
+    const oversizedFiles = files.filter(file => file.size > maxSize);
+    
+    if (oversizedFiles.length > 0) {
+      notify(`${oversizedFiles.length} imagem(ns) excedem 2MB. Por favor, comprima as imagens antes de fazer upload.`, 'error');
+      return;
+    }
+    
     setSelectedImages(files);
   };
 
@@ -159,14 +169,27 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       const propertyTypeMap = { apartment: 1, house: 2, villa: 3, studio: 4, room: 5 };
       const listingTypeMap = { entire_place: 1, private_room: 2, shared_room: 3 };
 
+      // Format times based on operation: Y-m-d H:i:s for create, H:i for update
+      let checkInFormatted, checkOutFormatted;
+      if (editingProperty) {
+        // For update: just H:i
+        checkInFormatted = formData.check_in_time;
+        checkOutFormatted = formData.check_out_time;
+      } else {
+        // For create: Y-m-d H:i:s
+        const today = new Date().toISOString().split('T')[0];
+        checkInFormatted = `${today} ${formData.check_in_time}:00`;
+        checkOutFormatted = `${today} ${formData.check_out_time}:00`;
+      }
+
       const propertyData = {
         title: formData.title,
         description: formData.description || 'Descrição da propriedade',
         summary: formData.summary,
         price_per_night: parseFloat(formData.price_per_night),
         host_id: user.id,
-        check_in_time: formData.check_in_time,
-        check_out_time: formData.check_out_time,
+        check_in_time: checkInFormatted,
+        check_out_time: checkOutFormatted,
         address: formData.address || 'Endereço não especificado',
         neighborhood: formData.neighborhood,
         postal_code: formData.postal_code,
@@ -193,16 +216,20 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
       const propertyId = response.data?.data?.id || response.data?.id || editingProperty?.id;
 
-      if (!editingProperty && selectedImages.length > 0 && propertyId) {
+      // Upload images for both new and edited properties
+      if (selectedImages.length > 0 && propertyId) {
         const formDataImages = new FormData();
         selectedImages.forEach(image => formDataImages.append('images[]', image));
         try {
           await api.post(`/properties/${propertyId}/images`, formDataImages, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
+          if (editingProperty) {
+            notify('Imagens adicionadas com sucesso!', 'success');
+          }
         } catch (imgError) {
           console.error('Error uploading images:', imgError);
-          notify('Propriedade criada, mas erro ao fazer upload das imagens', 'warning');
+          notify(editingProperty ? 'Erro ao adicionar imagens' : 'Propriedade criada, mas erro ao fazer upload das imagens', 'warning');
         }
       }
 
@@ -337,6 +364,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <title>Discover - Painel Anfitrião</title>
       <Header 
         user={user} 
         setUser={setUser} 
