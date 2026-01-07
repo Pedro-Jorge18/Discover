@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorAuthController;
@@ -32,6 +33,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
     });
+
+    //profile routes
+    Route::put('/user', [UserController::class, 'update']);
+    Route::delete('/user', [UserController::class, 'destroy']);
 
     // Properties protegidas
     Route::apiResource('properties', PropertyController::class)->only(['store', 'update', 'destroy']);
