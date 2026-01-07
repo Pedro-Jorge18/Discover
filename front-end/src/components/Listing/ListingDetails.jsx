@@ -253,16 +253,36 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         {/* Gallery Section - Instant Load Logic */}
         <div className="grid grid-cols-4 gap-2 h-[550px] rounded-[3rem] overflow-hidden mb-12 shadow-2xl bg-gray-50 border border-gray-100">
           <div className="col-span-2 row-span-2 overflow-hidden bg-gray-200">
-            <img src={getImageUrl(0)} className="w-full h-full object-cover hover:scale-105 transition duration-700" alt="Destaque" />
+            <img 
+              src={getImageUrl(0)} 
+              className="w-full h-full object-cover hover:scale-105 transition duration-700" 
+              alt="Destaque"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800'; }}
+            />
           </div>
           <div className="overflow-hidden bg-gray-200">
-            <img src={getImageUrl(1)} className="w-full h-full object-cover" alt="Interior 1" />
+            <img 
+              src={getImageUrl(1)} 
+              className="w-full h-full object-cover" 
+              alt="Interior 1"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800'; }}
+            />
           </div>
           <div className="overflow-hidden bg-gray-200">
-            <img src={getImageUrl(2)} className="w-full h-full object-cover" alt="Interior 2" />
+            <img 
+              src={getImageUrl(2)} 
+              className="w-full h-full object-cover" 
+              alt="Interior 2"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800'; }}
+            />
           </div>
           <div className="col-span-2 overflow-hidden bg-gray-200">
-            <img src={getImageUrl(3)} className="w-full h-full object-cover" alt="Interior 3" />
+            <img 
+              src={getImageUrl(3)} 
+              className="w-full h-full object-cover" 
+              alt="Interior 3"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800'; }}
+            />
           </div>
         </div>
 
@@ -344,7 +364,13 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                 </div>
               )}
 
-              <ReviewsList propertyId={id} key={reviewRefreshTrigger} onStatsUpdate={handleStatsUpdate} />
+              <ReviewsList 
+                propertyId={id} 
+                key={reviewRefreshTrigger} 
+                onStatsUpdate={handleStatsUpdate}
+                user={user}
+                propertyHostId={alojamento?.host?.id}
+              />
             </div>
           </div>
 
