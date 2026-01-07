@@ -12,7 +12,7 @@ import { differenceInDays, addDays, startOfDay } from 'date-fns';
 import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
 
-function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {
   const { id } = useParams();
   const navigate = useNavigate();
   
@@ -87,6 +87,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       checkFavoriteStatus();
       checkReviewEligibility();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, user]);
 
   // Renderizar as estrelas baseado no rating
@@ -207,7 +208,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
   return (
     <div className="min-h-screen bg-white text-left font-sans text-gray-900">
-      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
 
       <main className={`max-w-[1200px] mx-auto px-6 pt-28 pb-20 transition-all duration-700 ${showModal ? 'blur-xl scale-95 opacity-40 pointer-events-none' : ''}`}>
         

@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../components/HomePage/Home.jsx'; 
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
-import SettingsHost from '../components/Settings/SettingsHost.jsx';
 import Login from '../components/Auth/Login.jsx';
 import GoogleCallback from '../components/Auth/GoogleCallback.jsx';
 import Registration from '../components/Auth/Registration.jsx';
@@ -12,8 +11,9 @@ import SettingsMain from '../components/Settings/SettingsMain.jsx';
 import SearchPage from '../components/Nav/SearchPage.jsx';
 import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
 import MyReviews from '../components/Review/MyReviews.jsx';
+import HostDashboard from '../components/Host/HostDashboard.jsx';
 
-function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
   // Simple frontend guards. Server must also enforce auth/roles.
   const Protected = ({ children }) => {
     if (!user) return <Navigate to="/login" replace />;
@@ -37,7 +37,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
               termoPesquisa={termoPesquisa} 
               setTermoPesquisa={setTermoPesquisa}
               onOpenSettings={onOpenSettings}
-              onOpenSettingsHost={onOpenSettingsHost}
               onOpenSettingsAdmin={onOpenSettingsAdmin}
             />
           }
@@ -50,7 +49,7 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
               user={user} 
               setUser={setUser} 
               onOpenSettings={onOpenSettings}
-              onOpenSettingsHost={onOpenSettingsHost}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
             />
           }
         />
@@ -63,7 +62,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
               user={user} 
               setUser={setUser} 
               onOpenSettings={onOpenSettings}
-              onOpenSettingsHost={onOpenSettingsHost}
               onOpenSettingsAdmin={onOpenSettingsAdmin}
             />
           }
@@ -76,7 +74,7 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
               user={user} 
               setUser={setUser} 
               onOpenSettings={onOpenSettings}
-              onOpenSettingsHost={onOpenSettingsHost}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
             />
           }
         />
@@ -84,7 +82,12 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
         {/* User & Settings Routes */}
         <Route path="/host" element={
           <RoleProtected role="host">
-            <SettingsHost user={user} />
+            <HostDashboard 
+              user={user} 
+              setUser={setUser}
+              onOpenSettings={onOpenSettings}
+              onOpenSettingsAdmin={onOpenSettingsAdmin}
+            />
           </RoleProtected>
         } />
         <Route path="/configuration" element={
@@ -105,7 +108,6 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
               user={user}
               setUser={setUser}
               onOpenSettings={onOpenSettings}
-              onOpenSettingsHost={onOpenSettingsHost}
               onOpenSettingsAdmin={onOpenSettingsAdmin}
             />
           </Protected>

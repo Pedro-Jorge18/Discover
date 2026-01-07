@@ -6,7 +6,7 @@ import PropertyCard from '../HomePage/PropertyCard.jsx';
 import PropertySkeleton from '../HomePage/PropertySkeleton.jsx';
 import api from '../../api/axios';
 
-function SearchPage({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function SearchPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -39,7 +39,7 @@ function SearchPage({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenS
 
   return (
     <div className="min-h-screen bg-white">
-      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
       <main className="max-w-[1790px] mx-auto px-10 pt-32 pb-20 text-left">
         <h1 className="text-4xl font-black italic uppercase tracking-tighter mb-12 underline decoration-blue-500 decoration-8 underline-offset-4">Resultados</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
