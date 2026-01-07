@@ -95,7 +95,7 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">A carregar avaliações...</p>
+        <p className="text-gray-500">{t('review.loading')}</p>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
     return (
       <div className="text-center py-8">
         <MessageSquare className="mx-auto mb-3 text-gray-400" size={48} />
-        <p className="text-gray-500">Ainda não há avaliações para esta propriedade</p>
+        <p className="text-gray-500">{t('review.noPropertyReviews')}</p>
       </div>
     );
   }
