@@ -480,8 +480,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
             bookingLoading={bookingLoading}
         />
       )}
-
-      <Footer />
     </div>
   );
 }
