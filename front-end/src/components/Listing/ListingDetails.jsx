@@ -8,7 +8,7 @@ import notify from '../../utils/notify';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { pt } from 'date-fns/locale';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, addDays, startOfDay } from 'date-fns';
 import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
 
@@ -21,6 +21,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   // Reservation dates state
   const [startDate, setStartDate] = useState(new Date());
@@ -43,6 +44,17 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
           rating: parseFloat(stats.average_rating).toFixed(2)
         }
       }));
+    }
+  };
+
+  // Check if user can review this property (only needs to be authenticated)
+  const checkReviewEligibility = () => {
+    if (user && user.id) {
+      setCanReview(true);
+      // Create a temporary reservation object for the form
+      setEligibleReservation({ id: null });
+    } else {
+      setCanReview(false);
     }
   };
 
@@ -77,17 +89,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     }
   }, [id, user]);
 
-  // Check if user can review this property (only needs to be authenticated)
-  const checkReviewEligibility = () => {
-    if (user && user.id) {
-      setCanReview(true);
-      // Create a temporary reservation object for the form
-      setEligibleReservation({ id: null });
-    } else {
-      setCanReview(false);
-    }
-  };
-
   // Renderizar as estrelas baseado no rating
   const renderStars = (rating) => {
     return (
@@ -116,8 +117,29 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       navigate("/login");
       return;
     }
+    
+    const storageKey = `favoritos_user_${user.id}`;
+    const favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const isCurrentlyFavorite = favs.some(f => String(f.id) === String(id));
 
-    // 2. High-quality architectural placeholders to avoid delays
+    if (isCurrentlyFavorite) {
+      // Remove from favorites
+      const newFavs = favs.filter(f => String(f.id) !== String(id));
+      localStorage.setItem(storageKey, JSON.stringify(newFavs));
+      setIsFavorite(false);
+      notify('Removido dos favoritos', 'info');
+    } else {
+      // Add to favorites
+      const newFavs = [...favs, alojamento];
+      localStorage.setItem(storageKey, JSON.stringify(newFavs));
+      setIsFavorite(true);
+      notify('Adicionado aos favoritos', 'success');
+    }
+  };
+
+  // Get image URL or placeholder
+  const getImageUrl = (index) => {
+    // High-quality architectural placeholders to avoid delays
     const backupPlaceholders = [
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800', // Sala
       'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800', // Quarto
@@ -125,12 +147,15 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800'  // Casa de Banho
     ];
 
-    // 3. Return the valid photo if available at this index
+    // Get valid photos from alojamento
+    const validPhotos = alojamento?.images || [];
+
+    // Return the valid photo if available at this index
     if (validPhotos[index]) {
       return validPhotos[index].image_path || validPhotos[index].url || validPhotos[index].path;
     }
 
-    // 4. Otherwise, use a placeholder from the list based on the slot index
+    // Otherwise, use a placeholder from the list based on the slot index
     return backupPlaceholders[index % backupPlaceholders.length];
   };
 
@@ -164,7 +189,8 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       });
       setShowModal(false);
       notify('Reserva efetuada com sucesso!', 'success');
-    } catch (err) {
+    } catch (error) {
+      console.error('Booking error:', error);
       notify('Erro ao processar reserva.', 'error');
     } finally {
       setBookingLoading(false);
@@ -195,7 +221,9 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
           </div>
           <div className="flex gap-3">
              <button className="p-3 border rounded-full hover:bg-gray-50 transition shadow-sm"><Share2 size={18}/></button>
-             <button className="p-3 border rounded-full hover:bg-gray-50 transition shadow-sm"><Heart size={18}/></button>
+             <button onClick={toggleFavorite} className={`p-3 border rounded-full hover:bg-gray-50 transition shadow-sm ${isFavorite ? 'bg-red-50 border-red-300' : ''}`}>
+               <Heart size={18} className={isFavorite ? 'fill-red-500 text-red-500' : ''}/>
+             </button>
           </div>
         </div>
 
