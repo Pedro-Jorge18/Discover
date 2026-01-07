@@ -1,25 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Star, MessageSquare, Trash2, AlertCircle, X } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
-import { useTranslation } from '../../contexts/TranslationContext';
 
-export default function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
-export default function ReviewsList({ propertyId, onStatsUpdate }) {
-  const { t } = useTranslation();
+function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
 
-  useEffect(() => {
-    if (propertyId) {
-      fetchReviews();
-    }
-  }, [propertyId]);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const response = await api.get(`/properties/${propertyId}/reviews`);
       console.log('Reviews API Response:', response.data);
@@ -40,12 +31,18 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
       }
     } catch (err) {
       console.error('Error fetching reviews:', err);
-      notify(t('review.errorLoadingReviews'), 'error');
+      notify('Erro ao carregar avaliações', 'error');
       setReviews([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [propertyId, onStatsUpdate]);
+
+  useEffect(() => {
+    if (propertyId) {
+      fetchReviews();
+    }
+  }, [propertyId, fetchReviews]);
 
   const handleDeleteReview = async (reviewId) => {
     setConfirmDelete(reviewId);
@@ -95,7 +92,7 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">{t('review.loading')}</p>
+        <p className="text-gray-500">A carregar avaliações...</p>
       </div>
     );
   }
@@ -104,7 +101,7 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
     return (
       <div className="text-center py-8">
         <MessageSquare className="mx-auto mb-3 text-gray-400" size={48} />
-        <p className="text-gray-500">{t('review.noPropertyReviews')}</p>
+        <p className="text-gray-500">Esta propriedade ainda não tem avaliações</p>
       </div>
     );
   }
@@ -260,4 +257,6 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
       )}
     </div>
   );
-}
+};
+
+export default ReviewsList;
