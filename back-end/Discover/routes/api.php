@@ -20,7 +20,7 @@ Route::apiResource('properties', PropertyController::class)->only('index', 'show
 // Rotas públicas de reviews (listar reviews de propriedades)
 Route::get('properties/{property}/reviews', [ReviewController::class, 'propertyReviews']);
 Route::get('reviews', [ReviewController::class, 'index']);
-Route::get('reviews/{review}', [ReviewController::class, 'show']);
+Route::get('reviews-test-public', function() { return response()->json(['message' => 'Public reviews route working']); });
 
 // Autenticação
 Route::prefix('auth')->group(function () {
@@ -93,11 +93,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas de REVIEWS (autenticadas)
     Route::prefix('reviews')->group(function () {
-        Route::post('/', [ReviewController::class, 'store']); // Criar review
         Route::get('/my-reviews', [ReviewController::class, 'userReviews']); // Reviews do usuário autenticado
         Route::get('/can-review/{reservation}', [ReviewController::class, 'canReview']); // Verificar se pode avaliar
-        Route::put('/{review}', [ReviewController::class, 'update']); // Atualizar review ou adicionar resposta do host
+        Route::post('/', [ReviewController::class, 'store']); // Criar review
         Route::delete('/{review}', [ReviewController::class, 'destroy']); // Deletar review
+        Route::put('/{review}', [ReviewController::class, 'update']); // Atualizar review ou adicionar resposta do host
+        Route::get('/{review}', [ReviewController::class, 'show']); // DEVE SER A ÚLTIMA - captura qualquer ID
     });
 });
 

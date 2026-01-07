@@ -6,26 +6,34 @@ export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-  const [oldPasswordError, setOldPasswordError] = useState("");
-  const [newPasswordError, setNewPasswordError] = useState("");
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (newPassword !== confirmPassword) {
-      setNewPasswordError("A nova password e a confirmação não coincidem.");
+      window.dispatchEvent(new CustomEvent('app-notify', {
+        detail: {
+          message: 'A nova password e a confirmação não coincidem.',
+          type: 'error'
+        }
+      }));
+      return;
+    }
+
+    // Verify if the new password is the same as the old one
+    if (oldPassword === newPassword) {
+      window.dispatchEvent(new CustomEvent('app-notify', {
+        detail: {
+          message: 'Está a alterar a palavra-passe para a anterior.',
+          type: 'error'
+        }
+      }));
       return;
     }
     
-    // clear field errors before request
-    setOldPasswordError("");
-    setNewPasswordError("");
-
     try {
       // For authenticated users we call change-password endpoint
       const res = await api.post("/auth/change-password", {
@@ -47,19 +55,27 @@ export default function ResetPassword() {
       console.error("Erro ao resetar password:", err);
 
       const errors = err.response?.data?.errors;
-      if (errors) {
-        if (errors.current_password) {
-          setOldPasswordError(errors.current_password.join(' '));
-        }
-        if (errors.password) {
-          setNewPasswordError(errors.password.join(' '));
-        }
-        // if there is a general message, show it in the top-level error
-        if (err.response?.data?.message) {
-          setError(err.response.data.message);
-        }
+      if (errors?.current_password) {
+        window.dispatchEvent(new CustomEvent('app-notify', {
+          detail: {
+            message: 'Palavra-passe antiga incorreta',
+            type: 'error'
+          }
+        }));
+      } else if (errors?.password) {
+        window.dispatchEvent(new CustomEvent('app-notify', {
+          detail: {
+            message: errors.password.join(' '),
+            type: 'error'
+          }
+        }));
       } else {
-        setError(err.response?.data?.message || 'Erro interno do servidor');
+        window.dispatchEvent(new CustomEvent('app-notify', {
+          detail: {
+            message: err.response?.data?.message || 'Erro interno do servidor',
+            type: 'error'
+          }
+        }));
       }
     }
   };
@@ -81,7 +97,7 @@ export default function ResetPassword() {
               <input
                 type={showOldPassword ? 'text' : 'password'}
                 value={oldPassword}
-                onChange={(e) => { setOldPassword(e.target.value); setOldPasswordError(""); setError(""); }}
+                onChange={(e) => setOldPassword(e.target.value)}
                 placeholder="Insira a sua palavra-passe atual"
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
@@ -95,7 +111,6 @@ export default function ResetPassword() {
                 {showOldPassword ? '🙈' : '👁️'}
               </button>
             </div>
-            {oldPasswordError && <p className="text-red-500 text-sm mt-1">{oldPasswordError}</p>}
           </div>
 
           {/* New password */}
@@ -107,7 +122,7 @@ export default function ResetPassword() {
               <input
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
-                onChange={(e) => { setNewPassword(e.target.value); setNewPasswordError(""); setError(""); }}
+                onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Insira a sua nova palavra-passe"
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
@@ -121,7 +136,6 @@ export default function ResetPassword() {
                 {showNewPassword ? '🙈' : '👁️'}
               </button>
             </div>
-            {newPasswordError && <p className="text-red-500 text-sm mt-1">{newPasswordError}</p>}
           </div>
 
           {/* Confirm new password */}
@@ -148,9 +162,6 @@ export default function ResetPassword() {
               </button>
             </div>
           </div>
-
-          {/* Error message */}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           {/* Button */}
           <button

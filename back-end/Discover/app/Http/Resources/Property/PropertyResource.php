@@ -138,20 +138,14 @@ class PropertyResource extends JsonResource
                 ] : null;
             }),
             'images' => PropertyImageResource::collection($this->whenLoaded('images')),
-            /*
-
-            'property_type' => new PropertyTypeResource($this->whenLoaded('propertyType')),
-            'listing_type' => new ListingTypeResource($this->whenLoaded('listingType')),
-            'city' => new CityResource($this->whenLoaded('city')),
-
-
-            // metricas para futuras rotas
+            
+            // metricas
             'metrics' => [
                 'rating' => (float) $this->rating,
                 'reviews_count' => $this->reviews_count,
                 'views' => $this->views,
             ],
-            */
+            
             'dates' => [
                 'created_at' => $this->created_at?->toISOString(),
                 'published_at' => $this->published_at?->toISOString(),

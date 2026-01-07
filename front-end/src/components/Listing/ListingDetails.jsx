@@ -8,7 +8,9 @@ import notify from '../../utils/notify';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { pt } from 'date-fns/locale';
-import { differenceInDays, addDays, startOfDay } from 'date-fns';
+import { differenceInDays } from 'date-fns';
+import ReviewsList from '../Review/ReviewsList.jsx';
+import ReviewForm from '../Review/ReviewForm.jsx';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
   const { id } = useParams();
@@ -25,6 +27,36 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   const [endDate, setEndDate] = useState(addDays(new Date(), 1));
   const [hospedes, setHospedes] = useState(1);
 
+  // Review States
+  const [canReview, setCanReview] = useState(false);
+  const [eligibleReservation, setEligibleReservation] = useState(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
+
+  const handleStatsUpdate = (stats) => {
+    if (stats && stats.average_rating && alojamento) {
+      // Atualiza o rating da propriedade baseado nas reviews
+      setAlojamento(prev => ({
+        ...prev,
+        metrics: {
+          ...prev.metrics,
+          rating: parseFloat(stats.average_rating).toFixed(2)
+        }
+      }));
+    }
+  };
+
+  // Check if this property is in user's favorites
+  const checkFavoriteStatus = () => {
+    if (!user || !user.id) {
+      setIsFavorite(false);
+      return;
+    }
+    const storageKey = `favoritos_user_${user.id}`;
+    const favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    setIsFavorite(favs.some(f => String(f.id) === String(id)));
+  };
+
   useEffect(() => {
     const fetchProperty = async () => {
       try {
@@ -38,22 +70,52 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         setLoading(false);
       }
     };
-    if (id) fetchProperty();
+    if (id) {
+      fetchProperty();
+      checkFavoriteStatus();
+      checkReviewEligibility();
+    }
+  }, [id, user]);
+
+  // Check if user can review this property (only needs to be authenticated)
+  const checkReviewEligibility = () => {
+    if (user && user.id) {
+      setCanReview(true);
+      // Create a temporary reservation object for the form
+      setEligibleReservation({ id: null });
+    } else {
+      setCanReview(false);
+    }
+  };
+
+  // Renderizar as estrelas baseado no rating
+  const renderStars = (rating) => {
+    return (
+      <div className="flex gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            size={14}
+            className={`${
+              star <= (rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  // Guardar o pathname para redirecionar após login
+  useEffect(() => {
+    localStorage.setItem('propertyRedirect', window.location.pathname);
   }, [id]);
 
-  /**
-   * Professional Image Filtering:
-   * Prioritizes valid HTTP links (Unsplash) to avoid server timeouts.
-   * If local files are broken or missing, it fills the slots with high-quality placeholders instantly.
-   */
-  const getImageUrl = (index) => {
-    const photos = alojamento?.images || [];
-    
-    // 1. Filter only valid working links (starts with http)
-    const validPhotos = photos.filter(img => {
-      const p = img.image_path || img.url || img.path;
-      return p && p.startsWith('http');
-    });
+  // Logic to add/remove from account-based favorites
+  const toggleFavorite = () => {
+    if (!user || !user.id) {
+      navigate("/login");
+      return;
+    }
 
     // 2. High-quality architectural placeholders to avoid delays
     const backupPlaceholders = [
@@ -160,8 +222,59 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={16}/> {alojamento.bedrooms} quartos</span>
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={16}/> {alojamento.bathrooms || 1} banho</span>
             </div>
-            <h3 className="text-xl font-black mb-6 uppercase italic underline decoration-blue-500 decoration-[6px] underline-offset-8">Sobre este espaço</h3>
-            <p className="text-gray-700 leading-relaxed text-xl font-light whitespace-pre-line mb-10">{alojamento.description}</p>
+
+            {/* Reviews Section */}
+            <div className="mt-16 pt-16 border-t border-gray-200">
+              <h3 className="text-2xl font-black mb-8 uppercase italic underline decoration-blue-500 decoration-[6px] underline-offset-8">Avaliações</h3>
+              
+              {/* Review Eligibility Banner */}
+              {!user && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                  <p className="text-sm text-blue-700">
+                    <a href="/login" className="font-semibold underline">Faça login</a> para avaliar esta propriedade
+                  </p>
+                </div>
+              )}
+
+              {canReview && user && !showReviewForm && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6 flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-green-900 mb-1">Partilhe a sua opinião</h4>
+                    <p className="text-sm text-green-700">
+                      Gostaria de avaliar esta propriedade?
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition font-semibold"
+                  >
+                    <Star size={18} />
+                    Avaliar
+                  </button>
+                </div>
+              )}
+
+              {/* Review Form */}
+              {showReviewForm && (
+                <div className="mb-6">
+                  <ReviewForm
+                    reservation={eligibleReservation}
+                    property={alojamento}
+                    user={user}
+                    onSuccess={() => {
+                      setShowReviewForm(false);
+                      setCanReview(false);
+                      notify('Avaliação enviada com sucesso!', 'success');
+                      // Trigger ReviewsList to refresh
+                      setReviewRefreshTrigger(prev => prev + 1);
+                    }}
+                    onCancel={() => setShowReviewForm(false)}
+                  />
+                </div>
+              )}
+
+              <ReviewsList propertyId={id} key={reviewRefreshTrigger} onStatsUpdate={handleStatsUpdate} />
+            </div>
           </div>
 
           <aside>
@@ -172,8 +285,9 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                   <span className="text-gray-400 font-bold ml-1 text-sm uppercase">/ noite</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-black bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
-                  <Star size={12} className="fill-current"/> {alojamento.rating || '4.95'}
-                </div>
+                {renderStars(alojamento?.metrics?.rating ? parseFloat(alojamento.metrics.rating) : 0)}
+                <span>{alojamento?.metrics?.rating ? parseFloat(alojamento.metrics.rating).toFixed(1) : "0"}</span>
+              </div>
               </div>
 
               <div className="border-2 border-gray-100 rounded-4xl mb-6 overflow-hidden">
@@ -250,7 +364,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         </div>
       )}
 
-      <Footer />
     </div>
   );
 }

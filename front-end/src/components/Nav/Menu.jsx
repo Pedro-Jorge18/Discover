@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogIn, HelpCircle, Gift, Home, Cog } from 'lucide-react';
+import { LogIn, HelpCircle, Gift, Home, Cog, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 
@@ -63,6 +63,15 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
         {user && user.role ? (
           <>
             <div className="border-t my-2"></div>
+            <Link
+              to="/my-reviews"
+              onClick={() => { if (typeof onCloseMenu === 'function') onCloseMenu(); }}
+              className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+            >
+              <MessageSquare className="w-5 h-5 text-gray-500" />
+              Opiniões
+            </Link>          
+            
             <button
               onClick={() => { onOpenSettings(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
               className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
@@ -70,7 +79,6 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
               <Cog className="w-5 h-5 text-gray-500" />
               Definições
             </button>
-
           
             {user.role === "host" ? (
               <button
