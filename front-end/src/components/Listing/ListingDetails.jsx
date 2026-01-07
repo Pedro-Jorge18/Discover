@@ -11,6 +11,7 @@ import { pt } from 'date-fns/locale';
 import { differenceInDays, addDays, startOfDay } from 'date-fns';
 import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
+import ListingInfo from './ListingInfo.jsx';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {
   const { id } = useParams();
@@ -251,6 +252,14 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={16}/> {alojamento.bedrooms} quartos</span>
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={16}/> {alojamento.bathrooms || 1} banho</span>
             </div>
+
+            <ListingInfo
+              city={alojamento.location?.city?.name}
+              description={alojamento.description || 'Sem descrição disponível.'}
+              guests={alojamento.max_guests}
+              bedrooms={alojamento.bedrooms}
+              bathrooms={alojamento.bathrooms || 1}
+            />
 
             {/* Reviews Section */}
             <div className="mt-16 pt-16 border-t border-gray-200">
