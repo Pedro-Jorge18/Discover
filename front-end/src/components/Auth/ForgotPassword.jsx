@@ -15,11 +15,11 @@ export default function ForgotPassword() {
     try {
       await api.post("/auth/forgot-password", { email });
       setEmailSent(true);
-      setErrorMessage(""); // clear errors
+      setErrorMessage("");
     } catch (error) {
       console.error("Erro ao enviar email:", error);
       setErrorMessage(
-        error.response?.data?.message || "Ocorreu um erro. Tente novamente."
+        error.response?.data?.message || t('auth.recoverError')
       );
       setEmailSent(true); // still show the sent message to avoid email enumeration
     }
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
                 <input
                   type="email"
                   id="userEmail"
-                  placeholder={t('auth.enterEmail')}
+                  placeholder={t('auth.emailPlaceholderRecover')}
                   required
                   className="input w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
@@ -82,7 +82,7 @@ export default function ForgotPassword() {
           ) : (
             <div className="text-center space-y-4">
               <p className="text-gray-300 text-sm">
-                {t('auth.recoveryEmailSent')}
+                {t('auth.recoveryMessage')}
               </p>
 
               {errorMessage && (

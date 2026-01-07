@@ -59,7 +59,7 @@ export default function EditProfile() {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                placeholder={t('settings.enterName')}
+                placeholder={t('settings.firstNamePlaceholder')}
                 className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             </div>
@@ -74,7 +74,7 @@ export default function EditProfile() {
                 name="last_name"
                 value={form.last_name}
                 onChange={handleChange}
-                placeholder={t('settings.enterLastName')}
+                placeholder={t('settings.lastNamePlaceholder')}
                 className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             </div>
@@ -89,7 +89,7 @@ export default function EditProfile() {
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder={t('settings.phonePlaceholder')}
+                placeholder={t('auth.phonePlaceholder')}
                 className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             </div>

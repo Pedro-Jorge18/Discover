@@ -75,7 +75,7 @@ export default function TwoFactorAuth() {
         setPassword("");
         notify(t('auth.passwordConfirmed2FA'), "info");
       } else {
-        notify(res.data?.message || "Erro ao ativar 2FA", "error");
+        notify(res.data?.message || t('auth.twoFactorAuthError'), "error");
       }
     } catch (err) {
       if (err?.response?.status === 422) {
@@ -119,7 +119,7 @@ export default function TwoFactorAuth() {
         setConfirmCode("");
         notify(t('auth.twoFactorEnabled'), "success");
       } else {
-        notify(res.data.message || "Código incorreto.", "error");
+        notify(res.data.message || t('auth.authIncorrect'), "error");
       }
     } catch (err) {
       console.error(err);
@@ -154,11 +154,11 @@ export default function TwoFactorAuth() {
         setDisableCode("");
         notify(t('auth.twoFactorDisabled'), "success");
       } else {
-        notify(res.data?.message || "Código incorreto.", "error");
+        notify(res.data?.message || t('auth.authIncorrect'), "error");
       }
     } catch (err) {
       if (err.response?.status === 422) {
-        notify(t('auth.incorrectAuthCode'), "error");
+        notify(t('auth.authIncorrect'), "error");
       } else {
         notify(t('auth.serverError'), "error");
       }
@@ -175,7 +175,7 @@ export default function TwoFactorAuth() {
       setCopied(true);
       if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
       copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
-      notify(t('auth.copiedToClipboard'), "success");
+      notify(t('auth.codesCopied'), "success");
     } catch {
       notify(t('auth.copyFailed'), "error");
     }
@@ -195,13 +195,13 @@ export default function TwoFactorAuth() {
       </h3>
       <div className="pt-6 space-y-6">
         <p className="text-gray-300 text-sm">
-          {t('auth.twoFactorDescription')}
+          {t('auth.twoFactorDesc')}
         </p>
 
         {/* Toggle */}
         <div className="flex items-center justify-between">
           <span className="text-gray-200 font-medium">
-            Ativar Autenticação de 2 fatores
+            {t('auth.enableTwoFactor')}
           </span>
 
           <button
@@ -221,9 +221,7 @@ export default function TwoFactorAuth() {
         </div>
 
         <p className="text-gray-300 text-sm">
-          {enabled
-            ? "A autenticação de dois fatores está ativada."
-            : "A autenticação de dois fatores está desativada."}
+          {enabled ? t('auth.twoFactorEnabled') : t('auth.twoFactorDisabled')}
         </p>
 
         {/* Pop-up Password */}
@@ -243,14 +241,14 @@ export default function TwoFactorAuth() {
               </button>
 
               <h4 className="text-white font-semibold mb-4 text-lg">
-                Introduza a sua Palavra-Passe
+                {t('auth.enterPassword')}
               </h4>
 
               {/* Input com show/hide password */}
               <div className="relative mb-3">
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Palavra-Passe"
+                  placeholder={t('auth.passwordPlaceholder')}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -293,7 +291,7 @@ export default function TwoFactorAuth() {
                   ✕
                 </button>
               <h4 className="text-white font-semibold mb-4 text-lg">
-                Código de Autenticação
+                {t('auth.authCodeTitle')}
               </h4>
 
               {qrCode && (
@@ -311,7 +309,7 @@ export default function TwoFactorAuth() {
               </p>
 
               <p className="text-gray-400 text-sm mb-4">
-                Introduza este código na sua aplicação de autenticação
+                {t('auth.authCodeHelp')}
                 (Google Authenticator, Authy, etc.)
               </p>
 
@@ -319,12 +317,12 @@ export default function TwoFactorAuth() {
                 onClick={copyToClipboard}
                 className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600 transition duration-300 mb-3 w-full"
               >
-                {copied ? "Copiado ✔" : "Copiar código"}
+                {copied ? t('auth.copied') : t('auth.copyCode')}
               </button>
 
               <input
                 type="text"
-                placeholder="Código"
+                placeholder={t('auth.enterCode')}
                 maxLength={6}
                 inputMode="numeric"
                 pattern="\\d*"
@@ -335,7 +333,7 @@ export default function TwoFactorAuth() {
                 }}
                 className="w-full mb-3 px-3 py-2 rounded-lg text-white border"
                 id="2fa-code-input"
-                aria-label="Código de autenticação"
+                aria-label={t('auth.authCodeTitle')}
               />
               <button
                 onClick={handleConfirmCode}
@@ -367,16 +365,16 @@ export default function TwoFactorAuth() {
                 ✕
               </button>
               <h4 className="text-white font-semibold mb-4 text-lg">
-                Código de Autenticação 2FA
+                {t('auth.disable2faTitle')}
               </h4>
 
               <p className="text-gray-300 text-sm mb-3">
-                Introduza o código da sua aplicação de autenticação para desativar o 2FA.
+                {t('auth.disable2faHelp')}
               </p>
 
               <input
                 type="text"
-                placeholder="Código"
+                placeholder={t('auth.enterCode')}
                 maxLength={6}
                 inputMode="numeric"
                 pattern="\\d*"
@@ -386,7 +384,7 @@ export default function TwoFactorAuth() {
                   setDisableCode(v);
                 }}
                 className="w-full mb-4 px-3 py-2 rounded-lg text-white border"
-                aria-label="Código para desativar 2FA"
+                aria-label={t('auth.disable2faTitle')}
               />
 
 
@@ -399,7 +397,7 @@ export default function TwoFactorAuth() {
                     : "bg-red-600 hover:bg-red-500 focus:ring-4 focus:ring-red-400"
                 }`}
               >
-                Desativar 2FA
+                {t('auth.disable2FA')}
               </button>
             </div>
           </div>

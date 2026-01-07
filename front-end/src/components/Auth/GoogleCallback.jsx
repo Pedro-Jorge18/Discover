@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api/axios';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function GoogleCallback({ setUser }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function GoogleCallback({ setUser }) {
           navigate('/');
         })
         .catch(() => {
-          setError('Erro a obter utilizador.');
+          setError(t('auth.googleUserFetchError'));
           setLoading(false);
         });
       return;
@@ -47,7 +49,7 @@ export default function GoogleCallback({ setUser }) {
       return;
     }
 
-    setError('Autenticação Google incompleta.');
+    setError(t('auth.googleAuthIncomplete'));
     setLoading(false);
   }, [location.search, navigate, setUser]);
 
@@ -65,9 +67,9 @@ export default function GoogleCallback({ setUser }) {
         setLoading(false);
         return;
       }
-      setError('Não foi possível completar o registo.');
+      setError(t('auth.googleCompleteError'));
     } catch (err) {
-      setError(err?.response?.data?.message || 'Erro ao completar o registo.');
+      setError(err?.response?.data?.message || t('auth.googleCompleteError'));
     } finally {
       setLoading(false);
     }
@@ -75,7 +77,7 @@ export default function GoogleCallback({ setUser }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">Processando autenticação...</div>
+      <div className="min-h-screen flex items-center justify-center">{t('auth.processingAuth')}</div>
     );
   }
 
@@ -94,24 +96,24 @@ export default function GoogleCallback({ setUser }) {
             <div>
               <div className="flex items-center justify-center mb-4">
                 <div className="text-left">
-                  <p className="text-gray-200 font-semibold">Bem-vindo{userInfo?.name ? `, ${userInfo.name}` : ''}.</p>
-                  <p className="text-gray-400 text-sm">Escolha o tipo de conta para continuar</p>
+                  <p className="text-gray-200 font-semibold">{t('auth.welcomeUser', { name: userInfo?.name || '' }).replace('  ', ' ').trim()}</p>
+                  <p className="text-gray-400 text-sm">{t('auth.chooseAccountType')}</p>
                 </div>
               </div>
 
               <div className="flex gap-3 justify-center mb-4">
-                <button onClick={() => setAccountType('guest')} className={`px-4 py-2 rounded ${accountType==='guest' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>Cliente</button>
-                <button onClick={() => setAccountType('host')} className={`px-4 py-2 rounded ${accountType==='host' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>Anfiltrião</button>
+                <button onClick={() => setAccountType('guest')} className={`px-4 py-2 rounded ${accountType==='guest' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>{t('auth.client')}</button>
+                <button onClick={() => setAccountType('host')} className={`px-4 py-2 rounded ${accountType==='host' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>{t('auth.host')}</button>
               </div>
 
               <div className="flex gap-3 justify-center">
-                <button onClick={completeSignup} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white">Continuar</button>
-                <button onClick={() => { navigate('/'); }} className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200">Cancelar</button>
+                <button onClick={completeSignup} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white">{t('common.next')}</button>
+                <button onClick={() => { navigate('/'); }} className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200">{t('common.cancel')}</button>
               </div>
             </div>
           ) : (
             <div>
-              <p className="text-gray-200">Autenticação concluída. Se não for redirecionado, tente novamente.</p>
+              <p className="text-gray-200">{t('auth.googleAuthIncomplete')}</p>
             </div>
           )}
         </div>
@@ -121,20 +123,20 @@ export default function GoogleCallback({ setUser }) {
       {showSetPassword && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-gray-800 p-6 rounded-xl text-center shadow-lg">
-            <h3 className="text-lg font-semibold text-white mb-3">Definir palavra-passe</h3>
-            <p className="text-gray-400 text-sm mb-4">Para futuramente ativar 2FA e mais segurança, define uma password para a tua conta.</p>
+            <h3 className="text-lg font-semibold text-white mb-3">{t('auth.setPasswordTitle')}</h3>
+            <p className="text-gray-400 text-sm mb-4">{t('auth.setPasswordDescription')}</p>
 
             {passwordError && <div className="text-red-400 mb-3">{passwordError}</div>}
 
             <div className="relative mb-3">
-              <input type={showPassword ? 'text' : 'password'} placeholder="Nova password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400" />
+              <input type={showPassword ? 'text' : 'password'} placeholder={t('auth.newPasswordPlaceholder')} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400">
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
 
             <div className="relative mb-4">
-              <input type={showPasswordConfirm ? 'text' : 'password'} placeholder="Confirma password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400" />
+              <input type={showPasswordConfirm ? 'text' : 'password'} placeholder={t('auth.confirmPasswordPlaceholder')} value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400" />
               <button type="button" onClick={() => setShowPasswordConfirm(!showPasswordConfirm)} className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400">
                 {showPasswordConfirm ? '🙈' : '👁️'}
               </button>
@@ -143,8 +145,8 @@ export default function GoogleCallback({ setUser }) {
             <div className="flex gap-3">
               <button onClick={async () => {
                 setPasswordError(null);
-                if (password.length < 8) { setPasswordError('A palavra-passe deve ter pelo menos 8 caracteres.'); return; }
-                if (password !== passwordConfirm) { setPasswordError('As palavra-passes não coincidem.'); return; }
+                if (password.length < 8) { setPasswordError(t('auth.passwordMinLength')); return; }
+                if (password !== passwordConfirm) { setPasswordError(t('auth.passwordMismatch')); return; }
                 try {
                   const token = sessionStorage.getItem('token');
                   await api.post('/auth/set-password', { password, password_confirmation: passwordConfirm }, { headers: { Authorization: `Bearer ${token}` } });
@@ -152,9 +154,9 @@ export default function GoogleCallback({ setUser }) {
                   setShowSetPassword(false);
                   navigate('/');
                 } catch (err) {
-                  setPasswordError(err?.response?.data?.message || 'Erro ao definir password.');
+                  setPasswordError(err?.response?.data?.message || t('auth.googleSetPasswordError'));
                 }
-              }} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white">Definir</button>
+              }} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white">{t('auth.setPassword')}</button>
 
             </div>
           </div>

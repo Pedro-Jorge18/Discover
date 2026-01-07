@@ -30,7 +30,7 @@ export default function ResetPassword() {
     if (oldPassword === newPassword) {
       window.dispatchEvent(new CustomEvent('app-notify', {
         detail: {
-          message: t('auth.passwordSameAsOld'),
+          message: t('auth.samePassword'),
           type: 'error'
         }
       }));
@@ -61,7 +61,7 @@ export default function ResetPassword() {
       if (errors?.current_password) {
         window.dispatchEvent(new CustomEvent('app-notify', {
           detail: {
-            message: t('auth.incorrectPassword'),
+            message: t('auth.passwordIncorrect'),
             type: 'error'
           }
         }));
@@ -75,7 +75,7 @@ export default function ResetPassword() {
       } else {
         window.dispatchEvent(new CustomEvent('app-notify', {
           detail: {
-            message: err.response?.data?.message || 'Erro interno do servidor',
+            message: err.response?.data?.message || t('auth.serverError'),
             type: 'error'
           }
         }));
@@ -86,7 +86,7 @@ export default function ResetPassword() {
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl mx-auto mt-10">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        {t('auth.changePassword')}
+        {t('auth.changePasswordTitle')}
       </h3>
 
       {!success ? (
@@ -101,7 +101,7 @@ export default function ResetPassword() {
                 type={showOldPassword ? 'text' : 'password'}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                placeholder={t('auth.enterCurrentPassword')}
+                placeholder={t('auth.oldPasswordPlaceholder')}
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
               />
@@ -126,7 +126,7 @@ export default function ResetPassword() {
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder={t('auth.enterNewPassword')}
+                placeholder={t('auth.newPasswordPlaceholder')}
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
               />
@@ -176,7 +176,7 @@ export default function ResetPassword() {
         </form>
       ) : (
         <div className="text-center mt-6">
-          <p className="text-green-400">{t('auth.passwordChangedSuccess')}</p>
+          <p className="text-green-400">{t('auth.passwordChanged')}</p>
         </div>
       )}
     </div>
