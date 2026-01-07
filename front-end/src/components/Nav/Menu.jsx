@@ -1,56 +1,116 @@
 import React from 'react';
-import { LogIn, HelpCircle, Gift } from 'lucide-react'; 
+import { LogIn, HelpCircle, Gift, Home, Cog, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import api from '../../api/axios';
 
-/**
- * Menu popover component that appears when the user/hamburger icon is clicked.
- * It provides options for login, help, and navigation.
- *
- * @param {object} props
- * @param {function} props.onOpenLogin - Function to show the Login modal.
- * @param {function} props.onCloseMenu - Function to close the menu popover.
- */
-function Menu({ onOpenLogin, onCloseMenu }) {
-  const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors";
+function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin, onCloseMenu }) {
+  const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await api.post("/auth/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
+
+      // Clear token and user state
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      setUser(null);
+
+      // close menu and refresh page to reset UI
+      if (typeof onCloseMenu === 'function') onCloseMenu();
+      window.location.reload();
+
+    } catch (error) {
+      // If token is already revoked the server may return 401. In that case
+      // clear local token and user state anyway so the UI is consistent.
+      const status = error?.response?.status;
+      if (status === 401) {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        setUser(null);
+        if (typeof onCloseMenu === 'function') onCloseMenu();
+        window.location.reload();
+        return;
+      }
+
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
 
   return (
-    <div 
-      className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right animate-in fade-in zoom-in-95"
-      // Use setTimeout to allow the click event to propagate before closing
-      onClick={() => setTimeout(onCloseMenu, 100)} 
-    >
+    <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-20 transform origin-top-right">
+
+      {user && <p>Bem-vindo, {user.role}</p>}
       <div className="py-2">
-        
-        {/* Item: Log in or Sign up (Primary action) */}
-        <div 
-          className="px-4 py-3 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 flex items-center gap-3"
-          // Action: Opens the Login modal and closes the menu popover
-          onClick={() => { onOpenLogin(); onCloseMenu(); }} 
-        >
-          <LogIn className="w-5 h-5 text-gray-600" />
-          Entrar ou registar-se
-        </div>
-        
+
+        {user && user.id ? (
+          <button
+            onClick={handleLogout} //Calls Backend
+            className="px-4 py-3 font-semibold text-red-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+          >
+            Terminar Sessão
+          </button>
+        ) : (
+          <Link 
+            to="/login"
+            className="px-4 py-3 font-semibold text-gray-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+          >
+            Entrar ou Registar-se
+          </Link>
+        )}
+
+        {/* Show and Hide Pages */}
+        {user && user.role ? (
+          <>
+            <div className="border-t my-2"></div>
+            <Link
+              to="/my-reviews"
+              onClick={() => { if (typeof onCloseMenu === 'function') onCloseMenu(); }}
+              className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+            >
+              <MessageSquare className="w-5 h-5 text-gray-500" />
+              Opiniões
+            </Link>          
+            
+            <button
+              onClick={() => { onOpenSettings(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
+              className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+            >
+              <Cog className="w-5 h-5 text-gray-500" />
+              Definições
+            </button>
+          
+            {user.role === "host" ? (
+              <button
+                onClick={() => { onOpenSettingsHost(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
+                className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+              >
+                <Cog className="w-5 h-5 text-gray-500" />
+                Menu Host
+              </button>
+            ) : user.role === "admin" ? (
+              <button
+                onClick={() => { onOpenSettingsAdmin(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
+                className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
+              >
+                <Cog className="w-5 h-5 text-gray-500" />
+                Menu Administração
+              </button>
+            ) : (
+              <>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+          </>
+        )}      
+
         <div className="border-t my-2"></div>
-        
-        {/* Item: Help Center */}
-        <div className={itemClasses}>
-          <HelpCircle className="w-5 h-5 text-gray-500" />
-          Centro de Ajuda
-        </div>
 
-        {/* Item: Gift Cards */}
-        <div className={itemClasses}>
-          <Gift className="w-5 h-5 text-gray-500" />
-          Cartões-oferta
-        </div>
-        
-        <div className="border-t my-2"></div> 
-
-        {/* Item: Become a Host (Added back for completeness) */}
-        <div className={itemClasses}>
-          Tornar-se um Anfitrião
-        </div> 
-        
+        <Link to="/help" className={itemClasses}>
+          <HelpCircle className="w-5 h-5 text-gray-500" /> Centro de Ajuda
+        </Link>
       </div>
     </div>
   );

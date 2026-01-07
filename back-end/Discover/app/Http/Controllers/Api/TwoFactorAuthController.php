@@ -60,12 +60,23 @@ class TwoFactorAuthController extends Controller
 
             $verified = $this->verifyTwoFactorCodeAction->execute($dto);
 
+            if (!$verified) {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('auth.2fa.invalid_code'),
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+
+            // Gerar token JWT definitivo
+            $token = $user->createToken('api-token')->plainTextToken;
+
             return response()->json([
-                'status' => $verified,
-                'message' => $verified
-                    ? __('auth.2fa.verified_success')
-                    : __('auth.2fa.invalid_code'),
-            ], $verified ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
+                'status' => true,
+                'message' => __('auth.2fa.verified_success'),
+                'token' => $token,
+                'user' => $user,
+            ], Response::HTTP_OK);
+
         } catch (Throwable $e) {
             return response()->json([
                 'status' => false,
@@ -75,17 +86,25 @@ class TwoFactorAuthController extends Controller
         }
     }
 
+
     //disable two-factor authentication
     public function disable(DisableTwoFactorRequest $request): JsonResponse
     {
         try {
             $user = Auth::user();
-            $dto = new DisableTwoFactorDto($user->id);
+            $dto = new DisableTwoFactorDto($user->id, $request->input('code'));
 
             $disabled = $this->disableTwoFactorAuthAction->execute($dto);
 
+            if (!$disabled) {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('auth.2fa.invalid_code'),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             return response()->json([
-                'status' => $disabled,
+                'status' => true,
                 'message' => __('auth.2fa.disabled_success'),
             ], Response::HTTP_OK);
         } catch (Throwable $e) {

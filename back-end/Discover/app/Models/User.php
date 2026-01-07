@@ -21,17 +21,20 @@ class User extends Authenticatable
         'birthday',
         'email',
         'password',
+        'google_id',
         'image',
         'gender',
         'about',
         'verified',
         'active',
         'last_login_date',
+        'role',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
     ];
 
     protected $casts = [
@@ -41,6 +44,7 @@ class User extends Authenticatable
         'last_login_date' => 'datetime',
         'verified' => 'boolean',
         'active' => 'boolean',
+        'two_factor_enabled' => 'boolean',
     ];
 
 
@@ -63,6 +67,25 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
+    public function hasRole(string $role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function assignRole(string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+
+        if ($role) {
+            $this->roles()->syncWithoutDetaching($role);
+        }
+    }
+
     public function favoriteProperties(): BelongsToMany
     {
         return $this->belongsToMany(Property::class, 'favorites');
@@ -83,52 +106,21 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
-    //Identificao de Usuario anfittiao, cliente ou admin
-    public function isClient()
+
+    public function isClient(): bool
     {
-        return $this->roles()->where('name', 'client')->exists();
+        return $this->hasRole(Role::CLIENT);
     }
 
-    public function isHost()
+    public function isHost(): bool
     {
-        return $this->roles()->where('name', 'host')->exists();
+        return $this->hasRole(Role::HOST);
     }
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->roles()->where('name', 'admin')->exists();
+        return $this->hasRole(Role::ADMIN);
     }
-
-    public function hasRole($roleName)
-    {
-        return $this->roles()->where('name', $roleName)->exists();
-    }
-
-    public function hasAnyRole(array $roleNames)
-    {
-        return $this->roles()->whereIn('name', $roleNames)->exists();
-    }
-
-
-    public function assignRole($roleName)
-    {
-        $role = UserRole::where('name', $roleName)->first();
-
-        if ($role && !$this->hasRole($roleName)) {
-            $this->roles()->attach($role);
-        }
-    }
-
-
-    public function removeRole($roleName)
-    {
-        $role = UserRole::where('name', $roleName)->first();
-
-        if ($role) {
-            $this->roles()->detach($role);
-        }
-    }
-
 
     public function getFullNameAttribute()
     {
@@ -138,5 +130,10 @@ class User extends Authenticatable
     public function getInitialsAttribute()
     {
         return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_enabled === true;
     }
 }

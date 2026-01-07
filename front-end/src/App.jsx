@@ -1,42 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
-import Login from './components/Auth/Login';
-import Registration from './components/Auth/Registration';
-import ForgotPassword from './components/Auth/ForgotPassword';
-import ResetPassword from './components/Auth/ResetPassword';
-import SettingsMain from './components/Settings/SettingsMain';
+import AppRoutes from './Routes/AppRoutes.jsx';
+import ToastContainer from './components/Ui/ToastContainer.jsx';
+import api from './api/axios';
+import SettingsMain from './components/Settings/SettingsMain.jsx';
+import SettingsHost from './components/Settings/SettingsHost.jsx'; 
+import SettingsAdmin from './components/Settings/SettingsAdmin.jsx';
 
-function App() {/*
-  const [showLogin, setShowLogin] = useState(false);
+function App() {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [termoPesquisa, setTermoPesquisa] = useState(""); 
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpenHost, setSettingsOpenHost] = useState(false);
+  const [settingsOpenAdmin, setSettingsOpenAdmin] = useState(false);
 
-  const handleOpenLogin = () => {
-    setShowLogin(true);
-  };
+  useEffect(() => {
+    const sessionToken = sessionStorage.getItem("token");
+    const localToken = localStorage.getItem("token");
+    const currentToken = sessionToken || localToken;
 
-  const handleCloseLogin = () => {
-    setShowLogin(false);
-  };
+    if (currentToken) {
+      api.get("/auth/me", { headers: { Authorization: `Bearer ${currentToken}` } })
+        .then(res => {
+          setUser(res.data.user);
+          setToken(currentToken);
+        })
+        .catch(() => {
+          sessionStorage.removeItem("token");
+          localStorage.removeItem("token");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
-
-  return (
-    <div className="App">
-      <AppRoutes onOpenLogin={handleOpenLogin} />
-      {showLogin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Login onClose={handleCloseLogin} />
-        </div>
-      )}
-    </div>
-  );
-
-  
-*/
-const [showLogin, setShowLogin] = useState(false)
+  if (loading) {
     return (
-      <div className="min-h-screen bg-green-400 text-white flex flex-col items-center justify-center">
-        <Registration />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">A carregar...</p>
+        </div>
       </div>
     );
+  }
+
+  return (    
+    <div className="App">
+      <ToastContainer />
+      <AppRoutes 
+        user={user} 
+        setUser={setUser} 
+        termoPesquisa={termoPesquisa} 
+        setTermoPesquisa={setTermoPesquisa} 
+        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettingsHost={() => setSettingsOpenHost(true)}
+        onOpenSettingsAdmin={() => setSettingsOpenAdmin(true)}
+      />
+
+      {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} token={token} />}
+      {settingsOpenHost && <SettingsHost onClose={() => setSettingsOpenHost(false)} />}
+      {settingsOpenAdmin && <SettingsAdmin onClose={() => setSettingsOpenAdmin(false)} user={user} token={token} />}
+    </div>
+  );
 }
 
 export default App;

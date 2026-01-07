@@ -1,1 +1,99 @@
-@import "tailwindcss";
+/* --- EXISTING ANIMATIONS --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Improved skeleton shimmer animation 
+   It moves the gradient from left to right to create a light reflection effect
+*/
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Skeleton base class 
+   Uses a linear gradient to simulate a 'ghost' UI element before data arrives
+*/
+.skeleton {
+  background: #f6f7f8;
+  background-image: linear-gradient(
+    90deg, 
+    #f6f7f8 0%, 
+    #edeef1 20%, 
+    #f6f7f8 40%, 
+    #f6f7f8 100%
+  );
+  background-repeat: no-repeat;
+  /* Increased background-size is crucial for the shimmer to travel across the element */
+  background-size: 800px 104px; 
+  display: inline-block;
+  position: relative;
+  animation: shimmer 1.5s infinite linear;
+}
+
+/* --- SCROLLBAR MANAGEMENT --- */
+/* Completely hides scrollbars while maintaining scroll functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* --- UI HELPERS --- */
+.card-shadow-hover {
+  transition: all 0.3s ease;
+}
+.card-shadow-hover:hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+}
+
+/* --- DATEPICKER FIXES --- */
+/* Ensures the calendar component is styled properly following the Discover brand */
+.react-datepicker-wrapper { width: 100% !important; }
+
+.react-datepicker {
+  font-family: inherit !important;
+  border-radius: 2rem !important;
+  border: none !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  padding: 15px !important;
+  background-color: white !important;
+}
+
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  padding-top: 10px !important;
+}
+
+.react-datepicker__day-name, .react-datepicker__day {
+  width: 2.5rem !important;
+  line-height: 2.5rem !important;
+  margin: 0.2rem !important;
+  font-weight: 600 !important;
+}
+
+.react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+  background-color: #2563eb !important; /* Discover Blue */
+  color: white !important;
+  border-radius: 9999px !important;
+}
+
+.react-datepicker__day:hover { 
+  border-radius: 9999px !important; 
+  background-color: #f3f4f6 !important; 
+}
+
+.react-datepicker__navigation { top: 20px !important; }

@@ -18,7 +18,8 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-
+            'role' => $this->role,
+            
 
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name');
@@ -33,6 +34,10 @@ class UserResource extends JsonResource
                     'location' => $this->profile->location,
                 ] : null;
             }),
+
+            'two_factor' => [
+                'enabled' => $this->two_factor_enabled,
+            ],
 
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),

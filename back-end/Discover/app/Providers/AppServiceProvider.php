@@ -4,8 +4,10 @@ namespace App\Providers;
 
 
 use App\Models\User;
+use App\Models\Review;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->register(\App\Providers\PropertyServiceProvider::class);
     }
 
     /**
@@ -23,5 +25,35 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         User::observe(UserObserver::class);
+        
+        // Custom validator para verificar se o utilizador já avaliou a propriedade
+        Validator::extend('unique_review', function ($attribute, $value, $parameters, $validator) {
+            $userId = $parameters[0] ?? null;
+            if (!$userId) {
+                return true;
+            }
+            
+            $exists = Review::where('property_id', $value)
+                ->where('user_id', $userId)
+                ->exists();
+            
+            return !$exists; // Retorna true se NÃO existe (validação passa)
+        });
+        
+        Validator::replacer('unique_review', function ($message, $attribute, $rule, $parameters) {
+            return 'Você já avaliou esta propriedade';
+        });
+        
+        // Fix SSL certificate issues in development
+        if (app()->environment('local') || config('app.debug')) {
+            $guzzleConfig = [
+                'verify' => false, // Disable SSL verification for development
+            ];
+            
+            // Apply to Socialite's Guzzle client
+            $this->app->bind('guzzle.config', function () use ($guzzleConfig) {
+                return $guzzleConfig;
+            });
+        }
     }
 }
