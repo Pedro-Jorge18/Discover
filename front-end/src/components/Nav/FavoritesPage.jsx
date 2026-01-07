@@ -5,7 +5,7 @@ import PropertyCard from '../HomePage/PropertyCard.jsx';
 import { useNavigate } from 'react-router-dom';
 import { HeartOff } from 'lucide-react';
 
-function FavoritesPage({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function FavoritesPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [favorites, setFavorites] = useState([]);
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ function FavoritesPage({ user, setUser, onOpenSettings, onOpenSettingsHost, onOp
 
   return (
     <div className="min-h-screen bg-white text-left">
-      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 pt-44 pb-20">
         <div className="flex items-center gap-4 mb-12">
           <div className="w-2 h-10 bg-blue-600 rounded-full"></div>

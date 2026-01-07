@@ -1,9 +1,9 @@
 import React from 'react';
-import { LogIn, HelpCircle, Gift, Home, Cog, MessageSquare } from 'lucide-react';
+import { LogIn, HelpCircle, Gift, House, Cog, MessageSquare, UserStar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 
-function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin, onCloseMenu }) {
+function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu }) {
   const itemClasses = "px-4 py-3 text-gray-800 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition-colors w-full text-left";
 
   const handleLogout = async () => {
@@ -69,7 +69,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
               className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
             >
               <MessageSquare className="w-5 h-5 text-gray-500" />
-              Opiniões
+              Avaliações
             </Link>          
             
             <button
@@ -81,19 +81,20 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetting
             </button>
           
             {user.role === "host" ? (
-              <button
-                onClick={() => { onOpenSettingsHost(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
+              <Link
+                to="/host"
+                onClick={() => { if (typeof onCloseMenu === 'function') onCloseMenu(); }}
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
-                <Cog className="w-5 h-5 text-gray-500" />
-                Menu Host
-              </button>
+                <House className="w-5 h-5 text-gray-500" />
+                Anfitrião
+              </Link>
             ) : user.role === "admin" ? (
               <button
                 onClick={() => { onOpenSettingsAdmin(); if (typeof onCloseMenu === 'function') onCloseMenu(); }}
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
-                <Cog className="w-5 h-5 text-gray-500" />
+                <UserStar className="w-5 h-5 text-gray-500" />
                 Menu Administração
               </button>
             ) : (

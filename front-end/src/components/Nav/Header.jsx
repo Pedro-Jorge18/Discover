@@ -4,7 +4,7 @@ import { Globe, Menu as MenuIcon, User, Search, Heart, SlidersHorizontal } from 
 import { Link, useNavigate } from 'react-router-dom';
 import FilterModal from './FilterModal.jsx';
 
-function Header({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
@@ -101,7 +101,7 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSetti
                 {user ? user.name.charAt(0) : <User className="w-5 h-5 text-gray-400" />}
               </div>
             </button>
-            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} onCloseMenu={() => setIsMenuOpen(false)} />}
+            {isMenuOpen && <Menu user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} onCloseMenu={() => setIsMenuOpen(false)} />}
           </div>
         </div>
       </div>

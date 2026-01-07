@@ -5,7 +5,7 @@ import PropertySlider from './PropertySlider.jsx';
 import PropertyCard from './PropertyCard.jsx';
 import PropertySkeleton from './PropertySkeleton.jsx';
 
-function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
   const [alojamentos, setAlojamentos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+        <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
         <main className="max-w-[1790px] mx-auto px-5 sm:px-10 pt-28 pb-20 text-left">
           <div className="mb-12">
             <div className="h-10 w-64 skeleton rounded-2xl mb-4" />
@@ -87,7 +87,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   return (
     <div className="min-h-screen pt-20">
       <title>Discover - Página Inicial</title>
-      <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsHost={onOpenSettingsHost} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+      <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6 text-left">
         <PropertySlider user={user} title="Destaques Porto" subtitle="O melhor da Invicta" properties={porto} onVerTudo={() => handleVerTudo('Porto')} />

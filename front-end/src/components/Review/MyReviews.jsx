@@ -5,7 +5,7 @@ import Header from '../Nav/Header.jsx';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 
-export default function MyReviews({ user, setUser, onOpenSettings, onOpenSettingsHost, onOpenSettingsAdmin }) {
+export default function MyReviews({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +105,6 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
           user={user} 
           setUser={setUser} 
           onOpenSettings={onOpenSettings}
-          onOpenSettingsHost={onOpenSettingsHost}
           onOpenSettingsAdmin={onOpenSettingsAdmin}
         />
         <div className="max-w-4xl mx-auto px-4 py-8 pt-28">
@@ -121,7 +120,6 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
         user={user} 
         setUser={setUser} 
         onOpenSettings={onOpenSettings}
-        onOpenSettingsHost={onOpenSettingsHost}
         onOpenSettingsAdmin={onOpenSettingsAdmin}
       />
       <div className="max-w-4xl mx-auto px-4 py-8 pt-28">
