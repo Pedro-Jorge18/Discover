@@ -144,13 +144,15 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       const newFavs = favs.filter(f => String(f.id) !== String(id));
       localStorage.setItem(storageKey, JSON.stringify(newFavs));
       setIsFavorite(false);
-      notify(t('property.removedFromFavorites'), 'info');
+      notify('Removido dos favoritos', 'info');
     } else {
       const newFavs = [...favs, alojamento];
       localStorage.setItem(storageKey, JSON.stringify(newFavs));
       setIsFavorite(true);
-      notify(t('property.addedToFavorites'), 'success');
+      notify('Adicionado aos favoritos', 'success');
     }
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   };
 
   // Get image URL or placeholder
@@ -209,79 +211,26 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         total_price: totalPrice
       });
       setShowModal(false);
-      notify(t('property.bookingSuccess'), 'success');
+      notify('Reserva efetuada com sucesso!', 'success');
     } catch (error) {
       console.error('Booking error:', error);
-      notify(t('property.bookingError'), 'error');
+      notify('Erro ao processar reserva.', 'error');
     } finally {
       setBookingLoading(false);
     }
   };
 
-    const handleImgError = (e, index) => {
-        e.target.onerror = null; 
-        e.target.src = fallbacks[index % 4];
-    };
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+    </div>
+  );
 
-    const toggleFavorite = () => {
-        if (!user?.id) { navigate("/login"); return; }
-        const storageKey = `favoritos_user_${user.id}`;
-        let favs = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        const exists = favs.some(f => String(f.id) === String(id));
+  if (!alojamento) return null;
 
-        if (exists) {
-            favs = favs.filter(f => String(f.id) !== String(id));
-            setIsFavorite(false);
-        } else {
-            favs.push(alojamento);
-            setIsFavorite(true);
-        }
-        localStorage.setItem(storageKey, JSON.stringify(favs));
-        window.dispatchEvent(new Event('storage'));
-        window.dispatchEvent(new CustomEvent('favoritesUpdated'));
-    };
-
-    // Calculation logic for stay costs
-    const pricePerNight = Number(alojamento?.price_per_night || 0);
-    const cleaningFee = Number(alojamento?.cleaning_fee || 0);
-    const serviceFee = 20; 
-    const nights = (startDate && endDate) ? Math.max(0, differenceInDays(startOfDay(endDate), startOfDay(startDate))) : 0;
-    const nightsPrice = nights * pricePerNight;
-    const totalPrice = nights > 0 ? (nightsPrice + cleaningFee + serviceFee) : 0;
-
-    // Transition from summary modal to payment modal
-    const handleOpenPayment = () => {
-        setShowModal(false);
-        setShowPaymentModal(true);
-    };
-
-    // Final API call to process payment and reservation
-    const handleFinalPayment = async () => {
-        try {
-            setBookingLoading(true);
-            const response = await api.post('/payments', {
-                property_id: id,
-                check_in: startDate.toISOString().split('T')[0],
-                check_out: endDate.toISOString().split('T')[0],
-                guests: hospedes,
-                total_price: totalPrice
-            });
-
-            notify('Pagamento processado com sucesso!', 'success');
-            setShowPaymentModal(false);
-            navigate('/payment/success');
-
-        } catch (error) {
-            console.error("Payment submission error:", error);
-            notify(error.response?.data?.error || 'Erro ao processar o pagamento.', 'error');
-        } finally {
-            setBookingLoading(false);
-        }
-    };
-
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-white font-sans">
-            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+  return (
+    <div className="min-h-screen bg-white text-left font-sans text-gray-900">
+      <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
       <main className={`max-w-[1200px] mx-auto px-6 pt-28 pb-20 transition-all duration-700 ${showModal ? 'blur-xl scale-95 opacity-40 pointer-events-none' : ''}`}>
         
         {/* Header Section */}
@@ -289,7 +238,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
           <div>
             <h1 className="text-4xl font-black tracking-tighter uppercase italic">{alojamento.title}</h1>
             <p className="text-gray-400 font-bold mt-2 italic underline decoration-blue-400 decoration-2 underline-offset-4">
-              📍 {alojamento.city?.name || t('property.locationNotDefined')}
+              📍 {alojamento.city?.name || 'Localização não definida'}
             </p>
           </div>
           <div className="flex gap-3">
@@ -335,14 +284,13 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
             />
           </div>
         </div>
-    );
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2">
             <div className="flex gap-6 mb-10 border-b border-gray-100 pb-10 font-black text-[10px] uppercase text-gray-400 tracking-widest">
-              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Users size={16}/> {alojamento.max_guests} {t(alojamento.max_guests === 1 ? 'common.guest' : 'common.guests')}</span>
-              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={16}/> {alojamento.bedrooms} {t(alojamento.bedrooms === 1 ? 'common.bedroom' : 'common.bedrooms')}</span>
-              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={16}/> {alojamento.bathrooms || 1} {t((alojamento.bathrooms || 1) === 1 ? 'common.bathroom' : 'common.bathrooms')}</span>
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Users size={16}/> {alojamento.max_guests} hóspedes</span>
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={16}/> {alojamento.bedrooms} quartos</span>
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={16}/> {alojamento.bathrooms || 1} banho</span>
             </div>
 
             <div className="flex flex-wrap gap-3 mb-10 text-xs font-black uppercase text-gray-500 tracking-widest">
@@ -367,13 +315,13 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
             {/* Reviews Section */}
             <div className="mt-16 pt-16 border-t border-gray-200">
-              <h3 className="text-2xl font-black mb-8 uppercase italic underline decoration-blue-500 decoration-[6px] underline-offset-8">{t('property.reviews')}</h3>
+              <h3 className="text-2xl font-black mb-8 uppercase italic underline decoration-blue-500 decoration-[6px] underline-offset-8">Avaliações</h3>
               
               {/* Review Eligibility Banner */}
               {!user && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
                   <p className="text-sm text-blue-700">
-                    <a href="/login" className="font-semibold underline">{t('auth.login')}</a> {t('review.loginToReview')}
+                    <a href="/login" className="font-semibold underline">Faça login</a> para avaliar esta propriedade
                   </p>
                 </div>
               )}
@@ -381,9 +329,9 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               {canReview && user && !showReviewForm && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6 flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-green-900 mb-1">{t('review.shareYourOpinion')}</h4>
+                    <h4 className="font-semibold text-green-900 mb-1">Partilhe a sua opinião</h4>
                     <p className="text-sm text-green-700">
-                      {t('review.wouldYouLikeToReviewProperty')}
+                      Gostaria de avaliar esta propriedade?
                     </p>
                   </div>
                   <button
@@ -391,7 +339,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                     className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition font-semibold"
                   >
                     <Star size={18} />
-                    {t('review.review')}
+                    Avaliar
                   </button>
                 </div>
               )}
@@ -406,7 +354,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                     onSuccess={() => {
                       setShowReviewForm(false);
                       setCanReview(false);
-                      notify(t('review.reviewSubmittedSuccessfully'), 'success');
+                      notify('Avaliação enviada com sucesso!', 'success');
                       // Trigger ReviewsList to refresh
                       setReviewRefreshTrigger(prev => prev + 1);
                     }}
@@ -430,7 +378,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <div className="flex justify-between items-baseline mb-8">
                 <div>
                   <span className="text-3xl font-black italic">€{Math.round(pricePerNight)}</span>
-                  <span className="text-gray-400 font-bold ml-1 text-sm uppercase">{t('common.perNight')}</span>
+                  <span className="text-gray-400 font-bold ml-1 text-sm uppercase">/ noite</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-black bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
                 {renderStars(alojamento?.metrics?.rating ? parseFloat(alojamento.metrics.rating) : 0)}
@@ -441,37 +389,37 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <div className="border-2 border-gray-100 rounded-4xl mb-6 overflow-hidden">
                 <div className="grid grid-cols-2 border-b-2 border-gray-100">
                   <div className="p-4 border-r-2 border-gray-100 hover:bg-gray-50 transition-colors">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">{t('property.checkIn')}</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">Entrada</label>
                     <DatePicker selected={startDate} onChange={d => setStartDate(d)} minDate={new Date()} locale={pt} dateFormat="dd/MM/yyyy" className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer" />
                   </div>
                   <div className="p-4 hover:bg-gray-50 transition-colors">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">{t('property.checkOut')}</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">Saída</label>
                     <DatePicker selected={endDate} onChange={d => setEndDate(d)} minDate={addDays(startDate, 1)} locale={pt} dateFormat="dd/MM/yyyy" className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer" />
                   </div>
                 </div>
                 <div className="p-4 hover:bg-gray-50 transition-colors">
-                   <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">{t('common.guests')}</label>
+                   <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">Hóspedes</label>
                    <select value={hospedes} onChange={e => setHospedes(Number(e.target.value))} className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer appearance-none">
-                    {[...Array(alojamento.max_guests || 1)].map((_, i) => <option key={i+1} value={i+1}>{i+1} {t(i+1 === 1 ? 'common.guest' : 'common.guests')}</option>)}
+                    {[...Array(alojamento.max_guests || 1)].map((_, i) => <option key={i+1} value={i+1}>{i+1} hóspedes</option>)}
                    </select>
                 </div>
               </div>
 
               <button onClick={handleOpenModal} className="w-full bg-blue-600 text-white font-black py-5 rounded-[1.8rem] uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
-                {t('property.reserveNow')}
+                Reservar Agora
               </button>
 
               <div className="mt-8 space-y-4 text-sm font-bold text-gray-500">
                 <div className="flex justify-between items-center italic">
-                  <span>{t('property.subtotal')} ({nights} {t(nights === 1 ? 'common.night' : 'common.nights')})</span>
+                  <span>Subtotal ({nights} noites)</span>
                   <span className="text-gray-900 font-black">€{nightsPrice}</span>
                 </div>
                 <div className="flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-widest">
-                  <span>{t('property.fixedFees')}</span>
+                  <span>Taxas fixas</span>
                   <span>€{cleaningFee + serviceFee}</span>
                 </div>
                 <div className="flex justify-between text-2xl font-black text-gray-900 pt-6 border-t border-gray-100 italic uppercase">
-                  <span>{t('common.total')}</span>
+                  <span>Total</span>
                   <span className="text-blue-600 font-black">€{totalPrice}</span>
                 </div>
               </div>
@@ -486,31 +434,35 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setShowModal(false)}></div>
           <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] p-10 shadow-2xl text-left animate-slideUp">
             <button onClick={() => setShowModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-black transition"><X size={28}/></button>
-            <h2 className="text-3xl font-black italic mb-2 uppercase text-gray-900 tracking-tighter">{t('property.confirmReservation')}</h2>
+            <h2 className="text-3xl font-black italic mb-2 uppercase text-gray-900 tracking-tighter">Confirmar Reserva</h2>
             <div className="space-y-4 my-8 font-bold text-gray-900">
               <div className="bg-gray-50 p-6 rounded-[2.5rem] flex justify-between">
                 <div>
-                  <p className="text-[10px] font-black text-blue-500 uppercase mb-1 tracking-widest">{t('property.dates')}</p>
+                  <p className="text-[10px] font-black text-blue-500 uppercase mb-1 tracking-widest">Datas</p>
                   <p className="text-sm">{startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-blue-500 uppercase mb-1 tracking-widest">{t('common.guests')}</p>
-                  <p className="text-sm font-black">{hospedes} {hospedes === 1 ? t('common.guest') : t('common.guests')}</p>
+                  <p className="text-[10px] font-black text-blue-500 uppercase mb-1 tracking-widest">Hóspedes</p>
+                  <p className="text-sm font-black">{hospedes} hóspedes</p>
                 </div>
               </div>
               <div className="px-2 space-y-3 text-gray-500">
-                <div className="flex justify-between"><span>{t('property.subtotalNights')}</span><span className="text-gray-900 font-black">€{nightsPrice}</span></div>
+                <div className="flex justify-between"><span>Subtotal ({nights} noites)</span><span className="text-gray-900 font-black">€{nightsPrice}</span></div>
                 <div className="flex justify-between text-3xl font-black text-gray-900 pt-6 border-t border-gray-100 italic uppercase tracking-tighter">
-                  <span>{t('common.total')}</span><span className="text-blue-600 font-black">€{totalPrice}</span>
+                  <span>Total</span><span className="text-blue-600 font-black">€{totalPrice}</span>
                 </div>
               </div>
             </div>
             <button onClick={handleConfirmBooking} disabled={bookingLoading} className="w-full bg-blue-600 text-white font-black py-6 rounded-[2.2rem] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs italic">
-                {bookingLoading ? <Loader2 className="animate-spin"/> : <><CreditCard size={18}/> {t('property.confirmAndPay')}</>}
+                {bookingLoading ? <Loader2 className="animate-spin"/> : <><CreditCard size={18}/> Confirmar e Pagar</>}
             </button>
           </div>
         </div>
-    );
+      )}
+
+      <Footer />
+    </div>
+  );
 }
 
 export default ListingDetails;
