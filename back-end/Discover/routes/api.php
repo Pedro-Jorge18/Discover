@@ -4,6 +4,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Webhook\StripeWebHookController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 
 // Rotas públicas ----------------------------------------------------------
+Route::get('cities', [CityController::class, 'index']);
+Route::get('cities/{city}', [CityController::class, 'show']);
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
 
 // Rotas públicas de reviews (listar reviews de propriedades)

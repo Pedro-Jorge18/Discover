@@ -50,16 +50,26 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     }
     fetchHostProperties();
     fetchCities();
-  }, [user, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchHostProperties = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/properties/my-properties');
-      setProperties(response.data?.data || response.data || []);
+      
+      // Busca todas as propriedades e filtra pelo usuário atual
+      const response = await api.get('/properties');
+      const allProperties = response.data?.data?.data || response.data?.data || response.data || [];
+      // Filtra apenas as propriedades do usuário atual (host)
+      const myProperties = allProperties.filter(prop => prop.host_id === user?.id || prop.user_id === user?.id);
+      setProperties(myProperties);
     } catch (error) {
       console.error('Error fetching properties:', error);
-      notify('Erro ao carregar propriedades', 'error');
+      // Não mostra notificação se for apenas problema de não ter propriedades
+      if (error.response?.status && error.response.status >= 500) {
+        notify('Erro ao conectar com o servidor', 'error');
+      }
+      setProperties([]);
     } finally {
       setLoading(false);
     }
@@ -71,6 +81,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       setCities(response.data?.data || response.data || []);
     } catch (error) {
       console.error('Error fetching cities:', error);
+      notify('Erro ao carregar cidades', 'error');
     }
   };
 
