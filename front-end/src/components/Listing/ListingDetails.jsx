@@ -11,10 +11,9 @@ import { pt } from 'date-fns/locale';
 import { differenceInDays, addDays, startOfDay } from 'date-fns';
 import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
-import { useTranslation } from '../../contexts/TranslationContext';
+import ListingInfo from './ListingInfo.jsx';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {
-  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   
@@ -47,6 +46,22 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         }
       }));
     }
+  };
+
+  const formatTime = (value, fallback = '--:--') => {
+    if (!value) return fallback;
+    if (typeof value === 'string') {
+      // Strict HH:MM
+      if (/^\d{2}:\d{2}$/.test(value)) return value;
+      // ISO date strings with T separator
+      if (value.includes('T')) {
+        const timePart = value.split('T')[1];
+        if (timePart && timePart.length >= 5) return timePart.slice(0, 5);
+      }
+      // Datetime with space separator
+      if (value.includes(' ')) return value.split(' ')[1]?.slice(0, 5) || fallback;
+    }
+    return fallback;
   };
 
   // Check if user can review this property (only needs to be authenticated)
@@ -153,7 +168,12 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
     // Return the valid photo if available at this index
     if (validPhotos[index]) {
-      return validPhotos[index].image_path || validPhotos[index].url || validPhotos[index].path;
+      const image = validPhotos[index];
+      const raw = image.image_url || image.url || image.image_path || image.path;
+      if (!raw) return backupPlaceholders[index % backupPlaceholders.length];
+      if (raw.startsWith('http')) return raw;
+      const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      return `${base}/storage/${raw.replace(/^\/storage\//, '')}`;
     }
 
     // Otherwise, use a placeholder from the list based on the slot index
@@ -231,16 +251,36 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         {/* Gallery Section - Instant Load Logic */}
         <div className="grid grid-cols-4 gap-2 h-[550px] rounded-[3rem] overflow-hidden mb-12 shadow-2xl bg-gray-50 border border-gray-100">
           <div className="col-span-2 row-span-2 overflow-hidden bg-gray-200">
-            <img src={getImageUrl(0)} className="w-full h-full object-cover hover:scale-105 transition duration-700" alt="Destaque" />
+            <img 
+              src={getImageUrl(0)} 
+              className="w-full h-full object-cover hover:scale-105 transition duration-700" 
+              alt="Destaque"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800'; }}
+            />
           </div>
           <div className="overflow-hidden bg-gray-200">
-            <img src={getImageUrl(1)} className="w-full h-full object-cover" alt="Interior 1" />
+            <img 
+              src={getImageUrl(1)} 
+              className="w-full h-full object-cover" 
+              alt="Interior 1"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800'; }}
+            />
           </div>
           <div className="overflow-hidden bg-gray-200">
-            <img src={getImageUrl(2)} className="w-full h-full object-cover" alt="Interior 2" />
+            <img 
+              src={getImageUrl(2)} 
+              className="w-full h-full object-cover" 
+              alt="Interior 2"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800'; }}
+            />
           </div>
           <div className="col-span-2 overflow-hidden bg-gray-200">
-            <img src={getImageUrl(3)} className="w-full h-full object-cover" alt="Interior 3" />
+            <img 
+              src={getImageUrl(3)} 
+              className="w-full h-full object-cover" 
+              alt="Interior 3"
+              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800'; }}
+            />
           </div>
         </div>
 
@@ -251,6 +291,26 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={16}/> {alojamento.bedrooms} {t(alojamento.bedrooms === 1 ? 'common.bedroom' : 'common.bedrooms')}</span>
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={16}/> {alojamento.bathrooms || 1} {t((alojamento.bathrooms || 1) === 1 ? 'common.bathroom' : 'common.bathrooms')}</span>
             </div>
+
+            <div className="flex flex-wrap gap-3 mb-10 text-xs font-black uppercase text-gray-500 tracking-widest">
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+                <span className="text-gray-400">Check-in</span>
+                <span className="text-gray-800">{formatTime(alojamento.check_in_time, '15:00')}</span>
+              </span>
+              <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+                <span className="text-gray-400">Check-out</span>
+                <span className="text-gray-800">{formatTime(alojamento.check_out_time, '11:00')}</span>
+              </span>
+            </div>
+
+            <ListingInfo
+              city={alojamento.location?.city?.name}
+              description={alojamento.description || 'Sem descrição disponível.'}
+              guests={alojamento.max_guests}
+              bedrooms={alojamento.bedrooms}
+              bathrooms={alojamento.bathrooms || 1}
+              address={alojamento.location?.address || alojamento.address}
+            />
 
             {/* Reviews Section */}
             <div className="mt-16 pt-16 border-t border-gray-200">
@@ -302,7 +362,13 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                 </div>
               )}
 
-              <ReviewsList propertyId={id} key={reviewRefreshTrigger} onStatsUpdate={handleStatsUpdate} />
+              <ReviewsList 
+                propertyId={id} 
+                key={reviewRefreshTrigger} 
+                onStatsUpdate={handleStatsUpdate}
+                user={user}
+                propertyHostId={alojamento?.host?.id}
+              />
             </div>
           </div>
 

@@ -32,7 +32,7 @@ function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
       {/* Horizontal Scroll Area */}
       <div className="flex overflow-x-auto gap-6 pb-8 snap-x no-scrollbar">
         {properties.map((property) => (
-          <div key={property.id} className="min-w-[300px] snap-start">
+          <div key={property.id} className="min-w-[280px] max-w-[280px] snap-start">
             {/* IMPORTANT: Pass the user prop down to the card */}
             <PropertyCard property={property} user={user} />
           </div>

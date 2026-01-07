@@ -149,8 +149,15 @@ class ReviewController extends Controller
      */
     public function destroy(Review $review): JsonResponse
     {
-        // Apenas o dono da review pode deletar
-        if ($review->user_id !== auth()->id()) {
+        $user = auth()->user();
+        
+        // Permite apagar se for:
+        // 1. O dono da review
+        // 2. Admin
+        // 3. Host da propriedade
+        if ($review->user_id !== $user->id && 
+            $user->role !== 'admin' && 
+            $review->property->host_id !== $user->id) {
             return response()->json([
                 'message' => 'Você não tem permissão para deletar esta avaliação'
             ], 403);
@@ -185,7 +192,8 @@ class ReviewController extends Controller
                 AVG(rating_accuracy) as avg_accuracy,
                 AVG(rating_location) as avg_location,
                 AVG(rating_value) as avg_value,
-                COUNT(*) as total_reviews
+                COUNT(*) as total_reviews,
+                ROUND(SUM(CASE WHEN recommend = 1 THEN 1 ELSE 0 END) / COUNT(*) * 100) as recommend_percentage
             ')
             ->first();
 

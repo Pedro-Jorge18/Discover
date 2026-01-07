@@ -1,4 +1,7 @@
 import React from 'react';
+import { Users, Bed, Bath, MapPin } from 'lucide-react';
+
+const ListingInfo = ({ city, description, guests, bedrooms, bathrooms, address }) => {
 import { Users, Bed, Bath } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
 
@@ -12,6 +15,10 @@ const ListingInfo = ({ city, description, guests, bedrooms, bathrooms }) => {
           <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Users size={20}/> {guests} {t(guests === 1 ? 'common.guest' : 'common.guests')}</span>
           <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bed size={20}/> {bedrooms} {t(bedrooms === 1 ? 'common.bedroom' : 'common.bedrooms')}</span>
           <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl"><Bath size={20}/> {bathrooms} {t(bathrooms === 1 ? 'common.bathroom' : 'common.bathrooms')}</span>
+        </div>
+        <div className="mt-6 flex items-start gap-2 text-gray-600 text-base font-semibold">
+          <MapPin size={18} className="text-blue-600 mt-0.5" />
+          <span className="leading-snug">{address || 'Morada não definida'}</span>
         </div>
       </div>
       <div className="mb-12">
