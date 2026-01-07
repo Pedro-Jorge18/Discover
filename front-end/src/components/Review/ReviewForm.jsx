@@ -3,8 +3,10 @@ import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function ReviewForm({ reservation, property, onSuccess, onCancel, user }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [ratings, setRatings] = useState({
     rating_cleanliness: 0,
@@ -20,12 +22,12 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
   const [hoveredRating, setHoveredRating] = useState({});
 
   const categories = [
-    { key: 'rating_cleanliness', label: 'Limpeza' },
-    { key: 'rating_communication', label: 'Comunicação' },
-    { key: 'rating_checkin', label: 'Check-in' },
-    { key: 'rating_accuracy', label: 'Precisão' },
-    { key: 'rating_location', label: 'Localização' },
-    { key: 'rating_value', label: 'Qualidade/Preço' },
+    { key: 'rating_cleanliness', label: t('review.cleanliness') },
+    { key: 'rating_communication', label: t('review.communication') },
+    { key: 'rating_checkin', label: t('review.checkIn') },
+    { key: 'rating_accuracy', label: t('review.accuracy') },
+    { key: 'rating_location', label: t('review.location') },
+    { key: 'rating_value', label: t('review.valueForMoney') },
   ];
 
   const handleRatingClick = (category, value) => {
@@ -37,7 +39,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
 
     // Verificar se o utilizador está autenticado
     if (!user || !user.id) {
-      notify('Para avaliar a propriedade inicie sessão e tente novamente.', 'warning');
+      notify(t('review.mustBeAuthenticatedToReview'), 'warning');
       navigate('/login');
       return;
     }
@@ -45,12 +47,12 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
     // Validate all ratings
     const allRated = Object.values(ratings).every(r => r > 0);
     if (!allRated) {
-      notify('Por favor, avalie todas as categorias', 'error');
+      notify(t('review.pleaseRateAllCategories'), 'error');
       return;
     }
 
     if (comment.length < 10) {
-      notify('O comentário deve ter pelo menos 10 caracteres', 'error');
+      notify(t('review.commentMinimumLength'), 'error');
       return;
     }
 
@@ -70,7 +72,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
 
       const response = await api.post('/reviews', payload);
 
-      notify('Avaliação enviada com sucesso!', 'success');
+      notify(t('review.reviewSubmittedSuccessfully'), 'success');
       if (onSuccess) onSuccess(response.data.review);
     } catch (err) {
       console.error('Erro ao enviar review:', err?.response?.data);
@@ -109,7 +111,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-lg">
-      <h3 className="text-2xl font-bold mb-6 text-gray-900">Avaliar Estadia</h3>
+      <h3 className="text-2xl font-bold mb-6 text-gray-900">{t('review.rateStay')}</h3>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Rating Categories */}
@@ -125,7 +127,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
         {/* Comment */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Comentário *
+            {t('review.comment')} *
           </label>
           <textarea
             value={comment}
@@ -134,11 +136,11 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
             minLength={10}
             maxLength={1000}
             rows={5}
-            placeholder="Conte-nos sobre a sua experiência..."
+            placeholder={t('review.tellUsAboutYourExperience')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           />
           <p className="text-xs text-gray-500 mt-1">
-            {comment.length}/1000 caracteres (mínimo 10)
+            {comment.length}/1000 {t('review.charactersMinimum10')}
           </p>
         </div>
 
@@ -152,7 +154,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
             className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
           />
           <label htmlFor="recommend" className="text-sm font-medium text-gray-700">
-            Recomendaria esta propriedade
+            {t('review.recommendThisProperty')}
           </label>
         </div>
 
@@ -163,7 +165,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
             disabled={loading}
             className="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-500 transition disabled:opacity-50"
           >
-            {loading ? 'A enviar...' : 'Enviar Avaliação'}
+            {loading ? t('common.loading') : t('review.submitReview')}
           </button>
           {onCancel && (
             <button
@@ -171,7 +173,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
               onClick={onCancel}
               className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
           )}
         </div>

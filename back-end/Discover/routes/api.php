@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorAuthController;
 use App\Http\Controllers\Api\UserController;
@@ -52,6 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
+    //profile routes
+    Route::put('/user', [ProfileController::class, 'update']);
+    Route::delete('/user', [ProfileController::class, 'destroy']);
+
+    // Properties protegidas
     // Rotas de utilizadores (admin only)
     Route::get('users', [UserController::class, 'index']);
     Route::delete('users/{id}', [UserController::class, 'destroy']);

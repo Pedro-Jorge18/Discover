@@ -5,13 +5,15 @@ import TwoFactorAuth from "../Auth/TwoFactory";
 import AddAdmin from "./AddAdmin";
 import RemovePost from "./RemovePost";
 import RemUser from "./RemUser";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function SettingsAdmin({ onClose }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState("utilizador");
 
   const menuItems = [
-    { id: "utilizador", label: "Utilizador", icon: User },
-    { id: "imovel", label: "Imóvel", icon: House },
+    { id: "utilizador", label: t('settings.user'), icon: User },
+    { id: "imovel", label: t('settings.property'), icon: House },
     //{ id: "notificacoes", label: "Notificações", icon: IconBell },
     //{ id: "privacidade", label: "Privacidade", icon: IconLock },
   ];
@@ -25,7 +27,7 @@ export default function SettingsAdmin({ onClose }) {
         {/* Left Menu  */}
         <aside className="w-64 bg-gray-800 p-6 flex flex-col gap-3">
           <h2 className="text-lg font-semibold mb-4 text-gray-200">
-            Definições
+            {t('settings.settings')}
           </h2>
 
           {menuItems.map(item => {

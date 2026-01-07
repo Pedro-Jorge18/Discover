@@ -3,6 +3,8 @@ import Menu from './Menu.jsx';
 import { Globe, Menu as MenuIcon, User, Search, Heart, SlidersHorizontal } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import FilterModal from './FilterModal.jsx';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher.jsx';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +12,7 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [localSearch, setLocalSearch] = useState("");
   const [favCount, setFavCount] = useState(0);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Updates the favorite counter based on the specific logged-in user
   const updateFavCount = () => {
@@ -61,7 +64,7 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-md hover:shadow-lg transition-all pl-6 pr-2 py-1.5 w-full max-w-md group">
             <input 
               type="text"
-              placeholder="Para onde quer ir?"
+              placeholder={t('header.searchPlaceholder')}
               className="outline-none text-sm text-gray-700 w-full bg-transparent font-medium"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
@@ -90,9 +93,7 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             )}
           </button>
 
-          <button className="hidden sm:flex items-center gap-1.5 p-3 text-gray-700 rounded-full hover:bg-gray-100 font-bold text-xs uppercase">
-            <Globe className="w-4 h-4" /> PT
-          </button>
+          <LanguageSwitcher />
           
           <div className="relative">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="flex items-center space-x-2 border border-gray-300 bg-white rounded-full p-1.5 transition-shadow hover:shadow-md">

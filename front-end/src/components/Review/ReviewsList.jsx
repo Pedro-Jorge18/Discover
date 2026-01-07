@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, Trash2, AlertCircle, X } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
+export default function ReviewsList({ propertyId, onStatsUpdate }) {
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +40,7 @@ export default function ReviewsList({ propertyId, onStatsUpdate, user, propertyH
       }
     } catch (err) {
       console.error('Error fetching reviews:', err);
-      notify('Erro ao carregar avaliações', 'error');
+      notify(t('review.errorLoadingReviews'), 'error');
       setReviews([]);
     } finally {
       setLoading(false);

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function PropertyCard({ property, user }) {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
+  const { t } = useTranslation();
 
   // Safety check: only create storage key if user and user.id exist
   const storageKey = user && user.id ? `favoritos_user_${user.id}` : null;
@@ -129,7 +131,7 @@ function PropertyCard({ property, user }) {
           <span className="text-lg font-black italic">
             €{Math.round(property.price?.per_night || property.price_per_night || 0)}
           </span>
-          <span className="text-gray-400 text-[9px] font-black uppercase tracking-tighter">/ noite</span>
+          <span className="text-gray-400 text-[9px] font-black uppercase tracking-tighter">/ {t('common.night')}</span>
         </div>
       </div>
     </div>
