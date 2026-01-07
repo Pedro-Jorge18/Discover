@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import notify from "../../utils/notify";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function Login({ setUser }) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [show2FAPopup, setShow2FAPopup] = useState(false);
@@ -43,7 +45,7 @@ export default function Login({ setUser }) {
       if (response.data.two_factor_required) {
           if (!response.data.temp_token) {
           console.error("Temp token não fornecido pelo backend.");
-          notify("Erro ao iniciar 2FA. Tente novamente.", "error");
+          notify(t('auth.twoFactorError'), "error");
           return;
         }
         setTempToken(response.data.temp_token); 
@@ -55,7 +57,7 @@ export default function Login({ setUser }) {
       const token = response.data.token;
       if (!token) {
         console.error("Token não fornecido pelo backend.");
-        notify("Erro no login. Tente novamente.", "error");
+        notify(t('auth.noToken'), "error");
         return;
       }
 
@@ -82,9 +84,9 @@ export default function Login({ setUser }) {
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        setErrorMessage("Credenciais inválidas. Verifique o email e a palavra-passe.");
+        setErrorMessage(t('auth.invalidCredentials'));
       } else {
-        setErrorMessage("Erro de comunicação com o servidor.");
+        setErrorMessage(t('auth.serverError'));
       }
     }
   };
@@ -99,7 +101,7 @@ export default function Login({ setUser }) {
       console.log("Resposta 2FA:", res.data);
 
       if (!res.data.status) {
-        notify("Erro ao autenticar 2FA. Tente novamente.", "error");
+        notify(t('auth.twoFactorAuthError'), "error");
         return;
       }
 
@@ -107,7 +109,7 @@ export default function Login({ setUser }) {
 
       if (!token) {
         console.error("Token não fornecido pelo backend após 2FA.");
-        notify("Erro ao autenticar 2FA. Tente novamente.", "error");
+        notify(t('auth.twoFactorAuthError'), "error");
         return;
       }
 
@@ -133,9 +135,9 @@ export default function Login({ setUser }) {
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        setErrorMessage("Código inválido.");
+        setErrorMessage(t('auth.invalidCode'));
       } else {
-        setErrorMessage("Erro de comunicação com o servidor.");
+        setErrorMessage(t('auth.serverError'));
       }
     }
   };
@@ -149,13 +151,13 @@ export default function Login({ setUser }) {
           <button
             onClick={() => navigate("/")}
             className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
-            aria-label="Fechar"
+            aria-label={t('common.close')}
           >
             ✕
           </button>
 
           <h3 className="text-xl font-semibold text-white text-center">
-            Inicia sessão na tua conta
+            {t('auth.signInTitle')}
           </h3>
         </div>
 
@@ -165,13 +167,13 @@ export default function Login({ setUser }) {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Endereço de email
+                {t('auth.emailAddress')}
               </label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="exemplo@empresa.com"
+                placeholder={t('auth.emailPlaceholder')}
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
@@ -180,7 +182,7 @@ export default function Login({ setUser }) {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Palavra-passe
+                {t('auth.password')}
               </label>
               <div className="relative">
                 <input
@@ -210,10 +212,10 @@ export default function Login({ setUser }) {
                   onChange={(e) => setRemember(e.target.checked)}
                   className="mr-2 rounded border-gray-600 bg-gray-700 focus:ring-indigo-500"
                 />
-                Lembrar-me
+                {t('auth.rememberMe')}
               </label>
               <button type="button" onClick={() => window.location.href="/forgotpassword"} className="text-sm font-medium text-indigo-400 hover:text-indigo-300">
-                Esqueceu-se da palavra-passe?
+                {t('auth.forgotPassword')}
               </button>
             </div>
 
@@ -222,7 +224,7 @@ export default function Login({ setUser }) {
               type="submit"
               className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition"
             >
-              Entrar
+              {t('common.login')}
             </button>
           </form>
 

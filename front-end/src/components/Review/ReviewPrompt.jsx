@@ -3,8 +3,10 @@ import { Star } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 import ReviewForm from './ReviewForm.jsx';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function ReviewPrompt({ reservation, onReviewSubmitted }) {
+  const { t } = useTranslation();
   const [canReview, setCanReview] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -55,9 +57,9 @@ export default function ReviewPrompt({ reservation, onReviewSubmitted }) {
   return (
     <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-center justify-between">
       <div>
-        <h4 className="font-semibold text-green-900 mb-1">Estadia Concluída!</h4>
+        <h4 className="font-semibold text-green-900 mb-1">{t('review.stayCompleted')}</h4>
         <p className="text-sm text-green-700">
-          Gostaria de avaliar sua experiência em {reservation.property?.name}?
+          {t('review.wouldYouLikeToReview', { property: reservation.property?.name || '' })}
         </p>
       </div>
       <button
@@ -65,7 +67,7 @@ export default function ReviewPrompt({ reservation, onReviewSubmitted }) {
         className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition font-semibold"
       >
         <Star size={18} />
-        Avaliar
+        {t('review.review')}
       </button>
     </div>
   );

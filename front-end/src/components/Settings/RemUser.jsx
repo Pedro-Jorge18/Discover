@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import notify from "../../utils/notify";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function RemUser({ listMaxH = 'max-h-56' }) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
@@ -32,8 +34,8 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
       const filtered = list.filter(u => u.role === 'guest' || u.role === 'host');
       setUsers(filtered);
     } catch (err) {
-      setError("Erro ao carregar utilizadores.");
-      notify("Erro ao carregar utilizadores.", "error");
+      setError(t('settings.errorLoadingUsers'));
+      notify(t('settings.errorLoadingUsers'), "error");
     } finally {
       setLoading(false);
     }
@@ -54,13 +56,13 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
     try {
       await api.delete(`/users/${id}`);
       setUsers(prev => prev.filter(u => u.id !== id));
-      setSuccess("Utilizador apagado com sucesso.");
-      notify("Utilizador apagado com sucesso.", "success");
+      setSuccess(t('settings.userDeleted'));
+      notify(t('settings.userDeleted'), "success");
       setConfirm(null);
       // Refresh page shortly after successful deletion
       setTimeout(() => window.location.reload(), 700);
     } catch (err) {
-      const msg = err?.response?.data?.error || err?.response?.data?.message || "Erro ao apagar utilizador.";
+      const msg = err?.response?.data?.error || err?.response?.data?.message || t('settings.deleteUserError');
       setError(msg);
       notify(msg, "error");
     } finally {
@@ -89,35 +91,35 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
 
   // Role display helper
   function getRoleDisplay(role) {
-    if (role === 'guest') return 'Cliente';
-    if (role === 'host') return 'Anfitrião';
+    if (role === 'guest') return t('settings.client');
+    if (role === 'host') return t('auth.host');
     return role;
   }
 
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Remover Utilizador
+        {t('settings.removeUser')}
       </h3>
 
       {/* Inline confirmation panel */}
       {confirm && (
         <div className="w-full bg-gray-800 p-6 rounded-xl text-center space-y-4 mt-4">
-          <p className="text-red-600 text-sm">ATENÇÃO! Ao confirmar irá apagar o seguinte utilizador:<p></p><strong className="text-gray-100">{confirm.name} ({getRoleDisplay(confirm.role)})</strong></p>
+          <p className="text-red-600 text-sm">{t('settings.attention')} {t('settings.deleteUserMsg')}<p></p><strong className="text-gray-100">{confirm.name} ({getRoleDisplay(confirm.role)})</strong></p>
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={confirmDelete}
               disabled={deletingId === confirm.id}
               className="rounded-lg bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-500 focus:ring-4 focus:ring-red-400 transition"
             >
-              {deletingId === confirm.id ? 'A apagar...' : 'Confirmar'}
+              {deletingId === confirm.id ? t('settings.deleting') : t('common.confirm')}
             </button>
 
             <button
               onClick={cancelDelete}
               className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -136,7 +138,7 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
           <div className="space-y-3">
             <div className={`${listMaxH} overflow-y-auto divide-y divide-gray-700 rounded-lg border border-gray-700`}>
               {users.length === 0 && (
-                <div className="text-gray-400 text-sm text-center py-6">Nenhum utilizador encontrado.</div>
+                <div className="text-gray-400 text-sm text-center py-6">{t('settings.noUsersFound')}</div>
               )}
 
               {users.map((u) => (
@@ -144,7 +146,7 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
                   <div className="flex-1 pr-3">
                     <div className="text-sm font-medium text-gray-100">{u.name} {u.last_name || ''}</div>
                     <div className="text-xs text-gray-400">{u.email}</div>
-                    <div className="text-xs text-gray-500 mt-1">Cargo: <span className="text-gray-300">{getRoleDisplay(u.role)}</span></div>
+                    <div className="text-xs text-gray-500 mt-1">{t('settings.role')} <span className="text-gray-300">{getRoleDisplay(u.role)}</span></div>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -153,7 +155,7 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
                       disabled={deletingId === u.id}
                       className="rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-500 focus:ring-4 focus:ring-red-400 transition"
                     >
-                      {deletingId === u.id ? "A apagar..." : "Apagar"}
+                      {deletingId === u.id ? t('settings.deleting') : t('settings.delete')}
                     </button>
                   </div>
                 </div>
@@ -166,7 +168,7 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
                 onClick={fetchUsers}
                 className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition"
               >
-                Recarregar
+                {t('common.reload')}
               </button>
             </div>
           </div>

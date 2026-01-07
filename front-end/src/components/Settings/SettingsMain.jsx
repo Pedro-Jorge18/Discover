@@ -3,13 +3,15 @@ import { X } from "lucide-react";
 import ResetPassword from "../Auth/ResetPassword";
 import TwoFactorAuth from "../Auth/TwoFactory";
 import EditProfile from "./EditProfile";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function SettingsMain({ onClose}) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState("perfil");
 
   const menuItems = [
-    { id: "perfil", label: "Perfil", icon: IconUser },
-    { id: "seguranca", label: "Segurança", icon: IconShield },
+    { id: "perfil", label: t('settings.profile'), icon: IconUser },
+    { id: "seguranca", label: t('settings.security'), icon: IconShield },
     //{ id: "notificacoes", label: "Notificações", icon: IconBell },
     //{ id: "privacidade", label: "Privacidade", icon: IconLock },
   ];
@@ -23,7 +25,7 @@ export default function SettingsMain({ onClose}) {
         {/* Left Menu  */}
         <aside className="w-64 bg-gray-800 p-6 flex flex-col gap-3">
           <h2 className="text-lg font-semibold mb-4 text-gray-200">
-            Definições
+            {t('settings.settings')}
           </h2>
 
           {menuItems.map(item => {

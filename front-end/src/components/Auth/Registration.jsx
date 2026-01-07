@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import notify from "../../utils/notify";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function Registration() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ export default function Registration() {
     const form = e.target;
 
     if (form.password.value !== form.password_confirmation.value) {
-      notify("As palavra-passes não coincidem.", "error");
+      notify(t('auth.passwordMismatch'), "error");
       return;
     }
 
@@ -21,7 +23,7 @@ export default function Registration() {
     const birthValue = form.birthday.value;
     const birthDate = new Date(birthValue);
     if (isNaN(birthDate.getTime())) {
-      notify("Data de nascimento inválida.", "error");
+      notify(t('auth.invalidBirthdate'), "error");
       return;
     }
     const today = new Date();
@@ -29,7 +31,7 @@ export default function Registration() {
     const birthOnly = new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
 
     if (birthOnly >= todayOnly) {
-      notify("A data de nascimento não pode ser hoje nem uma data futura.", "error");
+      notify(t('auth.birthdateCannotBeToday'), "error");
       return;
     }
 
@@ -41,7 +43,7 @@ export default function Registration() {
     }
 
     if (age < 18) {
-      notify("Deve ter pelo menos 18 anos para se registar.", "error");
+      notify(t('auth.mustBe18'), "error");
       return;
     }
 
@@ -61,7 +63,7 @@ export default function Registration() {
 
       console.log("REGISTER RESPONSE:", response.data);
 
-      notify("Conta criada com sucesso! Faça o login.", "success");
+      notify(t('auth.accountCreated'), "success");
       navigate("/login");
 
     } catch (error) {
@@ -72,7 +74,7 @@ export default function Registration() {
       } else if (error.response?.data?.message) {
         notify(error.response.data.message, "error");
       } else {
-        notify("Erro de rede ou servidor.", "error");
+        notify(t('auth.networkError'), "error");
       }
     }
   };
@@ -97,7 +99,7 @@ export default function Registration() {
           </button>
           
           <h3 id="dialog-title" className="text-2xl font-semibold text-white text-center">
-            Criar Conta
+            {t('auth.createAccount')}
           </h3>
         </div>
 
@@ -107,12 +109,12 @@ export default function Registration() {
             {/* Name + Lastname */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.name')}</label>
                 <input type="text" id="name" name="name" placeholder="António" required
                   className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
               <div>
-                <label htmlFor="last_name" className="block text-sm font-medium text-gray-300 mb-2">Apelido</label>
+                <label htmlFor="last_name" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.lastName')}</label>
                 <input type="text" id="last_name" name="last_name" placeholder="Rodrigues" required
                   className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
@@ -121,12 +123,12 @@ export default function Registration() {
             {/* Phone + Birthday */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.phone')}</label>
                 <input type="text" id="phone" name="phone" placeholder="987654321" required
                   className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
               <div>
-                <label htmlFor="birthday" className="block text-sm font-medium text-gray-300 mb-2">Data de Nascimento</label>
+                <label htmlFor="birthday" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.birthdate')}</label>
                 <input type="date" id="birthday" name="birthday" required
                   className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
@@ -134,14 +136,14 @@ export default function Registration() {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.email')}</label>
               <input type="email" id="email" name="email" placeholder="exemplo@empresa.com" required
                 className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.password')}</label>
               <div className="relative">
                 <input id="password" name="password" type={showPassword ? "text" : "password"} placeholder="********" required
                   className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
@@ -154,7 +156,7 @@ export default function Registration() {
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-300 mb-2">Confirmar Password</label>
+                <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-300 mb-2">{t('auth.confirmPassword')}</label>
               <div className="relative">
                 <input id="password_confirmation" name="password_confirmation" type={showConfirmPassword ? "text" : "password"} placeholder="********" required
                   className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none" />
@@ -167,15 +169,15 @@ export default function Registration() {
 
             {/* Account type */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Tipo de conta</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">{t('auth.accountType')}</label>
               <div className="flex gap-6 bg-gray-700 border border-gray-600 rounded-lg p-3">
                 <label className="flex items-center gap-2 text-gray-200 cursor-pointer">
                   <input type="radio" name="role" value={"guest"} className="text-indigo-500 focus:ring-indigo-500" defaultChecked />
-                  <span className="text-sm">Cliente</span>
+                  <span className="text-sm">{t('auth.guest')}</span>
                 </label>
                 <label className="flex items-center gap-2 text-gray-200 cursor-pointer">
                   <input type="radio" name="role" value={"host"} className="text-indigo-500 focus:ring-indigo-500" />
-                  <span className="text-sm">Anfitrião</span>
+                  <span className="text-sm">{t('auth.host')}</span>
                 </label>
               </div>
             </div>
@@ -183,16 +185,16 @@ export default function Registration() {
             {/* Register Button */}
             <button type="submit"
               className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition">
-              Criar Conta
+              {t('auth.createAccount')}
             </button>
           </form>
 
           {/* Link to login */}
           <p className="mt-6 text-center text-sm text-gray-400">
-            Já tem conta?{" "}
+            {t('auth.alreadyHaveAccount')}{" "}
             <button onClick={() => window.location.href = "/login"}
               className="font-medium text-indigo-400 hover:text-indigo-300">
-              Entre agora
+              {t('auth.loginNow')}
             </button>
           </p>
         </div>

@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../api/axios";
 import notify from "../../utils/notify";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function TwoFactorAuth() {
+  const { t } = useTranslation();
   const [enabled, setEnabled] = useState(false);
   const [showCodePopup, setShowCodePopup] = useState(false);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
@@ -31,7 +33,7 @@ export default function TwoFactorAuth() {
         setEnabled(user?.two_factor?.enabled ?? false);
       } catch (error) {
         console.error("Erro ao obter utilizador:", error);
-        notify("Erro ao obter utilizador.", "error");
+        notify(t('auth.errorGettingUser'), "error");
       }
     };
 
@@ -53,7 +55,7 @@ export default function TwoFactorAuth() {
   /* Enable 2FA with password */
   const handlePasswordSubmit = async () => {
     if (!password) {
-      notify("Por favor, introduza a sua palavra-passe.", "error");
+      notify(t('auth.enterPassword'), "error");
       return;
     }
 
@@ -71,16 +73,16 @@ export default function TwoFactorAuth() {
         setShowPasswordPopup(false);
         setShowCodePopup(true);
         setPassword("");
-        notify("Palavra-passe confirmada. Configure o 2FA.", "info");
+        notify(t('auth.passwordConfirmed2FA'), "info");
       } else {
         notify(res.data?.message || "Erro ao ativar 2FA", "error");
       }
     } catch (err) {
       if (err?.response?.status === 422) {
-        notify("Palavra-passe incorreta! Tente novamente.", "error");
+        notify(t('auth.incorrectPassword'), "error");
       } else {
         console.error(err);
-        notify("Erro de comunicação com o servidor.", "error");
+        notify(t('auth.serverError'), "error");
       }
     } finally {
       setLoading(false);
@@ -92,7 +94,7 @@ export default function TwoFactorAuth() {
     const code = confirmCode?.trim();
 
     if (!code || code.length < 6) {
-      notify("Código inválido.", "error");
+      notify(t('auth.invalidCode'), "error");
       return;
     }
 
@@ -115,13 +117,13 @@ export default function TwoFactorAuth() {
         setSecret("");
         setPassword("");
         setConfirmCode("");
-        notify("Autenticação de dois fatores ativada.", "success");
+        notify(t('auth.twoFactorEnabled'), "success");
       } else {
         notify(res.data.message || "Código incorreto.", "error");
       }
     } catch (err) {
       console.error(err);
-      notify("Erro ao validar o código.", "error");
+      notify(t('auth.errorValidatingCode'), "error");
     } finally {
       setLoading(false);
     }
@@ -130,7 +132,7 @@ export default function TwoFactorAuth() {
   /* Disable 2FA */
   const handleDisable2FA = async () => {
     if (!disableCode || disableCode.length < 6) {
-      notify("Código inválido.", "error");
+      notify(t('auth.invalidCode'), "error");
       return;
     }
 
@@ -150,15 +152,15 @@ export default function TwoFactorAuth() {
         setEnabled(false);
         setShowDisablePopup(false);
         setDisableCode("");
-        notify("Autenticação de dois fatores desativada.", "success");
+        notify(t('auth.twoFactorDisabled'), "success");
       } else {
         notify(res.data?.message || "Código incorreto.", "error");
       }
     } catch (err) {
       if (err.response?.status === 422) {
-        notify("Código de autenticação incorreto.", "error");
+        notify(t('auth.incorrectAuthCode'), "error");
       } else {
-        notify("Erro de comunicação com o servidor.", "error");
+        notify(t('auth.serverError'), "error");
       }
     } finally {
       setLoading(false);
@@ -173,9 +175,9 @@ export default function TwoFactorAuth() {
       setCopied(true);
       if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
       copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
-      notify("Código copiado para a área de transferência.", "success");
+      notify(t('auth.copiedToClipboard'), "success");
     } catch {
-      notify("Não foi possível copiar o código.", "error");
+      notify(t('auth.copyFailed'), "error");
     }
   };
 
@@ -187,13 +189,13 @@ export default function TwoFactorAuth() {
 
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
-      <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Autenticação de Dois Fatores (2FA)
-      </h3>
 
+      <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
+        {t('auth.twoFactorAuth')}
+      </h3>
       <div className="pt-6 space-y-6">
         <p className="text-gray-300 text-sm">
-          Adicione uma camada extra de segurança ativando a autenticação de dois fatores.
+          {t('auth.twoFactorDescription')}
         </p>
 
         {/* Toggle */}

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api/axios";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function AddAdmin({ onSuccess } = {}) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [form, setForm] = useState({
@@ -42,7 +44,7 @@ export default function AddAdmin({ onSuccess } = {}) {
     const birthValue = form.birthday;
     const birthDate = new Date(birthValue);
     if (isNaN(birthDate.getTime())) {
-      setErrors({ birthday: ["Data de nascimento inválida."] });
+      setErrors({ birthday: [t('settings.invalidBirthday')] });
       setLoading(false);
       return;
     }
@@ -51,7 +53,7 @@ export default function AddAdmin({ onSuccess } = {}) {
     const birthOnly = new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
 
     if (birthOnly >= todayOnly) {
-      setErrors({ birthday: ["A data de nascimento não pode ser hoje nem uma data futura."] });
+      setErrors({ birthday: [t('settings.futureBirthday')] });
       setLoading(false);
       return;
     }
@@ -64,7 +66,7 @@ export default function AddAdmin({ onSuccess } = {}) {
     }
 
     if (age < 18) {
-      setErrors({ birthday: ["Deve ter pelo menos 18 anos para se registar."] });
+      setErrors({ birthday: [t('settings.ageRequirement')] });
       setLoading(false);
       return;
     }
@@ -97,7 +99,7 @@ export default function AddAdmin({ onSuccess } = {}) {
       } else if (resp?.message) {
         setErrors({ general: resp.message });
       } else {
-        setErrors({ general: "Erro ao criar admin." });
+        setErrors({ general: t('settings.addAdminError') });
       }
     } finally {
       setLoading(false);
@@ -107,12 +109,12 @@ export default function AddAdmin({ onSuccess } = {}) {
   if (saved) {
     return (
       <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl text-center space-y-6">
-        <p className="text-green-400 text-sm">O admin foi criado com sucesso!</p>
+        <p className="text-green-400 text-sm">{t('settings.adminAdded')}</p>
         <button
           onClick={() => setSaved(false)}
           className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition"
         >
-          Voltar
+          {t('settings.back')}
         </button>
       </div>
     );
@@ -121,7 +123,7 @@ export default function AddAdmin({ onSuccess } = {}) {
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Adicionar Admin
+        {t('settings.addAdmin')}
       </h3>
 
       <form className="pt-6 space-y-4" onSubmit={handleSubmit}>
@@ -131,13 +133,13 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Nome */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('settings.firstName')}</label>
           <input
             name="name"
             value={form.name}
             onChange={handleChange}
             required
-            placeholder="Introduza o nome"
+            placeholder={t('settings.firstNamePlaceholder')}
             className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
           {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name[0]}</div>}
@@ -145,13 +147,13 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Apelido */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Apelido</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('settings.lastName')}</label>
           <input
             name="last_name"
             value={form.last_name}
             onChange={handleChange}
             required
-            placeholder="Introduza o apelido"
+            placeholder={t('settings.lastNamePlaceholder')}
             className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
           {errors.last_name && <div className="text-red-500 text-sm mt-1">{errors.last_name[0]}</div>}
@@ -159,13 +161,13 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Telefone */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('settings.contact')}</label>
           <input
             name="phone"
             value={form.phone}
             onChange={handleChange}
             required
-            placeholder="Telemóvel ou telefone"
+            placeholder={t('settings.phoneContact')}
             className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
           {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone[0]}</div>}
@@ -173,7 +175,7 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Data de nascimento */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Data de nascimento</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('auth.birthday')}</label>
           <input
             type="date"
             name="birthday"
@@ -187,14 +189,14 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('auth.email')}</label>
           <input
             type="email"
             name="email"
             value={form.email}
             onChange={handleChange}
             required
-            placeholder="Introduza o email"
+            placeholder={t('auth.emailPlaceholder')}
             className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
           {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email[0]}</div>}
@@ -202,7 +204,7 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Palavra-passe */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Palavra-passe</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('auth.password')}</label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -210,7 +212,7 @@ export default function AddAdmin({ onSuccess } = {}) {
               value={form.password}
               onChange={handleChange}
               required
-              placeholder="Introduza a palavra-passe"
+              placeholder={t('auth.passwordPlaceholder')}
               className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
             />
             <button
@@ -226,7 +228,7 @@ export default function AddAdmin({ onSuccess } = {}) {
 
         {/* Confirmar palavra-passe */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Confirmar palavra-passe</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('auth.confirmPassword')}</label>
           <div className="relative">
             <input
               type={showPasswordConfirm ? "text" : "password"}
@@ -234,7 +236,7 @@ export default function AddAdmin({ onSuccess } = {}) {
               value={form.password_confirmation}
               onChange={handleChange}
               required
-              placeholder="Repita a palavra-passe"
+              placeholder={t('auth.confirmPassword')}
               className="py-2.5 px-4 w-full border border-gray-600 bg-gray-900 text-gray-100 rounded-lg text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
             />
             <button
@@ -254,7 +256,7 @@ export default function AddAdmin({ onSuccess } = {}) {
             disabled={loading}
             className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition"
           >
-            {loading ? "A criar..." : "Adicionar Admin"}
+            {loading ? t('settings.creating') : t('settings.addAdmin')}
           </button>
         </div>
       </form>

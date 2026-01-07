@@ -1,7 +1,10 @@
 import { useState } from "react";
 import api from "../../api/axios";
+import { useTranslation } from '../../contexts/TranslationContext';
+import notify from "../../utils/notify";
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,7 +19,7 @@ export default function ResetPassword() {
     if (newPassword !== confirmPassword) {
       window.dispatchEvent(new CustomEvent('app-notify', {
         detail: {
-          message: 'A nova password e a confirmação não coincidem.',
+          message: t('auth.passwordMismatch'),
           type: 'error'
         }
       }));
@@ -27,7 +30,7 @@ export default function ResetPassword() {
     if (oldPassword === newPassword) {
       window.dispatchEvent(new CustomEvent('app-notify', {
         detail: {
-          message: 'Está a alterar a palavra-passe para a anterior.',
+          message: t('auth.passwordSameAsOld'),
           type: 'error'
         }
       }));
@@ -58,7 +61,7 @@ export default function ResetPassword() {
       if (errors?.current_password) {
         window.dispatchEvent(new CustomEvent('app-notify', {
           detail: {
-            message: 'Palavra-passe antiga incorreta',
+            message: t('auth.incorrectPassword'),
             type: 'error'
           }
         }));
@@ -83,7 +86,7 @@ export default function ResetPassword() {
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl mx-auto mt-10">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Alterar Palavra-passe
+        {t('auth.changePassword')}
       </h3>
 
       {!success ? (
@@ -91,14 +94,14 @@ export default function ResetPassword() {
             {/* Old password */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Palavra-passe antiga
+              {t('auth.oldPassword')}
             </label>
             <div className="relative">
               <input
                 type={showOldPassword ? 'text' : 'password'}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                placeholder="Insira a sua palavra-passe atual"
+                placeholder={t('auth.enterCurrentPassword')}
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
               />
@@ -116,14 +119,14 @@ export default function ResetPassword() {
           {/* New password */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Nova palavra-passe
+              {t('auth.newPassword')}
             </label>
             <div className="relative">
               <input
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Insira a sua nova palavra-passe"
+                placeholder={t('auth.enterNewPassword')}
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
               />
@@ -141,14 +144,14 @@ export default function ResetPassword() {
           {/* Confirm new password */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Confirmar nova palavra-passe
+              {t('auth.confirmNewPassword')}
             </label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirme a sua nova palavra-passe"
+                placeholder={t('auth.confirmNewPasswordPlaceholder')}
                 required
                 className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-gray-100"
               />
@@ -168,12 +171,12 @@ export default function ResetPassword() {
             type="submit"
             className="w-full bg-indigo-600 py-2 px-4 rounded-lg text-white font-semibold hover:bg-indigo-500 transition"
           >
-            Confirmar
+            {t('common.confirm')}
           </button>
         </form>
       ) : (
         <div className="text-center mt-6">
-          <p className="text-green-400">A palavra-passe foi alterada com sucesso!</p>
+          <p className="text-green-400">{t('auth.passwordChangedSuccess')}</p>
         </div>
       )}
     </div>
