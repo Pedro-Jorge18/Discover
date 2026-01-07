@@ -62,24 +62,25 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   };
 
   // Pre-filtering logic for UI sections
-  const porto = alojamentos.filter(a => a.location?.city?.name?.toLowerCase().includes('porto'));
-  const madrid = alojamentos.filter(a => a.location?.city?.name?.toLowerCase().includes('madri'));
-  const economicos = alojamentos.filter(a => Number(a.price?.per_night ?? Infinity) <= 60);
-  const luxo = alojamentos.filter(a => Number(a.price?.per_night ?? 0) >= 150);
+  const publicados = alojamentos.filter(a => (a.settings?.published ?? a.published ?? false));
+  const porto = publicados.filter(a => a.location?.city?.name?.toLowerCase().includes('porto'));
+  const madrid = publicados.filter(a => a.location?.city?.name?.toLowerCase().includes('madri'));
+  const economicos = publicados.filter(a => Number(a.price?.per_night ?? Infinity) <= 60);
+  const luxo = publicados.filter(a => Number(a.price?.per_night ?? 0) >= 150);
 
   // Dynamic search logic for global listings
   const filtrados = (() => {
-    if (!termoPesquisa) return alojamentos;
+    if (!termoPesquisa) return publicados;
     const q = String(termoPesquisa).trim().toLowerCase();
     const qNum = Number(q);
     const isNumber = !Number.isNaN(qNum);
 
     if (isNumber) {
-      if (qNum <= 100) return alojamentos.filter(a => Number(a.price?.per_night ?? Infinity) <= qNum);
-      return alojamentos.filter(a => Number(a.price?.per_night ?? 0) >= qNum);
+      if (qNum <= 100) return publicados.filter(a => Number(a.price?.per_night ?? Infinity) <= qNum);
+      return publicados.filter(a => Number(a.price?.per_night ?? 0) >= qNum);
     }
 
-    return alojamentos.filter(a => {
+    return publicados.filter(a => {
       const city = String(a.location?.city?.name ?? '').toLowerCase();
       const title = String(a.title ?? '').toLowerCase();
       return city.includes(q) || title.includes(q);
@@ -88,7 +89,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
 
   return (
     <div className="min-h-screen pt-20">
-      <title>{t('home.title')}</title>
+      <title>Discover - Página Inicial</title>
       <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6 text-left">

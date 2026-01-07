@@ -61,6 +61,9 @@ class UpdatePropertyRequest extends FormRequest
             'floor' => 'sometimes|nullable|integer|min:0',
             'min_nights' => 'sometimes|nullable|integer|min:1',
             'max_nights' => 'sometimes|nullable|integer|min:1',
+
+            // Publicação
+            'published' => 'sometimes|boolean',
         ];
     }
 

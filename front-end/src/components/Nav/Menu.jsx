@@ -70,6 +70,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
               className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
             >
               <MessageSquare className="w-5 h-5 text-gray-500" />
+              Avaliações
               {t('header.myReviews')}
             </Link>          
             
@@ -88,6 +89,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
                 <House className="w-5 h-5 text-gray-500" />
+                Anfitrião
                 {t('header.hostMode')}
               </Link>
             ) : user.role === "admin" ? (
@@ -96,6 +98,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
                 className="px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
               >
                 <UserStar className="w-5 h-5 text-gray-500" />
+                Menu Administração
                 Admin Panel
               </button>
             ) : (

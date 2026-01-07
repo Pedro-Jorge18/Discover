@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Star, MessageSquare } from 'lucide-react';
+import { Star, MessageSquare, Trash2, AlertCircle, X } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 import { useTranslation } from '../../contexts/TranslationContext';
 
+export default function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
 export default function ReviewsList({ propertyId, onStatsUpdate }) {
   const { t } = useTranslation();
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     if (propertyId) {
@@ -42,6 +45,35 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    setConfirmDelete(reviewId);
+  };
+
+  const confirmDeleteReview = async () => {
+    const reviewId = confirmDelete;
+    setConfirmDelete(null);
+
+    try {
+      setDeleting(reviewId);
+      await api.delete(`/reviews/${reviewId}`);
+      notify('Avaliação apagada com sucesso', 'success');
+      fetchReviews(); // Reload reviews
+    } catch (err) {
+      console.error('Error deleting review:', err);
+      notify(err.response?.data?.message || 'Erro ao apagar avaliação', 'error');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const canDeleteReview = (review) => {
+    if (!user) return false;
+    // Can delete if: owner, admin, or property host
+    return review.user?.id === user.id || 
+           user.role === 'admin' || 
+           propertyHostId === user.id;
   };
 
   const renderStars = (rating) => {
@@ -90,7 +122,7 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
             <div className="border-l border-gray-300 pl-4">
               <p className="text-sm text-gray-600">{stats.total_reviews} avaliações</p>
               <p className="text-sm text-gray-600 mt-1">
-                {stats.recommend_percentage}% recomendam
+                {Math.round(stats.recommend_percentage || 0)}% recomendam
               </p>
             </div>
           </div>
@@ -99,27 +131,27 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div className="text-sm">
               <span className="text-gray-600">Limpeza:</span>
-              <span className="ml-2 font-semibold">{stats.avg_cleanliness}</span>
+              <span className="ml-2 font-semibold">{parseFloat(stats.avg_cleanliness).toFixed(1)}</span>
             </div>
             <div className="text-sm">
               <span className="text-gray-600">Comunicação:</span>
-              <span className="ml-2 font-semibold">{stats.avg_communication}</span>
+              <span className="ml-2 font-semibold">{parseFloat(stats.avg_communication).toFixed(1)}</span>
             </div>
             <div className="text-sm">
               <span className="text-gray-600">Check-in:</span>
-              <span className="ml-2 font-semibold">{stats.avg_checkin}</span>
+              <span className="ml-2 font-semibold">{parseFloat(stats.avg_checkin).toFixed(1)}</span>
             </div>
             <div className="text-sm">
               <span className="text-gray-600">Precisão:</span>
-              <span className="ml-2 font-semibold">{stats.avg_accuracy}</span>
+              <span className="ml-2 font-semibold">{parseFloat(stats.avg_accuracy).toFixed(1)}</span>
             </div>
             <div className="text-sm">
               <span className="text-gray-600">Localização:</span>
-              <span className="ml-2 font-semibold">{stats.avg_location}</span>
+              <span className="ml-2 font-semibold">{parseFloat(stats.avg_location).toFixed(1)}</span>
             </div>
             <div className="text-sm">
               <span className="text-gray-600">Qualidade/Preço:</span>
-              <span className="ml-2 font-semibold">{stats.avg_value}</span>
+              <span className="ml-2 font-semibold">{parseFloat(stats.avg_value).toFixed(1)}</span>
             </div>
           </div>
         </div>
@@ -128,7 +160,19 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
       {/* Reviews List */}
       <div className="space-y-4">
         {reviews.map((review) => (
-          <div key={review.id} className="bg-white border border-gray-200 rounded-xl p-6">
+          <div key={review.id} className="bg-white border border-gray-200 rounded-xl p-6 relative">
+            {/* Delete Button - Only visible for admin, host, or review owner */}
+            {canDeleteReview(review) && (
+              <button
+                onClick={() => handleDeleteReview(review.id)}
+                disabled={deleting === review.id}
+                className="absolute top-4 right-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                title="Apagar avaliação"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
+
             {/* User Info */}
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
@@ -175,6 +219,45 @@ export default function ReviewsList({ propertyId, onStatsUpdate }) {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <AlertCircle size={24} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-gray-900">Apagar Avaliação</h3>
+                <p className="text-sm text-gray-600 mt-1">Esta ação não pode ser desfeita.</p>
+              </div>
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDeleteReview}
+                disabled={deleting === confirmDelete}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting === confirmDelete ? 'A apagar...' : 'Apagar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
