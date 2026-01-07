@@ -18,8 +18,10 @@ import {
 } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       console.error('Error fetching properties:', error);
       // Não mostra notificação se for apenas problema de não ter propriedades
       if (error.response?.status && error.response.status >= 500) {
-        notify('Erro ao conectar com o servidor', 'error');
+        notify(t('errors.serverError'), 'error');
       }
       setProperties([]);
     } finally {
@@ -81,7 +83,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       setCities(response.data?.data || response.data || []);
     } catch (error) {
       console.error('Error fetching cities:', error);
-      notify('Erro ao carregar cidades', 'error');
+      notify(t('host.loadCitiesError'), 'error');
     }
   };
 
@@ -95,7 +97,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     
     // Validação básica
     if (!newProperty.title || !newProperty.price_per_night || !newProperty.city_id) {
-      notify('Por favor, preencha os campos obrigatórios', 'error');
+      notify(t('host.requiredFields'), 'error');
       return;
     }
 
@@ -111,7 +113,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         city_id: parseInt(newProperty.city_id)
       });
 
-      notify('Propriedade publicada com sucesso!', 'success');
+      notify(t('host.propertyCreated'), 'success');
       setShowAddModal(false);
       setNewProperty({
         title: '',
@@ -131,7 +133,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       if (error.response?.data?.errors) {
         notify(Object.values(error.response.data.errors).flat().join('\n'), 'error');
       } else {
-        notify('Erro ao publicar propriedade', 'error');
+        notify(t('host.propertyError'), 'error');
       }
     } finally {
       setSubmitting(false);
@@ -139,17 +141,17 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   };
 
   const handleDeleteProperty = async (propertyId) => {
-    if (!window.confirm('Tem certeza que deseja eliminar esta propriedade?')) {
+    if (!window.confirm(t('host.deleteConfirm'))) {
       return;
     }
 
     try {
       await api.delete(`/properties/${propertyId}`);
-      notify('Propriedade eliminada com sucesso', 'success');
+      notify(t('host.propertyDeleted'), 'success');
       fetchHostProperties();
     } catch (error) {
       console.error('Error deleting property:', error);
-      notify('Erro ao eliminar propriedade', 'error');
+      notify(t('host.deleteError'), 'error');
     }
   };
 
@@ -175,10 +177,10 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         <div className="flex justify-between items-center mb-12">
           <div>
             <h1 className="text-4xl font-black text-gray-900 mb-2 uppercase tracking-tight">
-              Painel de Anfitrião
+              {t('host.dashboard')}
             </h1>
             <p className="text-gray-600 font-medium">
-              Gerir as suas propriedades publicadas
+              {t('host.manageProperties')}
             </p>
           </div>
           <button
@@ -186,7 +188,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl active:scale-95"
           >
             <Plus size={20} />
-            Nova Propriedade
+            {t('host.addProperty')}
           </button>
         </div>
 
@@ -196,7 +198,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                  Total Propriedades
+                  {t('host.totalProperties')}
                 </p>
                 <p className="text-3xl font-black text-gray-900">
                   {properties.length}
@@ -212,7 +214,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                  Propriedades Ativas
+                  {t('host.activeProperties')}
                 </p>
                 <p className="text-3xl font-black text-green-600">
                   {properties.filter(p => p.status === 'available').length}
@@ -228,7 +230,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                  Receita Potencial
+                  {t('host.potentialRevenue')}
                 </p>
                 <p className="text-3xl font-black text-purple-600">
                   €{properties.reduce((sum, p) => sum + (parseFloat(p.price_per_night) || 0), 0).toFixed(0)}
@@ -246,17 +248,17 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           <div className="bg-white rounded-2xl shadow-md p-16 text-center">
             <HomeIcon size={64} className="mx-auto text-gray-300 mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Nenhuma propriedade publicada
+              {t('host.noProperties')}
             </h3>
             <p className="text-gray-600 mb-6">
-              Comece a publicar as suas propriedades para receber reservas
+              {t('host.noPropertiesDesc')}
             </p>
             <button
               onClick={() => setShowAddModal(true)}
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
             >
               <Plus size={20} />
-              Publicar Primeira Propriedade
+              {t('host.publishFirst')}
             </button>
           </div>
         ) : (
@@ -285,7 +287,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                         ? 'bg-green-500 text-white' 
                         : 'bg-gray-500 text-white'
                     }`}>
-                      {property.status === 'available' ? 'Ativo' : 'Inativo'}
+                      {property.status === 'available' ? t('host.active') : t('host.inactive')}
                     </span>
                   </div>
                 </div>
@@ -298,7 +300,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                     <MapPin size={14} />
-                    <span className="line-clamp-1">{property.city?.name || 'Localização'}</span>
+                    <span className="line-clamp-1">{property.city?.name || t('property.location')}</span>
                   </div>
 
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
@@ -308,7 +310,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                     </span>
                     <span>•</span>
                     <span className="font-bold text-blue-600 text-lg">
-                      €{property.price_per_night}/noite
+                      €{property.price_per_night}/{t('common.night')}
                     </span>
                   </div>
 
@@ -319,13 +321,13 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-semibold text-sm"
                     >
                       <Eye size={16} />
-                      Ver
+                      {t('settings.view')}
                     </button>
                     <button
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-semibold text-sm"
                     >
                       <Edit size={16} />
-                      Editar
+                      {t('common.edit')}
                     </button>
                     <button
                       onClick={() => handleDeleteProperty(property.id)}
@@ -348,7 +350,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
               <h2 className="text-2xl font-black text-gray-900 uppercase">
-                Publicar Nova Propriedade
+                {t('host.addProperty')}
               </h2>
               <button
                 onClick={() => setShowAddModal(false)}
@@ -363,14 +365,14 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               {/* Título */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Título da Propriedade *
+                  {t('host.propertyTitle')} *
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={newProperty.title}
                   onChange={handleInputChange}
-                  placeholder="Ex: Apartamento Moderno no Centro"
+                  placeholder={t('host.propertyTitle')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                   required
                 />
@@ -379,13 +381,13 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               {/* Descrição */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Descrição
+                  {t('host.propertyDescription')}
                 </label>
                 <textarea
                   name="description"
                   value={newProperty.description}
                   onChange={handleInputChange}
-                  placeholder="Descreva a sua propriedade..."
+                  placeholder={t('host.propertyDescription')}
                   rows="4"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
                 />
@@ -395,7 +397,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Preço/Noite (€) *
+                    {t('host.pricePerNight')} (€) *
                   </label>
                   <input
                     type="number"
@@ -412,7 +414,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Taxa de Limpeza (€)
+                    {t('property.cleaningFee')} (€)
                   </label>
                   <input
                     type="number"
@@ -431,7 +433,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Hóspedes
+                    {t('common.guests')}
                   </label>
                   <input
                     type="number"
@@ -446,7 +448,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Quartos
+                    {t('common.bedrooms')}
                   </label>
                   <input
                     type="number"
@@ -461,7 +463,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Casas de Banho
+                    {t('common.bathrooms')}
                   </label>
                   <input
                     type="number"
@@ -478,7 +480,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               {/* Tipo de Propriedade */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Tipo de Propriedade
+                  {t('host.propertyType')}
                 </label>
                 <select
                   name="property_type"
@@ -486,18 +488,18 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 >
-                  <option value="apartment">Apartamento</option>
-                  <option value="house">Casa</option>
-                  <option value="villa">Moradia</option>
-                  <option value="studio">Estúdio</option>
-                  <option value="room">Quarto</option>
+                  <option value="apartment">{t('filter.apartment')}</option>
+                  <option value="house">{t('filter.house')}</option>
+                  <option value="villa">{t('filter.villa')}</option>
+                  <option value="studio">{t('host.studio')}</option>
+                  <option value="room">{t('host.room')}</option>
                 </select>
               </div>
 
               {/* Cidade */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Cidade *
+                  {t('host.city')} *
                 </label>
                 <select
                   name="city_id"
@@ -506,7 +508,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                   required
                 >
-                  <option value="">Selecione uma cidade</option>
+                  <option value="">{t('host.selectCity')}</option>
                   {cities.map(city => (
                     <option key={city.id} value={city.id}>
                       {city.name}
@@ -518,14 +520,14 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               {/* Morada */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Morada
+                  {t('host.address')}
                 </label>
                 <input
                   type="text"
                   name="address"
                   value={newProperty.address}
                   onChange={handleInputChange}
-                  placeholder="Rua, número, código postal..."
+                  placeholder={t('host.address')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 />
               </div>
@@ -537,7 +539,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   onClick={() => setShowAddModal(false)}
                   className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -547,12 +549,12 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   {submitting ? (
                     <>
                       <Loader2 className="animate-spin" size={20} />
-                      A publicar...
+                      {t('host.publishing')}
                     </>
                   ) : (
                     <>
                       <Upload size={20} />
-                      Publicar Propriedade
+                      {t('host.publishProperty')}
                     </>
                   )}
                 </button>

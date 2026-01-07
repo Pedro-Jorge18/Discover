@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
+import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function RemovePost({ listMaxH = 'max-h-56' }) {
+  const { t } = useTranslation();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
@@ -29,7 +31,7 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
       }
       setProperties(list);
     } catch (err) {
-      setError("Erro ao carregar propriedades.");
+      setError(t('settings.errorLoadingProperties'));
     } finally {
       setLoading(false);
     }
@@ -50,12 +52,12 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
     try {
       await api.delete(`/properties/${id}`);
       setProperties(prev => prev.filter(p => p.id !== id));
-      setSuccess("Propriedade apagada com sucesso.");
+      setSuccess(t('settings.propertyDeleted'));
       setConfirm(null);
       // refresh page shortly after successful deletion
       setTimeout(() => window.location.reload(), 700);
     } catch (err) {
-      const msg = err?.response?.data?.error || err?.response?.data?.message || "Erro ao apagar propriedade.";
+      const msg = err?.response?.data?.error || err?.response?.data?.message || t('settings.deletePropertyError');
       setError(msg);
     } finally {
       setDeletingId(null);
@@ -84,27 +86,27 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
   return (
     <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
       <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
-        Remover Propriedade
+        {t('settings.removeProperty')}
       </h3>
 
       {/* Inline confirmation panel */}
       {confirm && (
         <div className="w-full bg-gray-800 p-6 rounded-xl text-center space-y-4 mt-4">
-          <p className="text-red-600 text-sm">ATENÇÃO! Ao confirmar irá apagar a seguinte propriedade:<p></p><strong className="text-gray-100">{confirm.title}</strong></p>
+          <p className="text-red-600 text-sm">{t('settings.attention')} {t('settings.deletePropertyMsg')}<p></p><strong className="text-gray-100">{confirm.title}</strong></p>
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={confirmDelete}
               disabled={deletingId === confirm.id}
               className="rounded-lg bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-500 focus:ring-4 focus:ring-red-400 transition"
             >
-              {deletingId === confirm.id ? 'A apagar...' : 'Confirmar'}
+              {deletingId === confirm.id ? t('settings.deleting') : t('common.confirm')}
             </button>
 
             <button
               onClick={cancelDelete}
               className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -123,7 +125,7 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
           <div className="space-y-3">
             <div className={`${listMaxH} overflow-y-auto divide-y divide-gray-700 rounded-lg border border-gray-700`}>
               {properties.length === 0 && (
-                <div className="text-gray-400 text-sm text-center py-6">Nenhuma propriedade encontrada.</div>
+                <div className="text-gray-400 text-sm text-center py-6">{t('settings.noPropertiesFound')}</div>
               )}
 
               {properties.map((p) => (
@@ -137,7 +139,7 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
                       onClick={() => (window.location.href = `/alojamento/${p.id}`)}
                       className="rounded-lg bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition"
                     >
-                      Ver
+                      {t('settings.view')}
                     </button>
 
                     <button
@@ -145,7 +147,7 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
                       disabled={deletingId === p.id}
                       className="rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-500 focus:ring-4 focus:ring-red-400 transition"
                     >
-                      {deletingId === p.id ? "A apagar..." : "Apagar"}
+                      {deletingId === p.id ? t('settings.deleting') : t('settings.delete')}
                     </button>
                   </div>
                 </div>
@@ -158,7 +160,7 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
                 onClick={fetchProperties}
                 className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition"
               >
-                Recarregar
+                {t('common.reload')}
               </button>
             </div>
           </div>
