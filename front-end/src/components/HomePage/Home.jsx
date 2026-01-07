@@ -21,7 +21,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
       setTimeout(() => {
         setAlojamentos(dados);
         setLoading(false);
-      }, 1200); // 1.2s is the 'sweet spot' for skeletons
+      }, 100); // 100ms delay
 
     } catch (erro) {
       console.error("API Error:", erro);
