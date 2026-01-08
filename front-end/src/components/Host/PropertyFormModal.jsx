@@ -2,17 +2,17 @@ import React from 'react';
 import { X, Upload, Edit, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
 
-function PropertyFormModal({ 
-  show, 
-  onClose, 
-  onSubmit, 
-  property, 
-  formData, 
-  onChange, 
-  selectedImages, 
-  onImageChange, 
-  submitting 
-}) {
+  function PropertyFormModal({ 
+    show, 
+    onClose, 
+    onSubmit, 
+    property, 
+    formData, 
+    onChange, 
+    selectedImages, 
+    onImageChange, 
+    submitting 
+  }) {
   if (!show) return null;
 
   const { t } = useTranslation();
@@ -282,15 +282,22 @@ function PropertyFormModal({
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.neighborhood')} *
               </label>
-              <input
-                type="text"
+              <select
                 name="neighborhood"
                 value={formData.neighborhood}
                 onChange={onChange}
-                placeholder={t('host.neighborhoodPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
-              />
+              >
+                <option value="">{t('host.select')}</option>
+                <option value="Centro histórico">Centro histórico</option>
+                <option value="Centro">Centro</option>
+                <option value="Norte">Norte</option>
+                <option value="Sul">Sul</option>
+                <option value="Comercial">Comercial</option>
+                <option value="Rural">Rural</option>
+                <option value="Residencial">Residencial</option>
+              </select>
             </div>
           </div>
 

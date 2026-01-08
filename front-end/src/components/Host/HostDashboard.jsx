@@ -298,6 +298,14 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         checkOutTime = property.check_out_time.substring(0, 5);
       }
     }
+
+    // Debug: Log the property location structure
+    console.log('Property location:', property.location);
+    console.log('Country from location:', property.location?.country);
+    console.log('Country from state:', property.location?.state?.country);
+    
+    const countryName = property.location?.country?.name || property.location?.state?.country?.name || '';
+    console.log('Final country name:', countryName);
     
     setFormData({
       title: property.title,
@@ -311,7 +319,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       beds: property.capacity?.beds || property.beds || '',
       city_id: property.location?.city?.id || property.city_id || '',
       city_name: property.location?.city?.name || '',
-      country_name: property.location?.country?.name || '',
+      country_name: countryName,
       address: property.location?.address || property.address || '',
       neighborhood: property.location?.neighborhood || property.neighborhood || '',
       postal_code: property.location?.postal_code || property.postal_code || '',
