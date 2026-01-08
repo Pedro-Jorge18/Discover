@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Trash2, Edit, MessageSquare } from 'lucide-react';
+import { Star, Trash2, Edit, MessageSquare, Loader2 } from 'lucide-react';
 import Header from '../Nav/Header.jsx';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
@@ -109,8 +109,9 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
           onOpenSettings={onOpenSettings}
           onOpenSettingsAdmin={onOpenSettingsAdmin}
         />
-        <div className="max-w-4xl mx-auto px-4 py-8 pt-28">
-          <p className="text-center text-gray-500">{t('review.loadingYourReviews')}</p>
+        <div className="max-w-4xl mx-auto px-4 py-12 pt-32 flex flex-col items-center gap-3 text-gray-500">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <p>{t('review.loadingYourReviews')}</p>
         </div>
       </>
     );

@@ -117,7 +117,7 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
 
         {/* Help Center Route */}
         <Route 
-          path="/ajuda" 
+          path="/help" 
           element={
             <HelpCenter 
               user={user} 

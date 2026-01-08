@@ -258,7 +258,6 @@ function HelpCenter({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         </div>
 
       </main>
-      <Footer />
     </div>
   );
 }

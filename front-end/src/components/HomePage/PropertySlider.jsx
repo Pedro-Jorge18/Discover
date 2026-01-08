@@ -1,10 +1,12 @@
 import React from 'react';
 import PropertyCard from './PropertyCard.jsx';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 // Slider component for the homepage sections
 // Added 'user' to props to enable favorite functionality within the slider
 function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
+  const { t } = useTranslation();
   if (!properties || properties.length === 0) return null;
 
   return (
@@ -24,7 +26,7 @@ function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
             onClick={onVerTudo}
             className="flex items-center gap-2 text-blue-600 font-black uppercase text-[10px] tracking-widest hover:gap-3 transition-all cursor-pointer"
           >
-            Ver Tudo <ChevronRight size={14} />
+            {t('common.viewAll')} <ChevronRight size={14} />
           </button>
         )}
       </div>

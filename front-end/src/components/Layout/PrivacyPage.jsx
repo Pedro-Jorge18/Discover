@@ -261,8 +261,8 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <p className="font-semibold text-gray-900 mb-2">Encarregado de Proteção de Dados</p>
                 <p className="mb-1">Descobrir, Inc.</p>
-                <p className="mb-1">Email: privacy@descobrir.com</p>
-                <p className="mb-1">Email DPO: dpo@descobrir.com</p>
+                <p className="mb-1">Email: privacy@discover.com</p>
+                <p className="mb-1">Email DPO: dpo@discover.com</p>
                 <p>Morada: Avenida da República, 123, 4000-123 Porto, Portugal</p>
               </div>
             </div>
@@ -278,7 +278,6 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         </div>
 
       </main>
-      <Footer />
     </div>
   );
 }

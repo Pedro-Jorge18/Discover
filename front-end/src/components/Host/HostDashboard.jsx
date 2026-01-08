@@ -7,8 +7,10 @@ import DeleteConfirmModal from './DeleteConfirmModal.jsx';
 import { Plus, Loader2, Home, Eye, Calendar, TrendingUp } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,7 +76,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     } catch (error) {
       console.error('Error fetching properties:', error);
       if (error.response?.status && error.response.status >= 500) {
-        notify('Erro ao conectar com o servidor', 'error');
+        notify(t('host.serverError'), 'error');
       }
       setProperties([]);
     } finally {
@@ -88,7 +90,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       setCities(response.data?.data || response.data || []);
     } catch (error) {
       console.error('Error fetching cities:', error);
-      notify('Erro ao carregar cidades', 'error');
+      notify(t('host.loadCitiesError'), 'error');
     }
   };
 
@@ -100,16 +102,16 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 5) {
-      notify('Máximo de 5 imagens permitidas', 'warning');
+      notify(t('host.maxImages'), 'warning');
       return;
     }
     
     // Check file sizes (2MB = 2 * 1024 * 1024 bytes)
     const maxSize = 2 * 1024 * 1024;
     const oversizedFiles = files.filter(file => file.size > maxSize);
-    
+
     if (oversizedFiles.length > 0) {
-      notify(`${oversizedFiles.length} imagem(ns) excedem 2MB. Por favor, comprima as imagens antes de fazer upload.`, 'error');
+      notify(`${t('host.imagesTooLarge')} (${oversizedFiles.length})`, 'error');
       return;
     }
     
@@ -145,23 +147,11 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     
-    const requiredFields = [
-      { field: 'title', message: 'Título' },
-      { field: 'summary', message: 'Resumo' },
-      { field: 'price_per_night', message: 'Preço por noite' },
-      { field: 'city_id', message: 'Cidade' },
-      { field: 'neighborhood', message: 'Bairro' },
-      { field: 'postal_code', message: 'Código Postal' },
-      { field: 'latitude', message: 'Latitude' },
-      { field: 'longitude', message: 'Longitude' },
-      { field: 'beds', message: 'Número de camas' }
-    ];
-
-    for (const { field, message } of requiredFields) {
-      if (!formData[field]) {
-        notify(`${message} é obrigatório`, 'error');
-        return;
-      }
+    const requiredFields = ['title','summary','price_per_night','city_id','neighborhood','postal_code','latitude','longitude','beds'];
+    const missing = requiredFields.find((field) => !formData[field]);
+    if (missing) {
+      notify(t('host.requiredFields'), 'error');
+      return;
     }
 
     try {
@@ -208,10 +198,10 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       let response;
       if (editingProperty) {
         response = await api.patch(`/properties/${editingProperty.id}`, propertyData);
-        notify('Propriedade atualizada com sucesso!', 'success');
+        notify(t('host.propertyUpdated'), 'success');
       } else {
         response = await api.post('/properties', propertyData);
-        notify('Propriedade publicada com sucesso!', 'success');
+        notify(t('host.propertyCreated'), 'success');
       }
 
       const propertyId = response.data?.data?.id || response.data?.id || editingProperty?.id;
@@ -225,11 +215,11 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
           if (editingProperty) {
-            notify('Imagens adicionadas com sucesso!', 'success');
+            notify(t('host.imagesAdded'), 'success');
           }
         } catch (imgError) {
           console.error('Error uploading images:', imgError);
-          notify(editingProperty ? 'Erro ao adicionar imagens' : 'Propriedade criada, mas erro ao fazer upload das imagens', 'warning');
+          notify(editingProperty ? t('host.imagesUploadError') : t('host.imagesUploadPartial'), 'warning');
         }
       }
 
@@ -242,7 +232,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       if (error.response?.data?.errors) {
         notify(Object.values(error.response.data.errors).flat().join('\n'), 'error');
       } else {
-        notify('Erro ao publicar propriedade', 'error');
+        notify(t('host.propertyError'), 'error');
       }
     } finally {
       setSubmitting(false);
@@ -265,11 +255,11 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         published: nextStatus,
         settings: { published: nextStatus }
       });
-      notify(nextStatus ? 'Propriedade ativada' : 'Propriedade desativada', 'success');
+      notify(nextStatus ? t('host.propertyActivated') : t('host.propertyDeactivated'), 'success');
       fetchHostProperties();
     } catch (error) {
       console.error('Error toggling property status:', error);
-      notify('Erro ao alterar status da propriedade', 'error');
+      notify(t('host.toggleStatusError'), 'error');
       // Revert on failure
       setProperties((prev) =>
         prev.map((p) =>
@@ -338,13 +328,13 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     if (!propertyToDelete) return;
     try {
       await api.delete(`/properties/${propertyToDelete.id}`);
-      notify('Propriedade eliminada com sucesso', 'success');
+      notify(t('host.propertyDeleted'), 'success');
       setShowDeleteModal(false);
       setPropertyToDelete(null);
       fetchHostProperties();
     } catch (error) {
       console.error('Error deleting property:', error);
-      notify('Erro ao eliminar propriedade', 'error');
+      notify(t('host.deleteError'), 'error');
     }
   };
 
@@ -364,7 +354,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <title>Discover - Painel Anfitrião</title>
+      <title>Discover - {t('host.dashboard')}</title>
       <Header 
         user={user} 
         setUser={setUser} 
@@ -376,10 +366,10 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-black text-gray-900 mb-2 uppercase tracking-tight">
-              Painel Anfitrião
+              {t('host.dashboard')}
             </h1>
             <p className="text-gray-600 font-medium">
-              Gerir as suas propriedades publicadas
+              {t('host.manageProperties')}
             </p>
           </div>
           <button
@@ -387,7 +377,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl active:scale-95"
           >
             <Plus size={20} />
-            Nova Propriedade
+            {t('host.addProperty')}
           </button>
         </div>
 
@@ -401,7 +391,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <TrendingUp size={20} className="opacity-60" />
             </div>
             <h3 className="text-3xl font-black mb-1">{properties.length}</h3>
-            <p className="text-blue-100 font-medium text-sm">Total Propriedades</p>
+            <p className="text-blue-100 font-medium text-sm">{t('host.totalProperties')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white">
@@ -414,7 +404,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <h3 className="text-3xl font-black mb-1">
               {properties.filter(p => p.settings?.published || p.published).length}
             </h3>
-            <p className="text-green-100 font-medium text-sm">Publicadas</p>
+            <p className="text-green-100 font-medium text-sm">{t('host.activeProperties')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
@@ -425,7 +415,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <TrendingUp size={20} className="opacity-60" />
             </div>
             <h3 className="text-3xl font-black mb-1">0</h3>
-            <p className="text-purple-100 font-medium text-sm">Reservas Ativas</p>
+            <p className="text-purple-100 font-medium text-sm">{t('host.activeReservations')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white">
@@ -436,24 +426,24 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">+0%</span>
             </div>
             <h3 className="text-3xl font-black mb-1">€0</h3>
-            <p className="text-orange-100 font-medium text-sm">Rendimentos</p>
+            <p className="text-orange-100 font-medium text-sm">{t('host.revenue')}</p>
           </div>
         </div>
 
         {properties.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-md p-16 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Nenhuma propriedade publicada
+              {t('host.noProperties')}
             </h3>
             <p className="text-gray-600 mb-6">
-              Comece a publicar as suas propriedades para receber reservas
+              {t('host.noPropertiesDesc')}
             </p>
             <button
               onClick={() => setShowAddModal(true)}
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
             >
               <Plus size={20} />
-              Primeira Publicação
+              {t('host.publishFirst')}
             </button>
           </div>
         ) : (

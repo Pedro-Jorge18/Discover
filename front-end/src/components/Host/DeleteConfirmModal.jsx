@@ -1,8 +1,11 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function DeleteConfirmModal({ show, property, onConfirm, onCancel }) {
   if (!show || !property) return null;
+
+  const { t } = useTranslation();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -13,12 +16,11 @@ function DeleteConfirmModal({ show, property, onConfirm, onCancel }) {
           </div>
           
           <h3 className="text-xl font-black text-gray-900 text-center mb-2">
-            Eliminar Propriedade
+            {t('host.deleteProperty')}
           </h3>
           
           <p className="text-gray-600 text-center mb-6">
-            Tem certeza que deseja eliminar <span className="font-bold">{property.title}</span>? 
-            Esta ação não pode ser desfeita.
+            {t('host.deleteConfirm')} <span className="font-bold">{property.title}</span>?
           </p>
 
           <div className="flex gap-3">
@@ -26,13 +28,13 @@ function DeleteConfirmModal({ show, property, onConfirm, onCancel }) {
               onClick={onCancel}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button
               onClick={onConfirm}
               className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition"
             >
-              Eliminar
+              {t('common.delete')}
             </button>
           </div>
         </div>
