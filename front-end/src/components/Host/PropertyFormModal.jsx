@@ -1,23 +1,22 @@
 import React from 'react';
-import { X, Upload, Edit, Loader2, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { X, Upload, Edit, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
 
-function PropertyFormModal({ 
-  show, 
-  onClose, 
-  onSubmit, 
-  property, 
-  formData, 
-  onChange, 
-  cities, 
-  selectedImages, 
-  onImageChange, 
-  submitting 
-}) {
-  if (!show) return null;
-
+  function PropertyFormModal({ 
+    show, 
+    onClose, 
+    onSubmit, 
+    property, 
+    formData, 
+    onChange, 
+    selectedImages, 
+    onImageChange, 
+    submitting 
+  }) {
   const { t } = useTranslation();
   const isEditing = !!property;
+
+  if (!show) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -68,21 +67,7 @@ function PropertyFormModal({
             />
           </div>
 
-          {/* Resumo */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              {t('host.summary')} *
-            </label>
-            <textarea
-              name="summary"
-              value={formData.summary}
-              onChange={onChange}
-              placeholder={t('host.summaryPlaceholder')}
-              rows="2"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
-              required
-            />
-          </div>
+          {/* Resumo removido conforme pedido */}
 
           {/* Grid para campos numéricos */}
           <div className="grid grid-cols-2 gap-4">
@@ -254,61 +239,70 @@ function PropertyFormModal({
             </div>
           </div>
 
-          {/* Cidade, Bairro e Código Postal */}
+          {/* País, Cidade, Bairro */}
           <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                {t('host.country')}
+              </label>
+              <select
+                name="country_name"
+                value={formData.country_name}
+                onChange={onChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              >
+                <option value="">{t('host.select')}</option>
+                <option value="Portugal">Portugal</option>
+                <option value="Espanha">Espanha</option>
+                <option value="França">França</option>
+                <option value="Alemanha">Alemanha</option>
+                <option value="Itália">Itália</option>
+                <option value="Reino Unido">Reino Unido</option>
+                <option value="Brasil">Brasil</option>
+                <option value="Estados Unidos">Estados Unidos</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.city')} *
               </label>
-              <select
-                name="city_id"
-                value={formData.city_id}
+              <input
+                type="text"
+                name="city_name"
+                value={formData.city_name}
                 onChange={onChange}
+                placeholder={t('host.cityPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
-              >
-                <option value="">{t('host.select')}</option>
-                {cities.map(city => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.neighborhood')} *
               </label>
-              <input
-                type="text"
+              <select
                 name="neighborhood"
                 value={formData.neighborhood}
                 onChange={onChange}
-                placeholder={t('host.neighborhoodPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                {t('host.postalCode')} *
-              </label>
-              <input
-                type="text"
-                name="postal_code"
-                value={formData.postal_code}
-                onChange={onChange}
-                placeholder={t('host.postalCodePlaceholder')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                required
-              />
+              >
+                <option value="">{t('host.select')}</option>
+                <option value="Centro histórico">Centro histórico</option>
+                <option value="Centro">Centro</option>
+                <option value="Norte">Norte</option>
+                <option value="Sul">Sul</option>
+                <option value="Comercial">Comercial</option>
+                <option value="Rural">Rural</option>
+                <option value="Residencial">Residencial</option>
+              </select>
             </div>
           </div>
 
-          {/* Morada, Latitude e Longitude */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Morada e Código Postal */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.address')}
@@ -325,31 +319,14 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                {t('host.latitude')} *
+                {t('host.postalCode')} *
               </label>
               <input
-                type="number"
-                name="latitude"
-                value={formData.latitude}
+                type="text"
+                name="postal_code"
+                value={formData.postal_code}
                 onChange={onChange}
-                placeholder="38.7223"
-                step="0.000001"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                {t('host.longitude')} *
-              </label>
-              <input
-                type="number"
-                name="longitude"
-                value={formData.longitude}
-                onChange={onChange}
-                placeholder="-9.1393"
-                step="0.000001"
+                placeholder={t('host.postalCodePlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
               />

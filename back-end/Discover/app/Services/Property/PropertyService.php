@@ -13,6 +13,9 @@ use App\Http\Resources\Property\PropertyCollection;
 use App\Http\Resources\Property\PropertyResource;
 use App\DTOs\Property\PropertyData;
 use App\Models\Property;
+use App\Models\City;
+use App\Models\State;
+use App\Models\Country;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -47,6 +50,53 @@ class PropertyService
             $data['host_id'] = Auth::id();
             $data['published'] = true; // Imediatlely published
             $data['published_at'] = now(); // Published timestamp
+
+            // Resolve or create city by name/country if city_id not provided
+            if ((!isset($data['city_id']) || empty($data['city_id'])) && !empty($data['city_name'])) {
+                $cityName = trim($data['city_name']);
+                $countryName = trim($data['country_name'] ?? 'Portugal'); // Default country
+
+                // Try to find existing country (case-insensitive)
+                $country = Country::whereRaw('LOWER(name) = ?', [strtolower($countryName)])->first();
+                if (!$country) {
+                    $country = Country::create([
+                        'name' => $countryName,
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'phone_code' => '+351', // Default
+                        'currency' => 'EUR',
+                        'currency_symbol' => '€',
+                        'language' => 'pt',
+                        'active' => true,
+                    ]);
+                }
+
+                // Find or create state (using country name as state name if no state info) - case-insensitive
+                $state = State::where('country_id', $country->id)
+                    ->whereRaw('LOWER(name) = ?', [strtolower($countryName)])
+                    ->first();
+                if (!$state) {
+                    $state = State::create([
+                        'country_id' => $country->id,
+                        'name' => $countryName,
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'active' => true,
+                    ]);
+                }
+
+                // Find or create city (case-insensitive by name within state)
+                $city = City::where('state_id', $state->id)
+                    ->whereRaw('LOWER(name) = ?', [strtolower($cityName)])
+                    ->first();
+                if (!$city) {
+                    $city = City::create([
+                        'state_id' => $state->id,
+                        'name' => $cityName,
+                        'active' => true,
+                    ]);
+                }
+
+                $data['city_id'] = $city->id;
+            }
             
             // DTO data
             $propertyData = PropertyData::fromArray($data);
@@ -67,7 +117,7 @@ class PropertyService
                 $this->createAmenitiesAction->execute($property,$propertyData->amenities);
             }
             // Relações
-            $property->load(['host','propertyType','listingType','city','images', 'amenities']);
+            $property->load(['host','propertyType','listingType','city.state.country','images', 'amenities']);
 
             return response()->json([
                 'success' => true,
@@ -94,7 +144,7 @@ class PropertyService
                 throw new ModelNotFoundException("Property with ID {$id} not found.");
             }
 
-            $property->load(['host','propertyType','listingType','city','images','amenities']);
+            $property->load(['host','propertyType','listingType','city.state.country','images','amenities']);
 
             return $property;
 
@@ -111,7 +161,7 @@ class PropertyService
         try {
             $includeUnpublished = request()->boolean('include_unpublished');
 
-            $property = Property::with(['host', 'propertyType', 'listingType', 'images', 'city'])
+            $property = Property::with(['host', 'propertyType', 'listingType', 'images', 'city.state.country'])
                 ->leftJoin('reviews', 'properties.id', '=', 'reviews.property_id')
                 ->when(!$includeUnpublished, function ($query) {
                     $query->where('properties.published', true);
@@ -119,6 +169,8 @@ class PropertyService
                 ->groupBy('properties.id')
                 ->selectRaw('properties.id, properties.host_id, properties.property_type_id, properties.listing_type_id, properties.city_id, properties.address, properties.neighborhood, properties.postal_code, properties.latitude, properties.longitude, properties.title, properties.description, properties.summary, properties.price_per_night, properties.cleaning_fee, properties.service_fee, properties.security_deposit, properties.max_guests, properties.bedrooms, properties.beds, properties.bathrooms, properties.area, properties.floor, properties.check_in_time, properties.check_out_time, properties.min_nights, properties.max_nights, properties.published, properties.active, properties.instant_book, properties.views, properties.reviews_count, properties.published_at, properties.created_at, properties.updated_at, properties.deleted_at, COALESCE(AVG(reviews.rating_overall), 0) as rating')
                 ->paginate(15);
+            // Ensure relations are loaded on the paginator collection
+            $property->getCollection()->load(['host', 'propertyType', 'listingType', 'images', 'city.state.country']);
 
             return response()->json([
                 'success' => true,
@@ -141,6 +193,53 @@ class PropertyService
 
             $this->validateUpdateAction->execute($data);
 
+            // Resolve or create city by name/country if city_id not provided
+            if ((!isset($data['city_id']) || empty($data['city_id'])) && !empty($data['city_name'])) {
+                $cityName = trim($data['city_name']);
+                $countryName = trim($data['country_name'] ?? 'Portugal'); // Default country
+                
+                // Try to find existing country (case-insensitive)
+                $country = Country::whereRaw('LOWER(name) = ?', [strtolower($countryName)])->first();
+                if (!$country) {
+                    $country = Country::create([
+                        'name' => $countryName,
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'phone_code' => '+351', // Default
+                        'currency' => 'EUR',
+                        'currency_symbol' => '€',
+                        'language' => 'pt',
+                        'active' => true,
+                    ]);
+                }
+
+                // Find or create state (using country name as state name if no state info) - case-insensitive
+                $state = State::where('country_id', $country->id)
+                    ->whereRaw('LOWER(name) = ?', [strtolower($countryName)])
+                    ->first();
+                if (!$state) {
+                    $state = State::create([
+                        'country_id' => $country->id,
+                        'name' => $countryName,
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'active' => true,
+                    ]);
+                }
+
+                // Find or create city (case-insensitive by name within state)
+                $city = City::where('state_id', $state->id)
+                    ->whereRaw('LOWER(name) = ?', [strtolower($cityName)])
+                    ->first();
+                if (!$city) {
+                    $city = City::create([
+                        'state_id' => $state->id,
+                        'name' => $cityName,
+                        'active' => true,
+                    ]);
+                }
+
+                $data['city_id'] = $city->id;
+            }
+
             $updated = $this->updatePropertyAction->execute($id, $data);
 
             if (!$updated) {
@@ -157,7 +256,7 @@ class PropertyService
             }
 
             $property = $this->findPropertyAction->execute($id);
-            $property->load(['host', 'propertyType', 'listingType', 'city', 'images', 'amenities']);
+            $property->load(['host', 'propertyType', 'listingType', 'city.state.country', 'images', 'amenities']);
 
             return response()->json([
                 'success' => true,
