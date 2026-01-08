@@ -241,7 +241,19 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     const response = await api.post('/reservations/with-payment', reservationData);
 
     if (response.data.success || response.status === 201) {
-      notify('Reserva confirmada! 🎉', 'success');
+      notify(t('property.bookingSuccess') || 'Reserva confirmada! 🎉', 'success');
+
+      const hostId = alojamento?.host?.id || alojamento?.user?.id;
+      if (hostId) {
+        pushHostNotification({
+          hostId,
+          type: 'payment',
+          title: t('hostNotifications.paymentTitle'),
+          message: `${t('hostNotifications.paymentBody')} ${alojamento?.title || ''} (€${totalPrice})`,
+          propertyId: alojamento?.id,
+        });
+      }
+
       navigate('/payment/success');
     } else {
       throw new Error('Erro ao criar reserva');
