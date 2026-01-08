@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bell, CreditCard, MessageSquare, CheckCheck, Check } from 'lucide-react';
+import { Bell, CreditCard, MessageSquare, CheckCheck, Check, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../contexts/TranslationContext';
 import {
@@ -33,6 +33,7 @@ const formatTimeAgo = (isoDate, language) => {
 const typeIcon = (type) => {
   if (type === 'payment') return <CreditCard className="w-4 h-4 text-blue-600" />;
   if (type === 'review') return <MessageSquare className="w-4 h-4 text-green-600" />;
+  if (type === 'reservation_request') return <Calendar className="w-4 h-4 text-purple-600" />;
   return <Bell className="w-4 h-4 text-gray-500" />;
 };
 

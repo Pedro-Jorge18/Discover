@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
 import Footer from '../Layout/Footer.jsx';
-import { Bell, CreditCard, MessageSquare, Trash2, CheckCheck, Check } from 'lucide-react';
+import { Bell, CreditCard, MessageSquare, Trash2, CheckCheck, Check, Calendar } from 'lucide-react';
 import {
   getHostNotifications,
   markHostNotificationsRead,
@@ -30,6 +30,7 @@ const formatTimeAgo = (isoDate, language) => {
 const typeIcon = (type) => {
   if (type === 'payment') return <CreditCard className="w-5 h-5 text-blue-600" />;
   if (type === 'review') return <MessageSquare className="w-5 h-5 text-green-600" />;
+  if (type === 'reservation_request') return <Calendar className="w-5 h-5 text-purple-600" />;
   return <Bell className="w-5 h-5 text-gray-500" />;
 };
 

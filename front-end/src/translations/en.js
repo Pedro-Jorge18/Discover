@@ -58,6 +58,8 @@ export default {
     markAsRead: 'Mark as read',
     clearAll: 'Clear all',
     empty: 'No notifications yet.',
+    reservationTitle: 'New booking request',
+    reservationBody: 'A guest requested to book',
     reviewTitle: 'New review',
     reviewBody: 'Someone commented on your listing',
     paymentTitle: 'Payment confirmed',

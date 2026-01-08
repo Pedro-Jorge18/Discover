@@ -58,6 +58,8 @@ export default {
     markAsRead: 'Marcar como lida',
     clearAll: 'Limpar todas',
     empty: 'Ainda não tem notificações.',
+    reservationTitle: 'Novo pedido de reserva',
+    reservationBody: 'Um hóspede pediu para reservar',
     reviewTitle: 'Nova avaliação',
     reviewBody: 'Alguém comentou na sua propriedade',
     paymentTitle: 'Pagamento confirmado',

@@ -247,6 +247,15 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       if (hostId) {
         pushHostNotification({
           hostId,
+          type: 'reservation_request',
+          title: t('hostNotifications.reservationTitle'),
+          message: `${t('hostNotifications.reservationBody')} ${alojamento?.title || ''} (${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()})`,
+          propertyId: alojamento?.id,
+          meta: { nights, totalPrice }
+        });
+
+        pushHostNotification({
+          hostId,
           type: 'payment',
           title: t('hostNotifications.paymentTitle'),
           message: `${t('hostNotifications.paymentBody')} ${alojamento?.title || ''} (€${totalPrice})`,
