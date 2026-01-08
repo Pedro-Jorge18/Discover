@@ -160,6 +160,8 @@ class PropertyService
     {
         try {
             $includeUnpublished = request()->boolean('include_unpublished');
+            $perPage = request()->integer('per_page', 15); // Default 15, but allow custom pagination
+            $perPage = min($perPage, 100); // Cap at 100 to prevent abuse
 
             $property = Property::with(['host', 'propertyType', 'listingType', 'images', 'city.state.country'])
                 ->leftJoin('reviews', 'properties.id', '=', 'reviews.property_id')
@@ -168,7 +170,7 @@ class PropertyService
                 })
                 ->groupBy('properties.id')
                 ->selectRaw('properties.id, properties.host_id, properties.property_type_id, properties.listing_type_id, properties.city_id, properties.address, properties.neighborhood, properties.postal_code, properties.latitude, properties.longitude, properties.title, properties.description, properties.summary, properties.price_per_night, properties.cleaning_fee, properties.service_fee, properties.security_deposit, properties.max_guests, properties.bedrooms, properties.beds, properties.bathrooms, properties.area, properties.floor, properties.check_in_time, properties.check_out_time, properties.min_nights, properties.max_nights, properties.published, properties.active, properties.instant_book, properties.views, properties.reviews_count, properties.published_at, properties.created_at, properties.updated_at, properties.deleted_at, COALESCE(AVG(reviews.rating_overall), 0) as rating')
-                ->paginate(15);
+                ->paginate($perPage);
             // Ensure relations are loaded on the paginator collection
             $property->getCollection()->load(['host', 'propertyType', 'listingType', 'images', 'city.state.country']);
 

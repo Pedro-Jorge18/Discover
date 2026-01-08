@@ -184,9 +184,8 @@ import { useTranslation } from '../../contexts/TranslationContext';
               >
                 <option value="apartment">{t('host.apartment')}</option>
                 <option value="house">{t('host.house')}</option>
-                <option value="villa">{t('host.villa')}</option>
-                <option value="studio">{t('host.studio')}</option>
-                <option value="room">{t('host.room')}</option>
+                <option value="cabin">{t('host.cabin')}</option>
+                <option value="hotel_room">{t('host.hotelRoom')}</option>
               </select>
             </div>
 

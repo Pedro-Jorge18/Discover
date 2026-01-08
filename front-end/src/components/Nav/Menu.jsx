@@ -23,7 +23,6 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
       window.location.reload();
 
     } catch (error) {
-      // If token is already revoked the server may return 401. In that case
       // clear local token and user state anyway so the UI is consistent.
       const status = error?.response?.status;
       if (status === 401) {
