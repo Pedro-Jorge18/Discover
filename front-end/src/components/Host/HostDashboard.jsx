@@ -156,12 +156,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         checkInFormatted = formData.check_in_time;
         checkOutFormatted = formData.check_out_time;
       } else {
-          const countryName =
-            property.location?.country?.name ||
-            property.location?.state?.country?.name ||
-            property.country_name ||
-            property.country ||
-            'Portugal';
         const today = new Date().toISOString().split('T')[0];
         checkInFormatted = `${today} ${formData.check_in_time}:00`;
         checkOutFormatted = `${today} ${formData.check_out_time}:00`;
@@ -177,7 +171,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         check_out_time: checkOutFormatted,
         address: formData.address || 'Endereço não especificado',
         neighborhood: formData.neighborhood,
-             country_name: countryName,
+        postal_code: formData.postal_code,
         ...(formData.city_id ? { city_id: parseInt(formData.city_id) } : {}),
         ...(formData.city_name ? { city_name: formData.city_name } : {}),
         ...(formData.country_name ? { country_name: formData.country_name } : {}),
