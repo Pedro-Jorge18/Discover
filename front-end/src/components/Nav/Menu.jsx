@@ -29,12 +29,18 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
       // Reload to ensure all private states are cleared
       window.location.reload();
     } catch (error) {
-      // Force logout on client side even if server request fails
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-      setUser(null);
-      if (typeof onCloseMenu === 'function') onCloseMenu();
-      window.location.reload();
+      // clear local token and user state anyway so the UI is consistent.
+      const status = error?.response?.status;
+      if (status === 401) {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        setUser(null);
+        if (typeof onCloseMenu === 'function') onCloseMenu();
+        window.location.reload();
+        return;
+      }
+
+      console.error("Erro ao fazer logout:", error);
     }
   };
 

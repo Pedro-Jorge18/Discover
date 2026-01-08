@@ -422,6 +422,8 @@ export default {
     apartment: 'Apartamento',
     house: 'Casa',
     villa: 'Moradia',
+    cabin: 'Cabana',
+    hotelRoom: 'Quarto de Hotel',
     entirePlace: 'Local Inteiro',
     privateRoom: 'Quarto Privado',
     sharedRoom: 'Quarto Partilhado',

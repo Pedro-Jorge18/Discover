@@ -43,7 +43,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
     } finally {
       setLoading(false);
     }
-  }, [propertyId, onStatsUpdate]);
+  }, [propertyId, t]);
 
   useEffect(() => {
     if (propertyId) {
@@ -63,10 +63,8 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
       setDeleting(reviewId);
       await api.delete(`/reviews/${reviewId}`);
       notify(t('review.deleted'), 'success');
-      // Refresh page to update all components
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Refresh reviews list without reloading the page
+      fetchReviews();
     } catch (err) {
       console.error('Error deleting review:', err);
       notify(err.response?.data?.message || t('review.deleteError'), 'error');

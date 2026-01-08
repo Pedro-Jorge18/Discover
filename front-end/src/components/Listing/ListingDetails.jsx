@@ -40,7 +40,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
 
-  const handleStatsUpdate = (stats) => {
+  const handleStatsUpdate = React.useCallback((stats) => {
     if (stats && stats.average_rating && alojamento) {
       // Atualiza o rating da propriedade baseado nas reviews
       setAlojamento(prev => ({
@@ -51,7 +51,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         }
       }));
     }
-  };
+  }, [alojamento]);
 
   const formatTime = (value, fallback = '--:--') => {
     if (!value) return fallback;

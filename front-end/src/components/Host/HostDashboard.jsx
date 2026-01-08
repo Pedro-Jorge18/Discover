@@ -58,9 +58,22 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const fetchHostProperties = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/properties', { params: { include_unpublished: true } });
+      const response = await api.get('/properties', { 
+        params: { 
+          include_unpublished: true,
+          per_page: 100  // Request up to 100 properties for host dashboard
+        } 
+      });
+      console.log('API Response:', response.data);
       const allProperties = response.data?.data?.data || response.data?.data || response.data || [];
-      const myProperties = allProperties.filter(prop => prop.host?.id === user?.id);
+      console.log('All Properties:', allProperties);
+      console.log('Current User ID:', user?.id);
+      const myProperties = allProperties.filter(prop => {
+        const hostId = prop.host?.id || prop.host_id;
+        console.log('Property:', prop.id, 'Host ID:', hostId, 'Matches:', hostId === user?.id);
+        return hostId === user?.id;
+      });
+      console.log('My Properties:', myProperties);
       const normalized = myProperties.map((prop) => {
         const published = prop.settings?.published ?? prop.published ?? false;
         return {
@@ -146,7 +159,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
     try {
       setSubmitting(true);
-      const propertyTypeMap = { apartment: 1, house: 2, villa: 3, studio: 4, room: 5 };
+      const propertyTypeMap = { apartment: 1, house: 2, cabin: 3, hotel_room: 4 };
       const listingTypeMap = { entire_place: 1, private_room: 2, shared_room: 3 };
 
       // Format times based on operation: Y-m-d H:i:s for create, H:i for update
@@ -217,7 +230,8 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       setShowAddModal(false);
       setShowEditModal(false);
       resetForm();
-      setTimeout(fetchHostProperties, 500);
+      // Refresh properties list after successful creation
+      await fetchHostProperties();
     } catch (error) {
       console.error('Error creating property:', error);
       if (error.response?.data?.errors) {

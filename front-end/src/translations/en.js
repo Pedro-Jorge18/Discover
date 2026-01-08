@@ -420,6 +420,8 @@ export default {
     apartment: 'Apartment',
     house: 'House',
     villa: 'Villa',
+    cabin: 'Cabin',
+    hotelRoom: 'Hotel Room',
     entirePlace: 'Entire place',
     privateRoom: 'Private room',
     sharedRoom: 'Shared room',
