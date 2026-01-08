@@ -10,6 +10,7 @@ import Footer from '../components/Layout/Footer.jsx';
 import SettingsMain from '../components/Settings/SettingsMain.jsx'; 
 import SearchPage from '../components/Nav/SearchPage.jsx';
 import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
+import NotificationsPage from '../components/Nav/NotificationsPage.jsx';
 import MyReviews from '../components/Review/MyReviews.jsx';
 import HostDashboard from '../components/Host/HostDashboard.jsx';
 import BookingSuccess from '../components/Booking/BookingSuccess.jsx';
@@ -154,6 +155,21 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
                             onOpenSettingsAdmin={onOpenSettingsAdmin}
                         />
                     } 
+                />
+
+                {/* Host Notifications */}
+                <Route 
+                  path="/notificacoes" 
+                  element={
+                    <RoleProtected role="host">
+                      <NotificationsPage 
+                        user={user} 
+                        setUser={setUser} 
+                        onOpenSettings={onOpenSettings}
+                        onOpenSettingsAdmin={onOpenSettingsAdmin}
+                      />
+                    </RoleProtected>
+                  } 
                 />
 
                 {/* Host Dashboard */}

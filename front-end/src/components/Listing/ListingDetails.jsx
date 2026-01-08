@@ -13,6 +13,7 @@ import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
 import ListingInfo from './ListingInfo.jsx';
 import PaymentModal from '../Booking/PaymentModal.jsx';
+import { pushHostNotification } from '../../utils/hostNotifications';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {
@@ -222,6 +223,18 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       });
 
       notify(t('property.bookingSuccess'), 'success');
+
+      const hostId = alojamento?.host?.id || alojamento?.user?.id;
+      if (hostId) {
+        pushHostNotification({
+          hostId,
+          type: 'payment',
+          title: t('hostNotifications.paymentTitle'),
+          message: `${t('hostNotifications.paymentBody')} ${alojamento?.title || ''} (€${totalPrice})`,
+          propertyId: alojamento?.id,
+        });
+      }
+
       setShowPaymentModal(false);
       navigate('/payment/success');
     } catch (error) {

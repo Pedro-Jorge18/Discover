@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Menu from './Menu.jsx';
+import HostNotifications from './HostNotifications.jsx';
 import { Globe, Menu as MenuIcon, User, Search, Heart, SlidersHorizontal } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import FilterModal from './FilterModal.jsx';
@@ -92,6 +93,8 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               </span>
             )}
           </button>
+
+          {user?.role === 'host' && <HostNotifications user={user} />}
 
           <LanguageSwitcher />
           
