@@ -26,7 +26,7 @@ class StorePropertyRequest extends FormRequest
 
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:10000',
-            'summary' => 'required|string|max:255',
+            'summary' => 'sometimes|nullable|string|max:500',
             'price_per_night' => 'required|numeric|min:1',
 
             'host_id' => 'required|integer|exists:users,id',
@@ -37,9 +37,11 @@ class StorePropertyRequest extends FormRequest
             'address' => 'required|string|max:255',
             'neighborhood' => 'required|string|max:255',
             'postal_code' => 'required|string|max:25',
-            'city_id' => 'required|integer|exists:cities,id',
-            'latitude' => 'required|numeric|min:-90|max:90',
-            'longitude' => 'required|numeric|min:-180|max:180',
+            'city_id' => 'required_without:city_name|integer|exists:cities,id',
+            'city_name' => 'required_without:city_id|string|max:100',
+            'country_name' => 'sometimes|nullable|string|max:100',
+            'latitude' => 'sometimes|nullable|numeric|min:-90|max:90',
+            'longitude' => 'sometimes|nullable|numeric|min:-180|max:180',
 
             //CARACTERISTICAS
             'property_type_id' => 'required|integer|exists:property_types,id',
@@ -69,7 +71,6 @@ class StorePropertyRequest extends FormRequest
             // mensagens de acompanhamento
               'title.required' => 'It has to have a title.',
               'description.required' => 'It has to have a description.',
-              'summary.required' => 'It has to have a summary.',
               'price_per_night.required' => 'The price per night is mandatory.',
               'host_id.required' => 'It has to have a host.',
               'check_in_time.required' => 'It has to have a Check In Time.',
@@ -77,7 +78,8 @@ class StorePropertyRequest extends FormRequest
               'address.required' => 'Address is required.',
               'neighborhood.required' => 'Neighborhood is required.',
               'postal_code.required' => 'Postal code is required.',
-              'city_id.required' => 'City is required.',
+              'city_id.required_without' => 'City is required (id or name).',
+              'city_name.required_without' => 'City name is required when City ID is not provided.',
               'property_type_id.required' => 'Property Type is required.',
               'listing_type_id.required' => 'Listing Type is required.',
               'max_guests.required' => 'Maximum number of guests is required.',

@@ -34,6 +34,8 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     bathrooms: '',
     beds: '',
     city_id: '',
+    city_name: '',
+    country_name: '',
     address: '',
     neighborhood: '',
     postal_code: '',
@@ -147,7 +149,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     
-    const requiredFields = ['title','summary','price_per_night','city_id','neighborhood','postal_code','latitude','longitude','beds'];
+    const requiredFields = ['title','price_per_night','neighborhood','postal_code','beds','city_name'];
     const missing = requiredFields.find((field) => !formData[field]);
     if (missing) {
       notify(t('host.requiredFields'), 'error');
@@ -175,7 +177,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       const propertyData = {
         title: formData.title,
         description: formData.description || 'Descrição da propriedade',
-        summary: formData.summary,
+        ...(formData.summary ? { summary: formData.summary } : {}),
         price_per_night: parseFloat(formData.price_per_night),
         host_id: user.id,
         check_in_time: checkInFormatted,
@@ -183,9 +185,11 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         address: formData.address || 'Endereço não especificado',
         neighborhood: formData.neighborhood,
         postal_code: formData.postal_code,
-        city_id: parseInt(formData.city_id),
-        latitude: parseFloat(formData.latitude),
-        longitude: parseFloat(formData.longitude),
+        ...(formData.city_id ? { city_id: parseInt(formData.city_id) } : {}),
+        ...(formData.city_name ? { city_name: formData.city_name } : {}),
+        ...(formData.country_name ? { country_name: formData.country_name } : {}),
+        ...(formData.latitude !== '' && formData.latitude != null ? { latitude: parseFloat(formData.latitude) } : {}),
+        ...(formData.longitude !== '' && formData.longitude != null ? { longitude: parseFloat(formData.longitude) } : {}),
         property_type_id: propertyTypeMap[formData.property_type] || 1,
         listing_type_id: listingTypeMap[formData.listing_type] || 1,
         max_guests: parseInt(formData.max_guests || 1),
@@ -306,6 +310,8 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       bathrooms: property.capacity?.bathrooms || property.bathrooms || '',
       beds: property.capacity?.beds || property.beds || '',
       city_id: property.location?.city?.id || property.city_id || '',
+      city_name: property.location?.city?.name || '',
+      country_name: property.location?.country?.name || '',
       address: property.location?.address || property.address || '',
       neighborhood: property.location?.neighborhood || property.neighborhood || '',
       postal_code: property.location?.postal_code || property.postal_code || '',

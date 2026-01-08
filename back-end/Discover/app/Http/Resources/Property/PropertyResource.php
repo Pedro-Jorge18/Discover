@@ -15,13 +15,14 @@ class PropertyResource extends JsonResource
      * */
     public function toArray(Request $request): array
     {
+        $isAuthenticated = (bool) $request->user();
         return [
 
             'id' => $this->id,
 
             'title' => $this->title,
             'description' => $this->description,
-            'summary' => $this->summary,
+            'summary' => $isAuthenticated ? $this->summary : null,
 
             'check_in_time' => $this->check_in_time ? $this->check_in_time->format('H:i') : null,
             'check_out_time' => $this->check_out_time ? $this->check_out_time->format('H:i') : null,
@@ -47,9 +48,12 @@ class PropertyResource extends JsonResource
                 'address' => $this->address,
                 'neighborhood' => $this->neighborhood,
                 'postal_code' => $this->postal_code,
-                'coordinates' => [
+                'coordinates' => $isAuthenticated ? [
                     'latitude' => (float) $this->latitude,
                     'longitude' => (float) $this->longitude,
+                ] : [
+                    'latitude' => null,
+                    'longitude' => null,
                 ],
                 'city' => $this->whenLoaded('city', function() {
                     return $this->city ? [

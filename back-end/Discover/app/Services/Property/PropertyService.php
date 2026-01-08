@@ -13,6 +13,9 @@ use App\Http\Resources\Property\PropertyCollection;
 use App\Http\Resources\Property\PropertyResource;
 use App\DTOs\Property\PropertyData;
 use App\Models\Property;
+use App\Models\City;
+use App\Models\State;
+use App\Models\Country;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -47,6 +50,50 @@ class PropertyService
             $data['host_id'] = Auth::id();
             $data['published'] = true; // Imediatlely published
             $data['published_at'] = now(); // Published timestamp
+
+            // Resolve or create city by name/country if city_id not provided
+            if ((!isset($data['city_id']) || empty($data['city_id'])) && !empty($data['city_name'])) {
+                $cityName = $data['city_name'];
+                $countryName = $data['country_name'] ?? 'Portugal'; // Default country
+                
+                // Find or create country
+                $country = Country::firstOrCreate(
+                    ['name' => $countryName],
+                    [
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'phone_code' => '+351', // Default
+                        'currency' => 'EUR',
+                        'currency_symbol' => '€',
+                        'language' => 'pt',
+                        'active' => true,
+                    ]
+                );
+
+                // Find or create state (using country name as state name if no state info)
+                $state = State::firstOrCreate(
+                    [
+                        'country_id' => $country->id,
+                        'name' => $countryName, // Use country name as state
+                    ],
+                    [
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'active' => true,
+                    ]
+                );
+
+                // Find or create city
+                $city = City::firstOrCreate(
+                    [
+                        'state_id' => $state->id,
+                        'name' => $cityName,
+                    ],
+                    [
+                        'active' => true,
+                    ]
+                );
+
+                $data['city_id'] = $city->id;
+            }
             
             // DTO data
             $propertyData = PropertyData::fromArray($data);
@@ -140,6 +187,50 @@ class PropertyService
         try {
 
             $this->validateUpdateAction->execute($data);
+
+            // Resolve or create city by name/country if city_id not provided
+            if ((!isset($data['city_id']) || empty($data['city_id'])) && !empty($data['city_name'])) {
+                $cityName = $data['city_name'];
+                $countryName = $data['country_name'] ?? 'Portugal'; // Default country
+                
+                // Find or create country
+                $country = Country::firstOrCreate(
+                    ['name' => $countryName],
+                    [
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'phone_code' => '+351', // Default
+                        'currency' => 'EUR',
+                        'currency_symbol' => '€',
+                        'language' => 'pt',
+                        'active' => true,
+                    ]
+                );
+
+                // Find or create state (using country name as state name if no state info)
+                $state = State::firstOrCreate(
+                    [
+                        'country_id' => $country->id,
+                        'name' => $countryName, // Use country name as state
+                    ],
+                    [
+                        'code' => strtoupper(substr($countryName, 0, 3)),
+                        'active' => true,
+                    ]
+                );
+
+                // Find or create city
+                $city = City::firstOrCreate(
+                    [
+                        'state_id' => $state->id,
+                        'name' => $cityName,
+                    ],
+                    [
+                        'active' => true,
+                    ]
+                );
+
+                $data['city_id'] = $city->id;
+            }
 
             $updated = $this->updatePropertyAction->execute($id, $data);
 
