@@ -20,7 +20,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [propertyToDelete, setPropertyToDelete] = useState(null);
   const [editingProperty, setEditingProperty] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [cities, setCities] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -53,7 +52,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       return;
     }
     fetchHostProperties();
-    fetchCities();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -83,16 +81,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       setProperties([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCities = async () => {
-    try {
-      const response = await api.get('/cities');
-      setCities(response.data?.data || response.data || []);
-    } catch (error) {
-      console.error('Error fetching cities:', error);
-      notify(t('host.loadCitiesError'), 'error');
     }
   };
 
@@ -168,7 +156,12 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         checkInFormatted = formData.check_in_time;
         checkOutFormatted = formData.check_out_time;
       } else {
-        // For create: Y-m-d H:i:s
+          const countryName =
+            property.location?.country?.name ||
+            property.location?.state?.country?.name ||
+            property.country_name ||
+            property.country ||
+            'Portugal';
         const today = new Date().toISOString().split('T')[0];
         checkInFormatted = `${today} ${formData.check_in_time}:00`;
         checkOutFormatted = `${today} ${formData.check_out_time}:00`;
@@ -184,7 +177,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         check_out_time: checkOutFormatted,
         address: formData.address || 'Endereço não especificado',
         neighborhood: formData.neighborhood,
-        postal_code: formData.postal_code,
+             country_name: countryName,
         ...(formData.city_id ? { city_id: parseInt(formData.city_id) } : {}),
         ...(formData.city_name ? { city_name: formData.city_name } : {}),
         ...(formData.country_name ? { country_name: formData.country_name } : {}),
@@ -299,13 +292,12 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       }
     }
 
-    // Debug: Log the property location structure
-    console.log('Property location:', property.location);
-    console.log('Country from location:', property.location?.country);
-    console.log('Country from state:', property.location?.state?.country);
-    
-    const countryName = property.location?.country?.name || property.location?.state?.country?.name || '';
-    console.log('Final country name:', countryName);
+    const countryName =
+      property.location?.country?.name ||
+      property.location?.state?.country?.name ||
+      property.country_name ||
+      property.country ||
+      'Portugal';
     
     setFormData({
       title: property.title,
@@ -478,7 +470,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         property={editingProperty}
         formData={formData}
         onChange={handleInputChange}
-        cities={cities}
         selectedImages={selectedImages}
         onImageChange={handleImageChange}
         submitting={submitting}

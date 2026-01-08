@@ -7,14 +7,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PropertyResource extends JsonResource
 {
-
-    /*  6ª etapa -> Resources - o que vai parecer para o usuário
-     *
-     *   7º etapa -> serviceProvider
-     *
-     * */
     public function toArray(Request $request): array
     {
+        // Ensure location relations are loaded for clients that need country/city on edit forms
+        $this->resource->loadMissing(['city.state.country']);
+        $city = $this->city;
+        $state = $city?->state;
+        $country = $state?->country;
         $isAuthenticated = (bool) $request->user();
         return [
 
@@ -55,31 +54,25 @@ class PropertyResource extends JsonResource
                     'latitude' => null,
                     'longitude' => null,
                 ],
-                'city' => $this->whenLoaded('city', function() {
-                    return $this->city ? [
-                        'id' => $this->city->id,
-                        'name' => $this->city->name,
-                        'postal_code' => $this->city->postal_code,
-                    ] : null;
-                }),
-                'state' => $this->whenLoaded('city.state', function() {
-                    return $this->city && $this->city->state ? [
-                        'id' => $this->city->state->id,
-                        'name' => $this->city->state->name,
-                        'code' => $this->city->state->code,
-                        'timezone' => $this->city->state->timezone,
-                    ] : null;
-                }),
-                'country' => $this->whenLoaded('city.state.country', function() {
-                    return $this->city && $this->city->state && $this->city->state->country ? [
-                        'id' => $this->city->state->country->id,
-                        'name' => $this->city->state->country->name,
-                        'code' => $this->city->state->country->code,
-                        'currency' => $this->city->state->country->currency,
-                        'currency_symbol' => $this->city->state->country->currency_symbol,
-                        'phone_code' => $this->city->state->country->phone_code,
-                    ] : null;
-                }),
+                'city' => $city ? [
+                    'id' => $city->id,
+                    'name' => $city->name,
+                    'postal_code' => $city->postal_code,
+                ] : null,
+                'state' => $state ? [
+                    'id' => $state->id,
+                    'name' => $state->name,
+                    'code' => $state->code,
+                    'timezone' => $state->timezone,
+                ] : null,
+                'country' => $country ? [
+                    'id' => $country->id,
+                    'name' => $country->name,
+                    'code' => $country->code,
+                    'currency' => $country->currency,
+                    'currency_symbol' => $country->currency_symbol,
+                    'phone_code' => $country->phone_code,
+                ] : null,
                 // FULL FORMATTED ADDRESS
                 'full_address' => $this->getFullAddress(),
 

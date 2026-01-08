@@ -169,6 +169,8 @@ class PropertyService
                 ->groupBy('properties.id')
                 ->selectRaw('properties.id, properties.host_id, properties.property_type_id, properties.listing_type_id, properties.city_id, properties.address, properties.neighborhood, properties.postal_code, properties.latitude, properties.longitude, properties.title, properties.description, properties.summary, properties.price_per_night, properties.cleaning_fee, properties.service_fee, properties.security_deposit, properties.max_guests, properties.bedrooms, properties.beds, properties.bathrooms, properties.area, properties.floor, properties.check_in_time, properties.check_out_time, properties.min_nights, properties.max_nights, properties.published, properties.active, properties.instant_book, properties.views, properties.reviews_count, properties.published_at, properties.created_at, properties.updated_at, properties.deleted_at, COALESCE(AVG(reviews.rating_overall), 0) as rating')
                 ->paginate(15);
+            // Ensure relations are loaded on the paginator collection
+            $property->getCollection()->load(['host', 'propertyType', 'listingType', 'images', 'city.state.country']);
 
             return response()->json([
                 'success' => true,
