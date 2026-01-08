@@ -14,20 +14,20 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
         cvc: ''
     });
 
-    // Handle Phone: Only numbers, max 9
+    // Handle Phone: Only numbers, strict 9 digits
     const handlePhone = (e) => {
         const val = e.target.value.replace(/\D/g, '').slice(0, 9);
         setFormData({ ...formData, phone: val });
     };
 
-    // Handle Card: Space every 4 digits, max 16 digits
+    // Handle Card: Space every 4 digits, strict 16 digits
     const handleCardNumber = (e) => {
         let val = e.target.value.replace(/\D/g, '').slice(0, 16);
         const formatted = val.match(/.{1,4}/g)?.join(' ') || val;
         setFormData({ ...formData, cardNumber: formatted });
     };
 
-    // Handle Expiry: Add slash automatically (MM/YY)
+    // Handle Expiry: Auto-slash MM/YY, strict 4 digits
     const handleExpiry = (e) => {
         let val = e.target.value.replace(/\D/g, '').slice(0, 4);
         if (val.length >= 3) {
@@ -36,7 +36,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
         setFormData({ ...formData, expiry: val });
     };
 
-    // Handle CVC: Only numbers, max 3
+    // Handle CVC: Only numbers, strict 3 digits
     const handleCvc = (e) => {
         const val = e.target.value.replace(/\D/g, '').slice(0, 3);
         setFormData({ ...formData, cvc: val });
@@ -44,6 +44,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Send the clean data to the parent
         onConfirm(formData);
     };
 
@@ -61,13 +62,13 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Personal Information Section */}
+                    {/* PERSONAL INFORMATION SECTION */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.firstName')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <User size={18} className="text-gray-400" />
-                                <input type="text" placeholder={t('payment.firstNamePlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="text" placeholder="EX: JOÃO" className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, firstName: e.target.value})} />
                             </div>
                         </div>
@@ -75,7 +76,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.lastName')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <User size={18} className="text-gray-400" />
-                                <input type="text" placeholder={t('payment.lastNamePlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="text" placeholder="EX: SILVA" className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
                             </div>
                         </div>
@@ -86,7 +87,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.email')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Mail size={18} className="text-gray-400" />
-                                <input type="email" placeholder={t('payment.emailPlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="email" placeholder="EMAIL@EXEMPLO.COM" className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, email: e.target.value})} />
                             </div>
                         </div>
@@ -94,19 +95,19 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.phone')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Phone size={18} className="text-gray-400" />
-                                <input type="text" placeholder={t('payment.phonePlaceholder')} value={formData.phone} onChange={handlePhone} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder="912345678" value={formData.phone} onChange={handlePhone} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                     </div>
 
                     <hr className="border-gray-100 my-4" />
 
-                    {/* Card Information Section */}
+                    {/* CARD DETAILS SECTION */}
                     <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.cardNumber')}</label>
                         <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                             <CreditCard size={18} className="text-blue-600" />
-                            <input type="text" placeholder={t('payment.cardNumberPlaceholder')} value={formData.cardNumber} onChange={handleCardNumber} className="bg-transparent w-full outline-none font-bold text-sm tracking-widest" required />
+                            <input type="text" placeholder="0000 0000 0000 0000" value={formData.cardNumber} onChange={handleCardNumber} className="bg-transparent w-full outline-none font-bold text-sm tracking-widest" required />
                         </div>
                     </div>
 
@@ -115,22 +116,23 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.expiry')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Calendar size={18} className="text-gray-400" />
-                                <input type="text" placeholder={t('payment.expiryPlaceholder')} value={formData.expiry} onChange={handleExpiry} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder="MM/AA" value={formData.expiry} onChange={handleExpiry} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.cvc')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Lock size={18} className="text-gray-400" />
-                                <input type="text" placeholder={t('payment.cvcPlaceholder')} value={formData.cvc} onChange={handleCvc} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder="000" value={formData.cvc} onChange={handleCvc} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-blue-50 p-6 rounded-4xl flex items-center justify-between mt-8">
+                    {/* SUBMIT SECTION */}
+                    <div className="bg-blue-50 p-6 rounded-[2.5rem] flex items-center justify-between mt-8">
                         <div>
                             <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{t('payment.totalToPay')}</p>
-                            <p className="text-2xl font-black text-blue-700 italic">€{totalPrice}</p>
+                            <p className="text-2xl font-black text-blue-700 italic font-sans">€{totalPrice}</p>
                         </div>
                         <button 
                             type="submit"

@@ -16,59 +16,19 @@ class StoreReservationRequest extends FormRequest
         return Auth::check();
     }
     public function rules(): array
-    {
-        $today = now()->format('Y-m-d');
-        $oneYearFromNow = now()->addYear()->format('Y-m-d');
+{
+    return [
+        'property_id' => 'required|integer',
+        'check_in'    => 'required|date',
+        'check_out'   => 'required|date|after:check_in',
+        'adults'      => 'required|integer|min:1',
+        'children'    => 'nullable|integer|min:0',
+        'infants'     => 'nullable|integer|min:0',
+        'total_amount' => 'required|numeric',
+        'nights'      => 'nullable|integer|min:1'
+    ];
+}
 
-        return [
-            'property_id' => [
-                'required',
-                'integer',
-                'exists:properties,id',
-            ],
-            'check_in' => [
-                'required',
-                'date',
-                'date_format:Y-m-d',
-                'after_or_equal:' . $today,
-                'before:' . $oneYearFromNow,
-            ],
-            'check_out' => [
-                'required',
-                'date',
-                'date_format:Y-m-d',
-                'after:check_in',
-            ],
-            'adults' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:10',
-            ],
-            'children' => [
-                'required',
-                'integer',
-                'min:0',
-                'max:8',
-            ],
-            'infants' => [
-                'required',
-                'integer',
-                'min:0',
-                'max:4',
-            ],
-            'special_requests' => [
-                'nullable',
-                'string',
-                'max:1000',
-            ],
-            'payment_method' => [
-                'nullable',
-                'string',
-                Rule::in(['credit_card', 'debit_card', 'pix', 'bank_transfer']),
-            ],
-        ];
-    }
     public function messages(): array
     {
         return [

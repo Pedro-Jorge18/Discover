@@ -51,7 +51,7 @@ const BookingSuccess = () => {
 
                 <div className="space-y-4">
                     <Link 
-                        to="/my-reservations" 
+                        to="/minhas-reservas" 
                         className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-black py-5 rounded-4xl uppercase tracking-widest text-xs shadow-xl hover:bg-blue-700 transition-all active:scale-95"
                     >
                         Ver as Minhas Reservas <ArrowRight size={18} />
