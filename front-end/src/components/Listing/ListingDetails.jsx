@@ -13,6 +13,7 @@ import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
 import ListingInfo from './ListingInfo.jsx';
 import PaymentModal from '../Booking/PaymentModal.jsx';
+import { pushHostNotification } from '../../utils/hostNotifications';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {

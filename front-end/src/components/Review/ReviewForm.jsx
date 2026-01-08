@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { pushHostNotification } from '../../utils/hostNotifications';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 export default function ReviewForm({ reservation, property, onSuccess, onCancel, user }) {
@@ -73,6 +74,18 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
       const response = await api.post('/reviews', payload);
 
       notify(t('review.reviewSubmittedSuccessfully'), 'success');
+
+      const hostId = property?.host?.id || property?.user?.id;
+      if (hostId) {
+        pushHostNotification({
+          hostId,
+          type: 'review',
+          title: t('hostNotifications.reviewTitle'),
+          message: `${t('hostNotifications.reviewBody')} ${property?.title || ''}`,
+          propertyId: property?.id,
+        });
+      }
+
       if (onSuccess) onSuccess(response.data.review);
     } catch (err) {
       console.error('Erro ao enviar review:', err?.response?.data);
