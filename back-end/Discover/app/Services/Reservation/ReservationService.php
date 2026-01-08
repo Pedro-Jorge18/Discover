@@ -107,18 +107,65 @@ class ReservationService
     /**
      * Cria reserva com pagamento instantâneo
      */
-    public function createReservationWithPayment(array $data, int $userId, string $paymentMethod): Reservation
+    public function createReservationWithPayment(array $data, int $userId, ?string $paymentMethod = null): Reservation
     {
-        return DB::transaction(function () use ($data, $userId, $paymentMethod) {
-            $reservation = $this->createReservation->executeWithFullPayment($data, $paymentMethod);
+        try {
+            return DB::transaction(function () use ($data, $userId) {
+                
+                $totalAmount = floatval($data['total_amount'] ?? 0);
+                $nights = intval($data['nights'] ?? 1);
+                
+                // Criar reserva SIMPLES
+                $reservation = Reservation::create([
+                    'property_id' => intval($data['property_id']),
+                    'user_id' => $userId,
+                    'check_in' => $data['check_in'],
+                    'check_out' => $data['check_out'],
+                    'adults' => intval($data['adults'] ?? 1),
+                    'children' => intval($data['children'] ?? 0),
+                    'infants' => intval($data['infants'] ?? 0),
+                    'nights' => $nights,
+                    'price_per_night' => $totalAmount / max($nights, 1),
+                    'subtotal' => $totalAmount,
+                    'total_amount' => $totalAmount,
+                    'reservation_code' => 'RES-' . strtoupper(bin2hex(random_bytes(4))),
+                    // após pagamento consideramos auto-confirmada
+                    'status_id' => 2,
+                ]);
 
-            Log::info('Reservation created with payment', [
-                'reservation_code' => $reservation->reservation_code,
-                'payment_method' => $paymentMethod
+                // Criar pagamento
+                if ($reservation->id) {
+                    // Save payment and include any safe metadata (payer info)
+                    DB::table('payments')->insert([
+                        'reservation_id' => $reservation->id,
+                        'user_id' => $userId,
+                        'amount' => $totalAmount,
+                        'payment_gateway' => 'manual',
+                        'status' => 'completed',
+                        'metadata' => isset($data['payment_metadata']) ? json_encode($data['payment_metadata']) : null,
+                        'processed_at' => now(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                Log::info('Reservation created with payment', [
+                    'reservation_id' => $reservation->id,
+                    'user_id' => $userId,
+                    'amount' => $totalAmount,
+                    'code' => $reservation->reservation_code
+                ]);
+
+                return $reservation;
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to create reservation with payment', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+                'data' => $data
             ]);
-
-            return $reservation;
-        });
+            throw $e;
+        }
     }
 
     /**
@@ -126,7 +173,7 @@ class ReservationService
      */
     public function getUserReservations(int $userId, array $filters = []): Collection
     {
-        $query = Reservation::with(['property', 'status'])
+        $query = Reservation::with(['property', 'status', 'successfulPayment'])
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc');
 

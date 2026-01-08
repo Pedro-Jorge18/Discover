@@ -44,6 +44,10 @@ class ReservationResource extends JsonResource
                 'transaction_id' => $this->transaction_id,
                 'payment_date' => $this->payment_date?->format('Y-m-d H:i:s'),
             ],
+            // raw payment metadata from successful payment (if loaded)
+            'payment_metadata' => $this->whenLoaded('successfulPayment', function () {
+                return $this->successfulPayment?->metadata;
+            }),
 
             // DETALHES
             'special_requests' => $this->special_requests,
