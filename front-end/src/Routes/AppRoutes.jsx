@@ -18,6 +18,7 @@ import CompanyInfo from '../components/Layout/CompanyInfo.jsx';
 import TermsPage from '../components/Layout/TermsPage.jsx';
 import PrivacyPage from '../components/Layout/PrivacyPage.jsx';
 import HelpCenter from '../components/Layout/HelpCenter.jsx';
+import MyReservations from '../components/Booking/MyReservations.jsx';
 
 function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, onOpenSettingsAdmin }) {
     
@@ -206,6 +207,18 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
                             setUser={setUser}
                             onOpenSettings={onOpenSettings}
                             onOpenSettingsAdmin={onOpenSettingsAdmin}
+                        />
+                    </Protected>
+                } />
+
+                {/* My Reservations */}
+                <Route path="/minhas-reservas" element={
+                    <Protected>
+                        <MyReservations 
+                            user={user} 
+                            setUser={setUser} 
+                            onOpenSettings={onOpenSettings} 
+                            onOpenSettingsAdmin={onOpenSettingsAdmin} 
                         />
                     </Protected>
                 } />

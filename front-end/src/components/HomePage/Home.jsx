@@ -23,7 +23,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
       setTimeout(() => {
         setAlojamentos(dados);
         setLoading(false);
-      }, 100); // 100ms delay
+      }, 0); // 0ms delay
 
     } catch (erro) {
       console.error("API Error:", erro);

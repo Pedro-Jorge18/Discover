@@ -49,7 +49,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
     if (propertyId) {
       fetchReviews();
     }
-  }, [propertyId, fetchReviews]);
+  }, [propertyId]);
 
   const handleDeleteReview = async (reviewId) => {
     setConfirmDelete(reviewId);

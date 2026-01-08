@@ -12,6 +12,7 @@ use App\Models\Reservation;
 use App\Services\Reservation\ReservationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
@@ -34,6 +35,12 @@ class ReservationController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error fetching user reservations', [
+                'user_id' => auth()->id(),
+                'filters' => $filters,
+                'error' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching reservations'
@@ -72,6 +79,12 @@ class ReservationController extends Controller
     public function storeWithPayment(StoreReservationRequest $request): JsonResponse
     {
         try {
+            Log::info('StoreWithPayment called', [
+                'user_id' => auth()->id(),
+                'is_authenticated' => auth()->check(),
+                'request_data' => $request->all()
+            ]);
+
             $reservation = $this->reservationService->createReservationWithPayment(
                 $request->validated(),
                 auth()->id(),
@@ -85,6 +98,13 @@ class ReservationController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            Log::error('Reservation creation with payment failed', [
+                'user_id' => auth()->id(),
+                'request_data' => $request->all(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
