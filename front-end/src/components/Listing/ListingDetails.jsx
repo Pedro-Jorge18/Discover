@@ -210,28 +210,48 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   };
 
   const handleFinalPayment = async (paymentData) => {
-    try {
-      setBookingLoading(true);
-      await api.post('/payments', {
-        property_id: id,
-        check_in: startDate.toISOString().split('T')[0],
-        check_out: endDate.toISOString().split('T')[0],
-        guests: hospedes,
-        total_price: totalPrice,
-        customer_info: paymentData
-      });
+  try {
+    setBookingLoading(true);
 
-      notify(t('property.bookingSuccess'), 'success');
-      setShowPaymentModal(false);
+    // Dados SIMPLES para a reserva
+    const reservationData = {
+      property_id: parseInt(id),
+      check_in: startDate.toISOString().split('T')[0],
+      check_out: endDate.toISOString().split('T')[0],
+      adults: parseInt(hospedes),
+      children: 0,
+      infants: 0,
+      total_amount: totalPrice,
+      nights: 1
+    };
+
+    // include safe payment info (no full card numbers) provided by PaymentModal
+    const safePayment = paymentData ? {
+      firstName: paymentData.firstName || null,
+      lastName: paymentData.lastName || null,
+      email: paymentData.email || null,
+      phone: paymentData.phone || null,
+      card_last4: paymentData.cardNumber ? paymentData.cardNumber.replace(/\s+/g, '').slice(-4) : null
+    } : null;
+
+    reservationData.payment_metadata = safePayment;
+
+    console.log('Enviando:', reservationData);
+    const response = await api.post('/reservations/with-payment', reservationData);
+
+    if (response.data.success || response.status === 201) {
+      notify('Reserva confirmada! 🎉', 'success');
       navigate('/payment/success');
-    } catch (error) {
-      console.error('Payment error:', error);
-      notify(t('property.bookingError'), 'error');
-    } finally {
-      setBookingLoading(false);
+    } else {
+      throw new Error('Erro ao criar reserva');
     }
-  };
-
+  } catch (error) {
+    console.error('Erro:', error);
+    notify('Erro ao criar reserva', 'error');
+  } finally {
+    setBookingLoading(false);
+  }
+};
 
 
   if (loading) return (
