@@ -27,14 +27,14 @@ class ReservationResource extends JsonResource
 
             // FINANCEIRO
             'pricing' => [
-                'price_per_night' => $this->price_per_night,
-                'cleaning_fee' => $this->cleaning_fee,
-                'service_fee' => $this->service_fee,
-                'security_deposit' => $this->security_deposit,
-                'subtotal' => $this->subtotal,
-                'total_amount' => $this->total_amount,
-                'amount_paid' => $this->amount_paid,
-                'remaining_balance' => $this->getRemainingBalance(),
+                'price_per_night' => (float) $this->price_per_night,
+                'cleaning_fee' => (float) $this->cleaning_fee,
+                'service_fee' => (float) $this->service_fee,
+                'security_deposit' => (float) $this->security_deposit,
+                'subtotal' => (float) $this->subtotal,
+                'total_amount' => (float) $this->total_amount,
+                'amount_paid' => (float) $this->amount_paid,
+                'remaining_balance' => (float) $this->getRemainingBalance(),
             ],
 
             // PAGAMENTO

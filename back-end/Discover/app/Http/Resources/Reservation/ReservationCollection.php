@@ -6,6 +6,11 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ReservationCollection extends ResourceCollection
 {
+    /**
+     * Each item in the collection should be transformed by ReservationResource.
+     */
+    public $collects = ReservationResource::class;
+
     public function toArray($request)
     {
 

@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('reservations')->group(function () {
         // Reservas do usuário
         Route::get('/', [ReservationController::class, 'index']);
+        Route::get('/host', [ReservationController::class, 'hostReservations']);
         Route::post('/', [ReservationController::class, 'store']);
         Route::post('/with-payment', [ReservationController::class, 'storeWithPayment']);
         Route::get('/stats', [ReservationController::class, 'stats']);

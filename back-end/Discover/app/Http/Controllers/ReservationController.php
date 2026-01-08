@@ -49,6 +49,34 @@ class ReservationController extends Controller
     }
 
     /**
+     * Lista reservas das propriedades do host autenticado
+     */
+    public function hostReservations(Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->only(['status']);
+            $reservations = $this->reservationService->getHostReservations(auth()->id(), $filters);
+
+            return response()->json([
+                'success' => true,
+                'data' => new ReservationCollection($reservations)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching host reservations', [
+                'user_id' => auth()->id(),
+                'filters' => $filters ?? [],
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching reservations'
+            ], 500);
+        }
+    }
+
+    /**
      * Cria uma nova reserva
      */
     public function store(StoreReservationRequest $request): JsonResponse

@@ -179,9 +179,26 @@ class Reservation extends Model
 
     public function isCancellable(): bool
     {
+        $statusName = $this->status->name ?? '';
+        $checkIn = $this->check_in instanceof Carbon ? $this->check_in : Carbon::parse($this->check_in);
 
-        return $this->check_in > now()->addDays(1) &&
-            ($this->status->name ?? '') !== 'Cancelada';
+        // Already cancelled or past stays cannot be cancelled
+        if (in_array($statusName, ['Cancelada', 'Cancelled'], true)) {
+            return false;
+        }
+
+        // If the stay is in the past, block
+        if ($checkIn->lt(today())) {
+            return false;
+        }
+
+        // Pending reservations can be cancelled anytime until check-in day
+        if (in_array($statusName, ['Pendente', 'Pending'], true)) {
+            return true;
+        }
+
+        // Confirmed reservations: allow cancellation if the check-in date is today or later
+        return $checkIn->gte(today());
     }
 
     // MÉTODOS DE STATUS
@@ -196,7 +213,7 @@ class Reservation extends Model
     public function cancel($reason = null): void
     {
         $this->update([
-            'status_id' => ReservationStatus::where('name', 'Cancelada')->first()->id,
+            'status_id' => optional(ReservationStatus::whereIn('name', ['Cancelada', 'Cancelled'])->first())->id ?? $this->status_id,
             'cancellation_reason' => $reason,
             'cancelled_at' => now(),
         ]);
