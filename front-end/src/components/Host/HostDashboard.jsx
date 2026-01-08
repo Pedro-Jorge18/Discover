@@ -107,12 +107,16 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const fetchPendingReservations = async () => {
     try {
       setLoadingReservations(true);
-      const response = await api.get('/reservations', {
-        params: { status: 'pending', host_id: user?.id }
+      const response = await api.get('/reservations/host', {
+        params: { status: 'pending' }
       });
-      const allReservations = response.data?.data || response.data || [];
-      // Ensure it's always an array
-      setPendingReservations(Array.isArray(allReservations) ? allReservations : []);
+      const data = response.data?.data;
+      const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Host reservations raw:', data);
+        console.log('First reservation:', list[0]);
+      }
+      setPendingReservations(list);
     } catch (error) {
       console.error('Error fetching reservations:', error);
       setPendingReservations([]);
@@ -124,9 +128,12 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleReservationAction = async (reservationId, action) => {
     try {
       setProcessingReservation(reservationId);
-      await api.patch(`/reservations/${reservationId}`, {
-        status: action === 'accept' ? 'confirmed' : 'cancelled'
-      });
+      if (action === 'accept') {
+        await api.post(`/reservations/${reservationId}/confirm`);
+      } else {
+        await api.delete(`/reservations/${reservationId}`);
+      }
+
       notify(
         action === 'accept' 
           ? t('host.reservationAccepted') 
@@ -521,7 +528,18 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.isArray(pendingReservations) && pendingReservations.map((reservation) => (
+              {Array.isArray(pendingReservations) && pendingReservations.map((reservation) => {
+                const guestCount =
+                  typeof reservation.guests === 'number'
+                    ? reservation.guests
+                    : ((reservation.guests?.adults ?? reservation.adults ?? 0)
+                      + (reservation.guests?.children ?? reservation.children ?? 0)
+                      + (reservation.guests?.infants ?? reservation.infants ?? 0));
+
+                const rawTotal = reservation.pricing?.total_amount ?? reservation.total_amount ?? reservation.total_price ?? 0;
+                const totalPrice = typeof rawTotal === 'number' ? rawTotal : Number(rawTotal.total ?? rawTotal.total_amount ?? rawTotal.amount ?? 0);
+
+                return (
                 <div 
                   key={reservation.id}
                   className="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-100 p-6 hover:shadow-xl transition"
@@ -552,7 +570,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                       </div>
                       <div>
                         <p className="font-bold text-gray-900">{reservation.guest?.name || 'Hóspede'}</p>
-                        <p className="text-xs text-gray-500">{reservation.guests} {t('common.guests')}</p>
+                        <p className="text-xs text-gray-500">{guestCount} {t('common.guests')}</p>
                       </div>
                     </div>
 
@@ -576,7 +594,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   {/* Total Price */}
                   <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-3 mb-4 text-white text-center">
                     <p className="text-xs font-semibold opacity-90 uppercase tracking-wide mb-1">{t('property.total')}</p>
-                    <p className="text-2xl font-black">€{reservation.total_price}</p>
+                    <p className="text-2xl font-black">€{Number(totalPrice).toFixed(2)}</p>
                   </div>
 
                   {/* Action Buttons - ACEITAR OU RECUSAR RESERVA */}
@@ -599,7 +617,8 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                     </button>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           )}
         </div>
