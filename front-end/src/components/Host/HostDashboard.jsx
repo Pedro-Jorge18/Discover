@@ -4,7 +4,7 @@ import Header from '../Nav/Header.jsx';
 import PropertyFormModal from './PropertyFormModal.jsx';
 import PropertyList from './PropertyList.jsx';
 import DeleteConfirmModal from './DeleteConfirmModal.jsx';
-import { Plus, Loader2, Home, Eye, Calendar, TrendingUp } from 'lucide-react';
+import { Plus, Loader2, Home, Eye, Calendar, TrendingUp, Clock, Check, X, User, MapPin } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 import { useTranslation } from '../../contexts/TranslationContext';
@@ -21,6 +21,9 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const [editingProperty, setEditingProperty] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [pendingReservations, setPendingReservations] = useState([]);
+  const [loadingReservations, setLoadingReservations] = useState(true);
+  const [processingReservation, setProcessingReservation] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -51,7 +54,11 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       navigate('/');
       return;
     }
-    fetchHostProperties();
+    const loadData = async () => {
+      await fetchHostProperties();
+      fetchPendingReservations();
+    };
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -94,6 +101,45 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       setProperties([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingReservations = async () => {
+    try {
+      setLoadingReservations(true);
+      const response = await api.get('/reservations', {
+        params: { status: 'pending', host_id: user?.id }
+      });
+      const allReservations = response.data?.data || response.data || [];
+      // Ensure it's always an array
+      setPendingReservations(Array.isArray(allReservations) ? allReservations : []);
+    } catch (error) {
+      console.error('Error fetching reservations:', error);
+      setPendingReservations([]);
+    } finally {
+      setLoadingReservations(false);
+    }
+  };
+
+  const handleReservationAction = async (reservationId, action) => {
+    try {
+      setProcessingReservation(reservationId);
+      await api.patch(`/reservations/${reservationId}`, {
+        status: action === 'accept' ? 'confirmed' : 'cancelled'
+      });
+      notify(
+        action === 'accept' 
+          ? t('host.reservationAccepted') 
+          : t('host.reservationRejected'), 
+        'success'
+      );
+      // Refresh reservations list
+      fetchPendingReservations();
+    } catch (error) {
+      console.error('Error updating reservation:', error);
+      notify(t('host.reservationError'), 'error');
+    } finally {
+      setProcessingReservation(null);
     }
   };
 
@@ -428,8 +474,8 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               </div>
               <TrendingUp size={20} className="opacity-60" />
             </div>
-            <h3 className="text-3xl font-black mb-1">0</h3>
-            <p className="text-purple-100 font-medium text-sm">{t('host.activeReservations')}</p>
+            <h3 className="text-3xl font-black mb-1">{pendingReservations.length}</h3>
+            <p className="text-purple-100 font-medium text-sm">{t('host.pendingReservations')}</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white">
@@ -442,6 +488,120 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <h3 className="text-3xl font-black mb-1">€0</h3>
             <p className="text-orange-100 font-medium text-sm">{t('host.revenue')}</p>
           </div>
+        </div>
+
+        {/* Pending Reservations Section - SEMPRE VISÍVEL */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <Clock className="text-purple-600" size={28} />
+            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">
+              {t('host.pendingReservationsTitle')}
+            </h2>
+            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-bold">
+              {pendingReservations.length}
+            </span>
+          </div>
+
+          {loadingReservations ? (
+            <div className="bg-white rounded-2xl shadow-md p-16 text-center">
+              <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto mb-4" />
+              <p className="text-gray-600">{t('common.loading')}</p>
+            </div>
+          ) : pendingReservations.length === 0 ? (
+            <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-md p-16 text-center border-2 border-purple-100">
+              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Calendar className="text-purple-600" size={40} />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                {t('host.noPendingReservations')}
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                {t('host.noPendingReservationsDesc')}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.isArray(pendingReservations) && pendingReservations.map((reservation) => (
+                <div 
+                  key={reservation.id}
+                  className="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-100 p-6 hover:shadow-xl transition"
+                >
+                  {/* Property Info */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-black text-gray-900 mb-1 line-clamp-1">
+                        {reservation.property?.title}
+                      </h3>
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <MapPin size={14} />
+                        <span className="line-clamp-1">
+                          {reservation.property?.location?.city?.name || reservation.property?.city?.name}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="bg-purple-100 px-3 py-1 rounded-full">
+                      <Clock size={14} className="text-purple-600" />
+                    </div>
+                  </div>
+
+                  {/* Guest Info */}
+                  <div className="bg-white/80 rounded-xl p-4 mb-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                        <User size={20} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900">{reservation.guest?.name || 'Hóspede'}</p>
+                        <p className="text-xs text-gray-500">{reservation.guests} {t('common.guests')}</p>
+                      </div>
+                    </div>
+
+                    {/* Dates */}
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-gray-500 text-xs font-semibold uppercase mb-1">{t('property.checkIn')}</p>
+                        <p className="font-bold text-gray-900">
+                          {new Date(reservation.check_in).toLocaleDateString('pt-PT')}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs font-semibold uppercase mb-1">{t('property.checkOut')}</p>
+                        <p className="font-bold text-gray-900">
+                          {new Date(reservation.check_out).toLocaleDateString('pt-PT')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Total Price */}
+                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-3 mb-4 text-white text-center">
+                    <p className="text-xs font-semibold opacity-90 uppercase tracking-wide mb-1">{t('property.total')}</p>
+                    <p className="text-2xl font-black">€{reservation.total_price}</p>
+                  </div>
+
+                  {/* Action Buttons - ACEITAR OU RECUSAR RESERVA */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleReservationAction(reservation.id, 'accept')}
+                      disabled={processingReservation === reservation.id}
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-4 rounded-xl font-black text-sm uppercase tracking-wide hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                    >
+                      <Check size={20} strokeWidth={3} />
+                      {processingReservation === reservation.id ? t('common.processing') : t('host.acceptReservation')}
+                    </button>
+                    <button
+                      onClick={() => handleReservationAction(reservation.id, 'reject')}
+                      disabled={processingReservation === reservation.id}
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-4 rounded-xl font-black text-sm uppercase tracking-wide hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                    >
+                      <X size={20} strokeWidth={3} />
+                      {processingReservation === reservation.id ? t('common.processing') : t('host.rejectReservation')}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {properties.length === 0 ? (
