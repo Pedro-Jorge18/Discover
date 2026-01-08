@@ -129,8 +129,8 @@ class ReservationService
                     'subtotal' => $totalAmount,
                     'total_amount' => $totalAmount,
                     'reservation_code' => 'RES-' . strtoupper(bin2hex(random_bytes(4))),
-                    // após pagamento consideramos auto-confirmada
-                    'status_id' => 2,
+                    // deixar Pendente; o host confirmará manualmente
+                    'status_id' => 1,
                 ]);
 
                 // Criar pagamento
@@ -178,11 +178,7 @@ class ReservationService
             ->orderBy('created_at', 'desc');
 
         // Filtros
-        if (isset($filters['status'])) {
-            $query->whereHas('status', function ($q) use ($filters) {
-                $q->where('name', $filters['status']);
-            });
-        }
+        $this->applyStatusFilter($query, $filters['status'] ?? null);
 
         if (isset($filters['upcoming']) && $filters['upcoming']) {
             $query->where('check_in', '>=', now());
@@ -196,6 +192,22 @@ class ReservationService
             $query->where('check_in', '<=', now())
                 ->where('check_out', '>=', now());
         }
+
+        return $query->get();
+    }
+
+    /**
+     * Busca reservas de propriedades de um host
+     */
+    public function getHostReservations(int $hostId, array $filters = []): Collection
+    {
+        $query = Reservation::with(['property', 'status', 'user'])
+            ->whereHas('property', function ($q) use ($hostId) {
+                $q->where('host_id', $hostId);
+            })
+            ->orderBy('created_at', 'desc');
+
+        $this->applyStatusFilter($query, $filters['status'] ?? null);
 
         return $query->get();
     }
@@ -242,13 +254,21 @@ class ReservationService
      */
     public function cancelReservation(int $reservationId, int $userId, ?string $reason = null): Reservation
     {
-        $reservation = $this->findUserReservation($reservationId, $userId);
+        $reservation = Reservation::with('property')->find($reservationId);
 
         if (!$reservation) {
             throw new \Exception('Reservation not found');
         }
 
-        if (!$reservation->isCancellable()) {
+        $isGuest = $reservation->user_id === $userId;
+        $isHost = $reservation->property && $reservation->property->host_id === $userId;
+
+        if (!$isGuest && !$isHost) {
+            throw new \Exception('You are not allowed to cancel this reservation');
+        }
+
+        // Guests: respect cancellable rules. Hosts: allow override to reject/recusar.
+        if (!$isHost && !$reservation->isCancellable()) {
             throw new \Exception('This reservation cannot be cancelled');
         }
 
@@ -257,6 +277,7 @@ class ReservationService
         Log::info('Reservation cancelled', [
             'reservation_id' => $reservationId,
             'user_id' => $userId,
+            'as_host' => $isHost,
             'reason' => $reason
         ]);
 
@@ -270,7 +291,8 @@ class ReservationService
     {
         $reservation = Reservation::findOrFail($reservationId);
 
-        $confirmedStatus = ReservationStatus::where('name', 'Confirmed')->first();
+        // Try Portuguese then English status names
+        $confirmedStatus = ReservationStatus::whereIn('name', ['Confirmada', 'Confirmed'])->first();
 
         if (!$confirmedStatus) {
             throw new \Exception('Confirmed status not found');
@@ -296,9 +318,9 @@ class ReservationService
         }
 
         $total = $query->count();
-        $confirmed = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Confirmed'))->count();
-        $pending = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Pending'))->count();
-        $cancelled = $query->clone()->whereHas('status', fn($q) => $q->where('name', 'Cancelled'))->count();
+        $confirmed = $query->clone()->whereHas('status', fn($q) => $q->whereIn('name', ['Confirmada', 'Confirmed']))->count();
+        $pending = $query->clone()->whereHas('status', fn($q) => $q->whereIn('name', ['Pendente', 'Pending']))->count();
+        $cancelled = $query->clone()->whereHas('status', fn($q) => $q->whereIn('name', ['Cancelada', 'Cancelled']))->count();
 
         return [
             'total' => $total,
@@ -341,5 +363,31 @@ class ReservationService
 
 
         ];
+    }
+
+    /**
+     * Aplica filtro de status aceitando PT/EN e case-insensitive
+     */
+    private function applyStatusFilter($query, $status = null): void
+    {
+        if (!$status) {
+            return;
+        }
+
+        $normalized = strtolower(trim($status));
+        $map = [
+            'pending' => ['Pendente', 'Pending'],
+            'pendente' => ['Pendente', 'Pending'],
+            'confirmed' => ['Confirmada', 'Confirmed'],
+            'confirmada' => ['Confirmada', 'Confirmed'],
+            'cancelled' => ['Cancelada', 'Cancelled'],
+            'cancelada' => ['Cancelada', 'Cancelled'],
+        ];
+
+        $names = $map[$normalized] ?? [ucfirst($normalized)];
+
+        $query->whereHas('status', function ($q) use ($names) {
+            $q->whereIn('name', $names);
+        });
     }
 }

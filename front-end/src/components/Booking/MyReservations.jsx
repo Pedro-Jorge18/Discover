@@ -9,14 +9,45 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
     const { t } = useTranslation();
     const [reservas, setReservas] = useState([]); // Começa como array vazio
     const [loading, setLoading] = useState(true);
-    const [showDetails, setShowDetails] = useState(false);
-    const [selected, setSelected] = useState(null);
+        const [showDetails, setShowDetails] = useState(false);
+        const [selected, setSelected] = useState(null);
+        const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+        const [cancelTarget, setCancelTarget] = useState(null);
 
-    useEffect(() => {
-      const fetchReservas = async () => {
-        try {
-          const response = await api.get('/reservations');
-          console.log('Resposta completa:', response.data);
+        const openCancelConfirm = (reservation) => {
+            setCancelTarget(reservation);
+            setShowCancelConfirm(true);
+        };
+
+        const handleConfirmCancel = async () => {
+            if (!cancelTarget) return;
+            try {
+                const response = await api.delete(`/reservations/${cancelTarget.id}`);
+                const updated = response.data?.data;
+
+                setReservas((prev) => prev.map(r => {
+                    if (r.id !== cancelTarget.id) return r;
+                    return {
+                        ...r,
+                        ...updated,
+                        status: updated?.status ?? 'Cancelada',
+                        status_name: updated?.status ?? 'Cancelada',
+                        cancelled_at: updated?.cancelled_at ?? new Date().toISOString(),
+                    };
+                }));
+
+                setShowCancelConfirm(false);
+                setCancelTarget(null);
+            } catch (err) {
+                console.error('Erro a cancelar:', err);
+                alert('Erro ao cancelar reserva.');
+            }
+        };
+
+        useEffect(() => {
+            const fetchReservas = async () => {
+                try {
+                    const response = await api.get('/reservations');
           
           // O backend responde com {success: true, data: ReservationCollection}
           // Onde ReservationCollection pode ser {data: [...]} ou uma array direto
@@ -24,7 +55,6 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
           
           if (response.data?.data) {
             const dataContent = response.data.data;
-            console.log('Data content:', dataContent);
             
             // Se data.data é um array, usa direto
             if (Array.isArray(dataContent)) {
@@ -40,7 +70,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
             }
           }
           
-          console.log('Array final de reservas:', reservasArray);
+          
           setReservas(reservasArray);
         } catch (error) {
           console.error("Erro ao carregar viagens:", error);
@@ -65,7 +95,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
             <main className="grow max-w-[1200px] w-full mx-auto px-6 pt-32 pb-20">
                 <div className="mb-12">
                     <h1 className="text-5xl font-black italic uppercase tracking-tighter text-gray-900 leading-none">
-                        As Minhas <span className="text-transparent" style={{ WebkitTextStroke: '1px #111' }}>Viagens</span>
+                        {t('myReservations')} <span className="text-transparent" style={{ WebkitTextStroke: '1px #111' }}></span>
                     </h1>
                     <div className="h-1 w-20 bg-blue-600 mt-2"></div>
                 </div>
@@ -114,13 +144,21 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                     <p className="text-xs text-gray-400 mt-1 uppercase font-bold">
                                         {res.status || (res.status_name ?? '')}
                                     </p>
-                                    <div className="mt-4">
+                                    <div className="mt-4 flex gap-2">
                                         <button
                                             onClick={() => { setSelected(res); setShowDetails(true); }}
                                             className="px-4 py-2 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase"
                                         >
                                             Detalhes
                                         </button>
+                                        {(res.status === 'Pendente' || res.status === 'Pending' || (res.status_name && (res.status_name === 'Pendente' || res.status_name === 'Pending'))) && (
+                                            <button
+                                                onClick={() => openCancelConfirm(res)}
+                                                className="px-4 py-2 bg-red-500 text-white rounded-2xl font-black text-xs uppercase"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -177,6 +215,20 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                 {selected.payment_metadata.card_last4 && <p className="text-gray-700">Cartão (últimos 4): **** **** **** {selected.payment_metadata.card_last4}</p>}
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+            {/* Cancel Confirm Modal */}
+            {showCancelConfirm && cancelTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/50" onClick={() => setShowCancelConfirm(false)}></div>
+                    <div className="relative bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl z-60">
+                        <h3 className="text-xl font-black text-gray-900 text-center mb-2">Confirmar cancelamento</h3>
+                        <p className="text-gray-600 text-center mb-6">Tem a certeza que pretende cancelar a reserva <span className="font-bold">{cancelTarget.reservation_code}</span>?</p>
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowCancelConfirm(false)} className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition">Cancelar</button>
+                            <button onClick={handleConfirmCancel} className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition">Confirmar cancelamento</button>
+                        </div>
                     </div>
                 </div>
             )}

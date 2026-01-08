@@ -237,7 +237,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
     reservationData.payment_metadata = safePayment;
 
-    console.log('Enviando:', reservationData);
     const response = await api.post('/reservations/with-payment', reservationData);
 
     if (response.data.success || response.status === 201) {
