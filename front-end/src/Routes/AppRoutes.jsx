@@ -11,6 +11,7 @@ import SettingsMain from '../components/Settings/SettingsMain.jsx';
 import SearchPage from '../components/Nav/SearchPage.jsx';
 import FavoritesPage from '../components/Nav/FavoritesPage.jsx';
 import NotificationsPage from '../components/Nav/NotificationsPage.jsx';
+import UserNotificationsPage from '../components/Nav/UserNotificationsPage.jsx';
 import MyReviews from '../components/Review/MyReviews.jsx';
 import HostDashboard from '../components/Host/HostDashboard.jsx';
 import BookingSuccess from '../components/Booking/BookingSuccess.jsx';
@@ -170,6 +171,21 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
                         onOpenSettingsAdmin={onOpenSettingsAdmin}
                       />
                     </RoleProtected>
+                  } 
+                />
+
+                {/* User Notifications */}
+                <Route 
+                  path="/reservas-notificacoes" 
+                  element={
+                    <Protected>
+                      <UserNotificationsPage 
+                        user={user} 
+                        setUser={setUser} 
+                        onOpenSettings={onOpenSettings}
+                        onOpenSettingsAdmin={onOpenSettingsAdmin}
+                      />
+                    </Protected>
                   } 
                 />
 
