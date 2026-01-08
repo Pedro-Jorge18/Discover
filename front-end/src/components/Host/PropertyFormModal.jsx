@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Upload, Edit, Loader2, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function PropertyFormModal({ 
   show, 
@@ -15,6 +16,7 @@ function PropertyFormModal({
 }) {
   if (!show) return null;
 
+  const { t } = useTranslation();
   const isEditing = !!property;
 
   return (
@@ -23,7 +25,7 @@ function PropertyFormModal({
         {/* Modal Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-2xl font-black text-gray-900 uppercase">
-            {isEditing ? 'Editar Propriedade' : 'Publicar Nova Propriedade'}
+            {isEditing ? t('host.editProperty') : t('host.publishNewProperty')}
           </h2>
           <button
             onClick={onClose}
@@ -38,14 +40,14 @@ function PropertyFormModal({
           {/* Título */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
-              Título da Propriedade *
+              {t('host.propertyTitle')} *
             </label>
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={onChange}
-              placeholder="Ex: Apartamento Moderno no Centro"
+              placeholder={t('host.propertyTitlePlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
               required
             />
@@ -54,13 +56,13 @@ function PropertyFormModal({
           {/* Descrição */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
-              Descrição
+              {t('host.description')}
             </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={onChange}
-              placeholder="Descreva a sua propriedade..."
+              placeholder={t('host.descriptionPlaceholder')}
               rows="3"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
             />
@@ -69,13 +71,13 @@ function PropertyFormModal({
           {/* Resumo */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
-              Resumo *
+              {t('host.summary')} *
             </label>
             <textarea
               name="summary"
               value={formData.summary}
               onChange={onChange}
-              placeholder="Breve resumo da propriedade..."
+              placeholder={t('host.summaryPlaceholder')}
               rows="2"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
               required
@@ -86,14 +88,14 @@ function PropertyFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Preço/Noite (€) *
+                {t('host.pricePerNight')} (€) *
               </label>
               <input
                 type="number"
                 name="price_per_night"
                 value={formData.price_per_night}
                 onChange={onChange}
-                placeholder="50"
+                placeholder={t('host.pricePerNightPlaceholder')}
                 min="0"
                 step="0.01"
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
@@ -103,14 +105,14 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Taxa de Limpeza (€)
+                {t('host.cleaningFee')} (€)
               </label>
               <input
                 type="number"
                 name="cleaning_fee"
                 value={formData.cleaning_fee}
                 onChange={onChange}
-                placeholder="20"
+                placeholder={t('host.cleaningFeePlaceholder')}
                 min="0"
                 step="0.01"
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
@@ -122,7 +124,7 @@ function PropertyFormModal({
           <div className="grid grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Hóspedes
+                {t('common.guests')}
               </label>
               <input
                 type="number"
@@ -137,7 +139,7 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Quartos
+                {t('common.bedrooms')}
               </label>
               <input
                 type="number"
@@ -152,7 +154,7 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Camas *
+                {t('common.beds')} *
               </label>
               <input
                 type="number"
@@ -168,7 +170,7 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Casas de Banho
+                {t('common.bathrooms')}
               </label>
               <input
                 type="number"
@@ -186,7 +188,7 @@ function PropertyFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Tipo de Propriedade *
+                {t('host.propertyType')} *
               </label>
               <select
                 name="property_type"
@@ -195,17 +197,17 @@ function PropertyFormModal({
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
               >
-                <option value="apartment">Apartamento</option>
-                <option value="house">Casa</option>
-                <option value="villa">Moradia</option>
-                <option value="studio">Estúdio</option>
-                <option value="room">Quarto</option>
+                <option value="apartment">{t('host.apartment')}</option>
+                <option value="house">{t('host.house')}</option>
+                <option value="villa">{t('host.villa')}</option>
+                <option value="studio">{t('host.studio')}</option>
+                <option value="room">{t('host.room')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Tipo de Alojamento *
+                {t('host.listingType')} *
               </label>
               <select
                 name="listing_type"
@@ -214,9 +216,9 @@ function PropertyFormModal({
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
               >
-                <option value="entire_place">Local Inteiro</option>
-                <option value="private_room">Quarto Privado</option>
-                <option value="shared_room">Quarto Partilhado</option>
+                <option value="entire_place">{t('host.entirePlace')}</option>
+                <option value="private_room">{t('host.privateRoom')}</option>
+                <option value="shared_room">{t('host.sharedRoom')}</option>
               </select>
             </div>
           </div>
@@ -225,7 +227,7 @@ function PropertyFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Hora Check-in *
+                {t('host.checkInTime')} *
               </label>
               <input
                 type="time"
@@ -239,7 +241,7 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Hora Check-out *
+                {t('host.checkOutTime')} *
               </label>
               <input
                 type="time"
@@ -256,7 +258,7 @@ function PropertyFormModal({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Cidade *
+                {t('host.city')} *
               </label>
               <select
                 name="city_id"
@@ -265,7 +267,7 @@ function PropertyFormModal({
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
               >
-                <option value="">Selecione</option>
+                <option value="">{t('host.select')}</option>
                 {cities.map(city => (
                   <option key={city.id} value={city.id}>
                     {city.name}
@@ -276,14 +278,14 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Vizinhança *
+                {t('host.neighborhood')} *
               </label>
               <input
                 type="text"
                 name="neighborhood"
                 value={formData.neighborhood}
                 onChange={onChange}
-                placeholder="Ex: Centro Histórico"
+                placeholder={t('host.neighborhoodPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
               />
@@ -291,14 +293,14 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Código Postal *
+                {t('host.postalCode')} *
               </label>
               <input
                 type="text"
                 name="postal_code"
                 value={formData.postal_code}
                 onChange={onChange}
-                placeholder="1000-001"
+                placeholder={t('host.postalCodePlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 required
               />
@@ -309,21 +311,21 @@ function PropertyFormModal({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Morada
+                {t('host.address')}
               </label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={onChange}
-                placeholder="Rua, número..."
+                placeholder={t('host.addressPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
               />
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Latitude *
+                {t('host.latitude')} *
               </label>
               <input
                 type="number"
@@ -339,7 +341,7 @@ function PropertyFormModal({
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                Longitude *
+                {t('host.longitude')} *
               </label>
               <input
                 type="number"
@@ -357,19 +359,19 @@ function PropertyFormModal({
           {/* Upload de Imagens */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
-              {isEditing ? 'Adicionar Novas Imagens' : 'Imagens da Propriedade'}
+              {isEditing ? t('host.addNewImages') : t('host.propertyImages')}
             </label>
             <div className="flex items-center justify-center w-full">
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <ImageIcon className="w-10 h-10 mb-3 text-gray-400" />
                   <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">Clique para fazer upload</span> ou arraste imagens
+                    <span className="font-semibold">{t('host.clickToUpload')}</span> {t('host.orDragImages')}
                   </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, WebP (máx. 5 imagens, 2MB cada)</p>
+                  <p className="text-xs text-gray-500">{t('host.uploadFormats')}</p>
                   {selectedImages.length > 0 && (
                     <p className="mt-2 text-xs text-blue-600 font-semibold">
-                      {selectedImages.length} imagem(ns) selecionada(s)
+                      {t('host.imagesSelected', { count: selectedImages.length })}
                     </p>
                   )}
                 </div>
@@ -384,8 +386,8 @@ function PropertyFormModal({
             </div>
             <p className="text-xs text-gray-500 mt-2">
               {isEditing 
-                ? '* Adicione novas imagens (as existentes serão mantidas)'
-                : '* Se não adicionar imagens, serão utilizadas imagens padrão'
+                ? t('host.imagesNoteEdit')
+                : t('host.imagesNoteCreate')
               }
             </p>
           </div>
@@ -397,7 +399,7 @@ function PropertyFormModal({
               onClick={onClose}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -407,12 +409,12 @@ function PropertyFormModal({
               {submitting ? (
                 <>
                   <Loader2 className="animate-spin" size={20} />
-                  {isEditing ? 'A atualizar...' : 'A publicar...'}
+                  {isEditing ? t('host.updating') : t('host.publishing')}
                 </>
               ) : (
                 <>
                   {isEditing ? <Edit size={20} /> : <Upload size={20} />}
-                  {isEditing ? 'Atualizar Propriedade' : 'Publicar Propriedade'}
+                  {isEditing ? t('host.updateProperty') : t('host.publishProperty')}
                 </>
               )}
             </button>

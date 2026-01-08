@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Star, MessageSquare, Trash2, AlertCircle, X, Edit2 } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
       }
     } catch (err) {
       console.error('Error fetching reviews:', err);
-      notify('Erro ao carregar avaliações', 'error');
+      notify(t('review.errorLoadingReviews'), 'error');
       setReviews([]);
     } finally {
       setLoading(false);
@@ -60,14 +62,14 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
     try {
       setDeleting(reviewId);
       await api.delete(`/reviews/${reviewId}`);
-      notify('Avaliação apagada com sucesso', 'success');
+      notify(t('review.deleted'), 'success');
       // Refresh page to update all components
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (err) {
       console.error('Error deleting review:', err);
-      notify(err.response?.data?.message || 'Erro ao apagar avaliação', 'error');
+      notify(err.response?.data?.message || t('review.deleteError'), 'error');
     } finally {
       setDeleting(null);
     }
@@ -102,7 +104,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
 
   const handleSaveEdit = async () => {
     if (!editComment.trim()) {
-      notify('Comentário não pode estar vazio', 'error');
+      notify(t('review.commentCannotBeEmpty'), 'error');
       return;
     }
 
@@ -113,7 +115,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
         recommend: editRecommend
       });
       
-      notify('Comentário atualizado com sucesso', 'success');
+      notify(t('review.updated'), 'success');
       // Update the review in the list
       setReviews(reviews.map(r => 
         r.id === editingId ? { ...r, comment: editComment, recommend: editRecommend } : r
@@ -123,7 +125,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
       setEditRecommend(false);
     } catch (err) {
       console.error('Error updating review:', err);
-      notify(err.response?.data?.message || 'Erro ao atualizar comentário', 'error');
+      notify(err.response?.data?.message || t('review.updateError'), 'error');
     } finally {
       setSaving(null);
     }
@@ -154,7 +156,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">A carregar avaliações...</p>
+        <p className="text-gray-500">{t('review.loading')}</p>
       </div>
     );
   }
@@ -163,7 +165,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
     return (
       <div className="text-center py-8">
         <MessageSquare className="mx-auto mb-3 text-gray-400" size={48} />
-        <p className="text-gray-500">Esta propriedade ainda não tem avaliações</p>
+        <p className="text-gray-500">{t('review.noPropertyReviews')}</p>
       </div>
     );
   }
@@ -179,9 +181,9 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
               <div className="flex justify-center mt-1">{renderStars(Math.round(stats.average_rating))}</div>
             </div>
             <div className="border-l border-gray-300 pl-4">
-              <p className="text-sm text-gray-600">{stats.total_reviews} avaliações</p>
+              <p className="text-sm text-gray-600">{stats.total_reviews} {t('review.reviewsCount')}</p>
               <p className="text-sm text-gray-600 mt-1">
-                {Math.round(stats.recommend_percentage || 0)}% recomendam
+                {Math.round(stats.recommend_percentage || 0)}{t('review.recommendPercent')}
               </p>
             </div>
           </div>
@@ -189,27 +191,27 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
           {/* Category Breakdown */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div className="text-sm">
-              <span className="text-gray-600">Limpeza:</span>
+              <span className="text-gray-600">{t('review.cleanliness')}:</span>
               <span className="ml-2 font-semibold">{parseFloat(stats.avg_cleanliness).toFixed(1)}</span>
             </div>
             <div className="text-sm">
-              <span className="text-gray-600">Comunicação:</span>
+              <span className="text-gray-600">{t('review.communication')}:</span>
               <span className="ml-2 font-semibold">{parseFloat(stats.avg_communication).toFixed(1)}</span>
             </div>
             <div className="text-sm">
-              <span className="text-gray-600">Check-in:</span>
+              <span className="text-gray-600">{t('review.checkIn')}:</span>
               <span className="ml-2 font-semibold">{parseFloat(stats.avg_checkin).toFixed(1)}</span>
             </div>
             <div className="text-sm">
-              <span className="text-gray-600">Precisão:</span>
+              <span className="text-gray-600">{t('review.accuracy')}:</span>
               <span className="ml-2 font-semibold">{parseFloat(stats.avg_accuracy).toFixed(1)}</span>
             </div>
             <div className="text-sm">
-              <span className="text-gray-600">Localização:</span>
+              <span className="text-gray-600">{t('review.location')}:</span>
               <span className="ml-2 font-semibold">{parseFloat(stats.avg_location).toFixed(1)}</span>
             </div>
             <div className="text-sm">
-              <span className="text-gray-600">Qualidade/Preço:</span>
+              <span className="text-gray-600">{t('review.valueForMoney')}:</span>
               <span className="ml-2 font-semibold">{parseFloat(stats.avg_value).toFixed(1)}</span>
             </div>
           </div>

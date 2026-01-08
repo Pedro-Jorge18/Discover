@@ -104,7 +104,7 @@ function CompanyInfo({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               {t('companyInfo.legalTitle')}
             </h3>
             <div className="space-y-2 text-gray-700">
-              <p><span className="font-semibold">{t('companyInfo.companyName')}:</span> Descobrir, Inc.</p>
+              <p><span className="font-semibold">{t('companyInfo.companyName')}:</span> Discover, Inc.</p>
               <p><span className="font-semibold">{t('companyInfo.vat')}:</span> PT123456789</p>
               <p><span className="font-semibold">{t('companyInfo.registration')}:</span> 987654321</p>
             </div>

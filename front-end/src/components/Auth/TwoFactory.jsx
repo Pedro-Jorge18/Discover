@@ -265,12 +265,12 @@ export default function TwoFactorAuth() {
                 </button>
               </div>
 
-              {/* Confirmar */}
+              {/* Confirm */}
               <button
                 onClick={handlePasswordSubmit}
                 className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
               >
-                Confirmar
+                {t('common.confirm')}
               </button>
             </div>
           </div>
@@ -344,7 +344,7 @@ export default function TwoFactorAuth() {
                     : "bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-400"
                 }`}
               >
-                Confirmar
+                {t('common.confirm')}
               </button>
             </div>
           </div>

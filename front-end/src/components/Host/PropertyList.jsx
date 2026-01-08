@@ -1,7 +1,9 @@
 import React from 'react';
 import { MapPin, Users, Eye, Edit, Trash2 } from 'lucide-react';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) {
+  const { t } = useTranslation();
   if (!properties || properties.length === 0) {
     return null;
   }
@@ -26,17 +28,17 @@ function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) 
                     : 'bg-gray-500 text-white hover:bg-gray-600'
                 }`}
               >
-                {property.published ? 'Ativo' : 'Inativo'}
+                {property.published ? t('host.active') : t('host.inactive')}
               </button>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
               <MapPin size={14} />
-              <span className="line-clamp-1">{property.location?.city?.name || 'Localização'}</span>
+              <span className="line-clamp-1">{property.location?.city?.name || t('property.location')}</span>
             </div>
 
             <p className="text-xs font-semibold text-gray-500 mb-3 line-clamp-2">
-              {property.location?.address || property.address || 'Morada não definida'}
+              {property.location?.address || property.address || t('property.locationNotDefined')}
             </p>
 
             <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
@@ -46,7 +48,7 @@ function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) 
               </span>
               <span>•</span>
               <span className="font-bold text-blue-600 text-lg">
-                €{property.price?.per_night || property.price_per_night}/noite
+                €{property.price?.per_night || property.price_per_night}/{t('common.perNight')}
               </span>
             </div>
 
@@ -57,14 +59,14 @@ function PropertyList({ properties, onView, onEdit, onDelete, onToggleStatus }) 
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-semibold text-sm"
               >
                 <Eye size={16} />
-                Ver
+                {t('host.view')}
               </button>
               <button
                 onClick={() => onEdit(property)}
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-semibold text-sm"
               >
                 <Edit size={16} />
-                Editar
+                {t('host.editProperty')}
               </button>
               <button
                 onClick={() => onDelete(property)}

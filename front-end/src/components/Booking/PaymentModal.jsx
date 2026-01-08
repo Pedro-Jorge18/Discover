@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { X, CreditCard, Lock, Loader2, User, Mail, Phone, Calendar } from 'lucide-react';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -54,7 +56,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                 </button>
 
                 <div className="mb-10">
-                    <h3 className="text-3xl font-black italic uppercase tracking-tighter text-gray-900">Pagamento Seguro</h3>
+                    <h3 className="text-3xl font-black italic uppercase tracking-tighter text-gray-900">{t('payment.securePayment')}</h3>
                     <div className="h-1 w-20 bg-blue-600 mt-2"></div>
                 </div>
 
@@ -62,18 +64,18 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                     {/* Personal Information Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Nome</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.firstName')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <User size={18} className="text-gray-400" />
-                                <input type="text" placeholder="Ex: João" className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="text" placeholder={t('payment.firstNamePlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, firstName: e.target.value})} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Apelido</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.lastName')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <User size={18} className="text-gray-400" />
-                                <input type="text" placeholder="Ex: Silva" className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="text" placeholder={t('payment.lastNamePlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
                             </div>
                         </div>
@@ -81,18 +83,18 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">E-mail</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.email')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Mail size={18} className="text-gray-400" />
-                                <input type="email" placeholder="joao@email.com" className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="email" placeholder={t('payment.emailPlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, email: e.target.value})} />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Telemóvel</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.phone')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Phone size={18} className="text-gray-400" />
-                                <input type="text" placeholder="912345678" value={formData.phone} onChange={handlePhone} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder={t('payment.phonePlaceholder')} value={formData.phone} onChange={handlePhone} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                     </div>
@@ -101,33 +103,33 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
 
                     {/* Card Information Section */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Número do Cartão</label>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.cardNumber')}</label>
                         <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                             <CreditCard size={18} className="text-blue-600" />
-                            <input type="text" placeholder="0000 0000 0000 0000" value={formData.cardNumber} onChange={handleCardNumber} className="bg-transparent w-full outline-none font-bold text-sm tracking-widest" required />
+                            <input type="text" placeholder={t('payment.cardNumberPlaceholder')} value={formData.cardNumber} onChange={handleCardNumber} className="bg-transparent w-full outline-none font-bold text-sm tracking-widest" required />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Validade</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.expiry')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Calendar size={18} className="text-gray-400" />
-                                <input type="text" placeholder="MM/AA" value={formData.expiry} onChange={handleExpiry} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder={t('payment.expiryPlaceholder')} value={formData.expiry} onChange={handleExpiry} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">CVC</label>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.cvc')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Lock size={18} className="text-gray-400" />
-                                <input type="text" placeholder="123" value={formData.cvc} onChange={handleCvc} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder={t('payment.cvcPlaceholder')} value={formData.cvc} onChange={handleCvc} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                     </div>
 
                     <div className="bg-blue-50 p-6 rounded-4xl flex items-center justify-between mt-8">
                         <div>
-                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Total a pagar</p>
+                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{t('payment.totalToPay')}</p>
                             <p className="text-2xl font-black text-blue-700 italic">€{totalPrice}</p>
                         </div>
                         <button 
@@ -135,7 +137,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             disabled={bookingLoading}
                             className="bg-blue-600 text-white font-black px-10 py-4 rounded-2xl uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all flex items-center gap-2"
                         >
-                            {bookingLoading ? <Loader2 className="animate-spin" /> : "Confirmar Pagamento"}
+                            {bookingLoading ? <Loader2 className="animate-spin" /> : t('payment.confirmPayment')}
                         </button>
                     </div>
                 </form>
