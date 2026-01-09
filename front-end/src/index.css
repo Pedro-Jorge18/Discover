@@ -1,68 +1,99 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* --- EXISTING ANIMATIONS --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+/* Improved skeleton shimmer animation 
+   It moves the gradient from left to right to create a light reflection effect
+*/
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.animate-fadeIn {
+  animation: fadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.animate-slideUp {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Skeleton base class 
+   Uses a linear gradient to simulate a 'ghost' UI element before data arrives
+*/
+.skeleton {
+  background: #f6f7f8;
+  background-image: linear-gradient(
+    90deg, 
+    #f6f7f8 0%, 
+    #edeef1 20%, 
+    #f6f7f8 40%, 
+    #f6f7f8 100%
+  );
+  background-repeat: no-repeat;
+  /* Increased background-size is crucial for the shimmer to travel across the element */
+  background-size: 800px 104px; 
+  display: inline-block;
+  position: relative;
+  animation: shimmer 1.5s infinite linear;
 }
+
+/* --- SCROLLBAR MANAGEMENT --- */
+/* Completely hides scrollbars while maintaining scroll functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* --- UI HELPERS --- */
+.card-shadow-hover {
+  transition: all 0.3s ease;
+}
+.card-shadow-hover:hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+}
+
+/* --- DATEPICKER FIXES --- */
+/* Ensures the calendar component is styled properly following the Discover brand */
+.react-datepicker-wrapper { width: 100% !important; }
+
+.react-datepicker {
+  font-family: inherit !important;
+  border-radius: 2rem !important;
+  border: none !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  padding: 15px !important;
+  background-color: white !important;
+}
+
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  padding-top: 10px !important;
+}
+
+.react-datepicker__day-name, .react-datepicker__day {
+  width: 2.5rem !important;
+  line-height: 2.5rem !important;
+  margin: 0.2rem !important;
+  font-weight: 600 !important;
+}
+
+.react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+  background-color: #2563eb !important; /* Discover Blue */
+  color: white !important;
+  border-radius: 9999px !important;
+}
+
+.react-datepicker__day:hover { 
+  border-radius: 9999px !important; 
+  background-color: #f3f4f6 !important; 
+}
+
+.react-datepicker__navigation { top: 20px !important; }

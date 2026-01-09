@@ -35,4 +35,24 @@ return [
         ],
     ],
 
+
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET_KEY'),
+        'public' => env('STRIPE_PUBLIC_KEY'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'google' =>[
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL'),
+    ],
+
+    // cURL configuration for development (SSL fix)
+    'curl' => [
+        'verify_ssl' => env('CURL_VERIFY_SSL', true),
+    ],
+
+
 ];

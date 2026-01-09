@@ -1,0 +1,12 @@
+No ficheiro D:\Discover\back-end\Discover\app\Services\Property\PropertyService.php
+
+Na linha ~161, substituir:
+            $property = Property::with(['host', 'propertyType', 'listingType', 'images', 'city.state.country'])
+
+Por:
+            $property = Property::query()
+
+E adicionar após a linha ->paginate(15); (~171):
+            
+            // Load relationships after pagination
+            $property->load(['host', 'propertyType', 'listingType', 'images', 'city.state.country']);

@@ -1,35 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
+import AppRoutes from './Routes/AppRoutes.jsx';
+import ToastContainer from './components/Ui/ToastContainer.jsx';
+import api from './api/axios';
+import SettingsMain from './components/Settings/SettingsMain.jsx';
+import SettingsAdmin from './components/Settings/SettingsAdmin.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [termoPesquisa, setTermoPesquisa] = useState(""); 
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpenAdmin, setSettingsOpenAdmin] = useState(false);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  useEffect(() => {
+    const sessionToken = sessionStorage.getItem("token");
+    const localToken = localStorage.getItem("token");
+    const currentToken = sessionToken || localToken;
+
+    if (currentToken) {
+      api.get("/auth/me", { headers: { Authorization: `Bearer ${currentToken}` } })
+        .then(res => {
+          setUser(res.data.user);
+          setToken(currentToken);
+        })
+        .catch(() => {
+          sessionStorage.removeItem("token");
+          localStorage.removeItem("token");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">A carregar...</p>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
+
+  return (    
+    <div className="App">
+      <ToastContainer />
+      <AppRoutes 
+        user={user} 
+        setUser={setUser} 
+        termoPesquisa={termoPesquisa} 
+        setTermoPesquisa={setTermoPesquisa} 
+        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettingsAdmin={() => setSettingsOpenAdmin(true)}
+      />
+
+      {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} setUser={setUser} token={token} />}
+      {settingsOpenAdmin && <SettingsAdmin onClose={() => setSettingsOpenAdmin(false)} user={user} token={token} />}
+    </div>
+  );
 }
 
-export default App
+export default App;
