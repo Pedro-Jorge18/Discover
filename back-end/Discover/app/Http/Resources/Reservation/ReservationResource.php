@@ -17,7 +17,8 @@ class ReservationResource extends JsonResource
             'check_out' => $this->check_out->format('Y-m-d'),
             'nights' => $this->nights,
 
-            // HÓSPED
+            // HÓSPED - Incluir user_id para notificações
+            'user_id' => $this->user_id,
             'guests' => [
                 'adults' => $this->adults,
                 'children' => $this->children,
