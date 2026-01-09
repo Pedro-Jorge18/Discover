@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../api/axios";
 import { useTranslation } from '../../contexts/TranslationContext';
-import notify from "../../utils/notify";
+//import notify from "../../utils/notify";
 
 export default function ResetPassword() {
   const { t } = useTranslation();
