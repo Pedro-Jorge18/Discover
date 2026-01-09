@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropertyCard from './PropertyCard.jsx';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 // Slider component for the homepage sections
 // Added 'user' to props to enable favorite functionality within the slider
-function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
+// Memoized to prevent unnecessary re-renders
+// Limited to 10 properties for performance
+const PropertySlider = memo(function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
   const { t } = useTranslation();
   if (!properties || properties.length === 0) return null;
+
+  // Limit to first 8 properties for performance
+  const displayProperties = properties.slice(0, 8);
 
   return (
     <div className="mb-16 animate-fadeIn">
@@ -32,9 +37,9 @@ function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
       </div>
 
       {/* Horizontal Scroll Area */}
-      <div className="flex overflow-x-auto gap-6 pb-8 snap-x no-scrollbar">
-        {properties.map((property) => (
-          <div key={property.id} className="min-w-[280px] max-w-[280px] snap-start">
+      <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory no-scrollbar scroll-smooth">
+        {displayProperties.map((property) => (
+          <div key={property.id} className="min-w-[280px] max-w-[280px] snap-start flex-shrink-0">
             {/* IMPORTANT: Pass the user prop down to the card */}
             <PropertyCard property={property} user={user} />
           </div>
@@ -42,6 +47,6 @@ function PropertySlider({ title, subtitle, properties, onVerTudo, user }) {
       </div>
     </div>
   );
-}
+});
 
 export default PropertySlider;

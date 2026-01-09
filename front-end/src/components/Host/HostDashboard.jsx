@@ -57,7 +57,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     }
     const loadData = async () => {
       await fetchHostProperties();
-      fetchPendingReservations();
+      await fetchPendingReservations();
     };
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,10 +113,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       });
       const data = response.data?.data;
       const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Host reservations raw:', data);
-        console.log('First reservation:', list[0]);
-      }
       setPendingReservations(list);
     } catch (error) {
       console.error('Error fetching reservations:', error);
@@ -365,7 +361,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         settings: { published: nextStatus }
       });
       notify(nextStatus ? t('host.propertyActivated') : t('host.propertyDeactivated'), 'success');
-      fetchHostProperties();
     } catch (error) {
       console.error('Error toggling property status:', error);
       notify(t('host.toggleStatusError'), 'error');

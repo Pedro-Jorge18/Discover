@@ -129,10 +129,15 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     );
   };
 
-  // Guardar o pathname para redirecionar após login
+  // Guardar o pathname para redirecionar após login (apenas se não estiver autenticado)
   useEffect(() => {
-    localStorage.setItem('propertyRedirect', window.location.pathname);
-  }, [id]);
+    if (!user) {
+      localStorage.setItem('propertyRedirect', window.location.pathname);
+    } else {
+      // Limpar redirect se já está autenticado
+      localStorage.removeItem('propertyRedirect');
+    }
+  }, [id, user]);
 
   // Logic to add/remove from account-based favorites
   const toggleFavorite = () => {

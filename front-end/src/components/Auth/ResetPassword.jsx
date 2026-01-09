@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../api/axios";
 import { useTranslation } from '../../contexts/TranslationContext';
-import notify from "../../utils/notify";
+//import notify from "../../utils/notify";
 
 export default function ResetPassword() {
   const { t } = useTranslation();
@@ -15,6 +15,17 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Verify minimum password length
+    if (newPassword.length < 8) {
+      window.dispatchEvent(new CustomEvent('app-notify', {
+        detail: {
+          message: 'A palavra-passe deverá conter no mínimo 8 caracteres',
+          type: 'error'
+        }
+      }));
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       window.dispatchEvent(new CustomEvent('app-notify', {

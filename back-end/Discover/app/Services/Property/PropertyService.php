@@ -60,7 +60,7 @@ class PropertyService
                 $country = Country::whereRaw('LOWER(name) = ?', [strtolower($countryName)])->first();
                 if (!$country) {
                     $country = Country::create([
-                        'name' => $countryName,
+                        'name' => ucfirst(strtolower($countryName)), // Normalize capitalization
                         'code' => strtoupper(substr($countryName, 0, 3)),
                         'phone_code' => '+351', // Default
                         'currency' => 'EUR',
@@ -77,22 +77,29 @@ class PropertyService
                 if (!$state) {
                     $state = State::create([
                         'country_id' => $country->id,
-                        'name' => $countryName,
+                        'name' => ucfirst(strtolower($countryName)), // Normalize capitalization
                         'code' => strtoupper(substr($countryName, 0, 3)),
                         'active' => true,
                     ]);
                 }
 
                 // Find or create city (case-insensitive by name within state)
+                $normalizedCityName = ucfirst(strtolower(trim($cityName)));
+                \Log::info("Searching for city", ['state_id' => $state->id, 'cityName' => $cityName, 'normalized' => $normalizedCityName]);
+                
                 $city = City::where('state_id', $state->id)
-                    ->whereRaw('LOWER(name) = ?', [strtolower($cityName)])
+                    ->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($cityName))])
                     ->first();
+                
+                \Log::info("City search result", ['found' => $city ? 'yes (id: '.$city->id.')' : 'no']);
+                    
                 if (!$city) {
                     $city = City::create([
                         'state_id' => $state->id,
-                        'name' => $cityName,
+                        'name' => $normalizedCityName,
                         'active' => true,
                     ]);
+                    \Log::info("Created new city", ['id' => $city->id, 'name' => $city->name]);
                 }
 
                 $data['city_id'] = $city->id;
@@ -201,10 +208,10 @@ class PropertyService
                 $countryName = trim($data['country_name'] ?? 'Portugal'); // Default country
                 
                 // Try to find existing country (case-insensitive)
-                $country = Country::whereRaw('LOWER(name) = ?', [strtolower($countryName)])->first();
+                $country = Country::whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($countryName))])->first();
                 if (!$country) {
                     $country = Country::create([
-                        'name' => $countryName,
+                        'name' => ucfirst(strtolower($countryName)),
                         'code' => strtoupper(substr($countryName, 0, 3)),
                         'phone_code' => '+351', // Default
                         'currency' => 'EUR',
@@ -216,27 +223,34 @@ class PropertyService
 
                 // Find or create state (using country name as state name if no state info) - case-insensitive
                 $state = State::where('country_id', $country->id)
-                    ->whereRaw('LOWER(name) = ?', [strtolower($countryName)])
+                    ->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($countryName))])
                     ->first();
                 if (!$state) {
                     $state = State::create([
                         'country_id' => $country->id,
-                        'name' => $countryName,
+                        'name' => ucfirst(strtolower($countryName)),
                         'code' => strtoupper(substr($countryName, 0, 3)),
                         'active' => true,
                     ]);
                 }
 
                 // Find or create city (case-insensitive by name within state)
+                $normalizedCityName = ucfirst(strtolower(trim($cityName)));
+                \Log::info("UPDATE: Searching for city", ['state_id' => $state->id, 'cityName' => $cityName, 'normalized' => $normalizedCityName]);
+                
                 $city = City::where('state_id', $state->id)
-                    ->whereRaw('LOWER(name) = ?', [strtolower($cityName)])
+                    ->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($cityName))])
                     ->first();
+                
+                \Log::info("UPDATE: City search result", ['found' => $city ? 'yes (id: '.$city->id.')' : 'no']);
+                    
                 if (!$city) {
                     $city = City::create([
                         'state_id' => $state->id,
-                        'name' => $cityName,
+                        'name' => $normalizedCityName,
                         'active' => true,
                     ]);
+                    \Log::info("UPDATE: Created new city", ['id' => $city->id, 'name' => $city->name]);
                 }
 
                 $data['city_id'] = $city->id;

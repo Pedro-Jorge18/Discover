@@ -39,6 +39,8 @@ export default {
     reload: 'Recarregar',
     ok: 'OK',
     processing: 'A processar...',
+    loadMore: 'Carregar mais',
+    remaining: 'restantes',
   },
   header: {
     searchPlaceholder: 'Para onde quer ir?',

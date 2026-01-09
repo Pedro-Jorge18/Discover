@@ -39,6 +39,8 @@ export default {
     reload: 'Reload',
     ok: 'OK',
     processing: 'Processing...',
+    loadMore: 'Load more',
+    remaining: 'remaining',
   },
   header: {
     searchPlaceholder: 'Where do you want to go?',
