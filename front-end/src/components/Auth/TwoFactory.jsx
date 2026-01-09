@@ -188,19 +188,19 @@ export default function TwoFactorAuth() {
   }, []);
 
   return (
-    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
+    <div className="w-full max-w-xl bg-white p-6 rounded-xl border border-gray-200">
 
-      <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
+      <h3 className="text-lg font-semibold text-gray-900 pb-4 border-b border-gray-200 text-center">
         {t('auth.twoFactorAuth')}
       </h3>
       <div className="pt-6 space-y-6">
-        <p className="text-gray-300 text-sm">
+        <p className="text-gray-700 text-sm">
           {t('auth.twoFactorDesc')}
         </p>
 
         {/* Toggle */}
         <div className="flex items-center justify-between">
-          <span className="text-gray-200 font-medium">
+          <span className="text-gray-900 font-medium">
             {t('auth.enableTwoFactor')}
           </span>
 
@@ -209,7 +209,7 @@ export default function TwoFactorAuth() {
             disabled={loading}
             aria-pressed={enabled}
             className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 outline-none cursor-pointer ${
-              enabled ? "bg-indigo-600" : "bg-gray-700"
+              enabled ? "bg-blue-600" : "bg-gray-300"
             }`}
           >
             <span
@@ -220,27 +220,27 @@ export default function TwoFactorAuth() {
           </button>
         </div>
 
-        <p className="text-gray-300 text-sm">
+        <p className="text-gray-700 text-sm">
           {enabled ? t('auth.twoFactorEnabled') : t('auth.twoFactorDisabled')}
         </p>
 
         {/* Pop-up Password */}
         {showPasswordPopup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="relative bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="relative bg-white rounded-xl p-6 max-w-sm w-full text-center border border-gray-200 shadow-2xl">
               {/* Botão fechar */}
               <button
                 onClick={() => {
                   setShowPasswordPopup(false);
                   setPassword("");
                 }}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
                 aria-label="Fechar"
               >
                 ✕
               </button>
 
-              <h4 className="text-white font-semibold mb-4 text-lg">
+              <h4 className="text-gray-900 font-semibold mb-4 text-lg">
                 {t('auth.enterPassword')}
               </h4>
 
@@ -253,12 +253,12 @@ export default function TwoFactorAuth() {
                   onChange={(e) => {
                     setPassword(e.target.value);
                   }}
-                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-600 bg-gray-700 text-gray-100 rounded-lg sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="py-2.5 ps-4 pe-10 block w-full border border-gray-300 bg-white text-gray-900 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 hover:text-gray-100 transition cursor-pointer"
+                  className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-500 hover:text-gray-900 transition cursor-pointer"
                   tabIndex={-1}
                 >
                   {showPassword ? "🙈" : "👁️"}
@@ -268,7 +268,7 @@ export default function TwoFactorAuth() {
               {/* Confirm */}
               <button
                 onClick={handlePasswordSubmit}
-                className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
+                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus:ring-4 focus:ring-blue-400 transition duration-300 w-full"
               >
                 {t('common.confirm')}
               </button>
@@ -278,19 +278,19 @@ export default function TwoFactorAuth() {
 
         {/* Code popup */}
         {showCodePopup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="relative bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="relative bg-white rounded-xl p-6 max-w-sm w-full text-center border border-gray-200 shadow-2xl">
               <button
                   onClick={() => {
                     setShowCodePopup(false);
                     setConfirmCode("");
                   }}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
                   aria-label="Fechar"
                 >
                   ✕
                 </button>
-              <h4 className="text-white font-semibold mb-4 text-lg">
+              <h4 className="text-gray-900 font-semibold mb-4 text-lg">
                 {t('auth.authCodeTitle')}
               </h4>
 
@@ -299,23 +299,23 @@ export default function TwoFactorAuth() {
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrCode)}`}
                     alt="QR Code 2FA"
-                    className="rounded-lg bg-white p-2"
+                    className="rounded-lg bg-white p-2 border border-gray-200"
                   />
                 </div>
               )}
 
-              <p className="text-gray-400 text-sm font-mono tracking-widest mb-4 select-text break-all">
+              <p className="text-gray-700 text-sm font-mono tracking-widest mb-4 select-text break-all bg-gray-100 p-2 rounded">
                 {secret}
               </p>
 
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-gray-600 text-sm mb-4">
                 {t('auth.authCodeHelp')}
                 (Google Authenticator, Authy, etc.)
               </p>
 
               <button
                 onClick={copyToClipboard}
-                className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600 transition duration-300 mb-3 w-full"
+                className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-300 transition duration-300 mb-3 w-full"
               >
                 {copied ? t('auth.copied') : t('auth.copyCode')}
               </button>
@@ -331,7 +331,7 @@ export default function TwoFactorAuth() {
                   const v = e.target.value.replace(/\D/g, "").slice(0, 6);
                   setConfirmCode(v);
                 }}
-                className="w-full mb-3 px-3 py-2 rounded-lg text-white border"
+                className="w-full mb-3 px-3 py-2 rounded-lg text-gray-900 border border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                 id="2fa-code-input"
                 aria-label={t('auth.authCodeTitle')}
               />
@@ -340,8 +340,8 @@ export default function TwoFactorAuth() {
                 disabled={loading || confirmCode.length !== 6}
                 className={`rounded-lg px-6 py-2 text-sm font-semibold text-white focus:ring-4 transition duration-300 w-full ${
                   loading || confirmCode.length !== 6
-                    ? "bg-indigo-600/60 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-400"
+                    ? "bg-blue-600/60 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-500 focus:ring-blue-400"
                 }`}
               >
                 {t('common.confirm')}
@@ -352,23 +352,23 @@ export default function TwoFactorAuth() {
 
         {/* Disable code popup */}
         {showDisablePopup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="relative bg-gray-800 rounded-xl p-6 max-w-sm w-full text-center border border-gray-700 shadow-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="relative bg-white rounded-xl p-6 max-w-sm w-full text-center border border-gray-200 shadow-2xl">
               <button
                 onClick={() => {
                   setShowDisablePopup(false);
                   setDisableCode("");
                 }}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
                 aria-label="Fechar"
               >
                 ✕
               </button>
-              <h4 className="text-white font-semibold mb-4 text-lg">
+              <h4 className="text-gray-900 font-semibold mb-4 text-lg">
                 {t('auth.disable2faTitle')}
               </h4>
 
-              <p className="text-gray-300 text-sm mb-3">
+              <p className="text-gray-700 text-sm mb-3">
                 {t('auth.disable2faHelp')}
               </p>
 
@@ -383,7 +383,7 @@ export default function TwoFactorAuth() {
                   const v = e.target.value.replace(/\D/g, "").slice(0, 6);
                   setDisableCode(v);
                 }}
-                className="w-full mb-4 px-3 py-2 rounded-lg text-white border"
+                className="w-full mb-4 px-3 py-2 rounded-lg text-gray-900 border border-gray-300 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500 outline-none"
                 aria-label={t('auth.disable2faTitle')}
               />
 

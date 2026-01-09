@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Actions\User\DeleteUserAction;
-use App\Actions\User\UpdateUserAction;
+use App\Actions\Profile\DeleteUserAction;
+use App\Actions\Profile\UpdateUserAction;
 use App\DTOs\User\Profile\UpdateUserDto;
 use App\Http\Resources\User\UserResource;
 use App\Http\Requests\Users\Profile\UpdateProfileRequest;
 
-class UserController extends Controller
+class ProfileController extends Controller
 {
     public function __construct(
         protected UpdateUserAction $updateUserAction,
@@ -28,7 +28,10 @@ class UserController extends Controller
         return response()->json([
             'user' => new UserResource($updatedUser),
             'message' => 'user.update.success'
-        ]);
+        ])->header('Access-Control-Allow-Origin', 'http://localhost:5173')
+          ->header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS')
+          ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+          ->header('Access-Control-Allow-Credentials', 'true');
     }
 
     public function destroy(): JsonResponse

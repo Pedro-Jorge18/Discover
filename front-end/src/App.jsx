@@ -60,7 +60,7 @@ function App() {
         onOpenSettingsAdmin={() => setSettingsOpenAdmin(true)}
       />
 
-      {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} token={token} />}
+      {settingsOpen && <SettingsMain onClose={() => setSettingsOpen(false)} user={user} setUser={setUser} token={token} />}
       {settingsOpenAdmin && <SettingsAdmin onClose={() => setSettingsOpenAdmin(false)} user={user} token={token} />}
     </div>
   );

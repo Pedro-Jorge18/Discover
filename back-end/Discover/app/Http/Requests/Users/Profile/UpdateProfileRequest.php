@@ -23,8 +23,9 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'name'     => 'sometimes|string|max:255',
-            'last_name' => 'sometimes|string|max:255',
-            'phone'  => 'sometimes|string|max:20',
+            'lastname' => 'sometimes|string|max:255',
+            'contact'  => 'sometimes|string|min:9|max:9',
+            'email'    => 'sometimes|email|unique:users,email,' . auth()->id(),
         ];
     }
 }
