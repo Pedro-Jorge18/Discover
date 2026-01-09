@@ -29,15 +29,18 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
   useEffect(() => {
     updateFavCount();
+    
+    // Only add listeners if user is logged in
+    if (!user) return;
+    
     // Listen for changes in localStorage and custom events for real-time sync
-    window.addEventListener('storage', updateFavCount);
-    window.addEventListener('favoritesUpdated', updateFavCount);
+    const handleUpdate = () => updateFavCount();
+    window.addEventListener('favoritesUpdated', handleUpdate);
     
     return () => {
-      window.removeEventListener('storage', updateFavCount);
-      window.removeEventListener('favoritesUpdated', updateFavCount);
+      window.removeEventListener('favoritesUpdated', handleUpdate);
     };
-  }, [user]); // Re-sync if user logs in or out
+  }, [user?.id]); // Re-sync if user logs in or out
 
   const handleSearch = () => {
     if (localSearch.trim()) {
@@ -53,14 +56,19 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     }
   };
 
+  const handleLogoClick = () => {
+    navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-[1790px] mx-auto px-5 sm:px-10 py-3 flex items-center justify-between h-20">
         
-        <Link to="/" className="w-1/4 flex items-center shrink-0"> 
+        <div onClick={handleLogoClick} className="w-1/4 flex items-center shrink-0 cursor-pointer"> 
           <img src='/Logo_Discover.png' className="h-12 w-auto" alt="Logo" />
           <span className="hidden xl:block font-black text-2xl text-blue-600 ml-2 tracking-tighter uppercase italic"></span>
-        </Link>
+        </div>
 
         <div className="hidden lg:flex items-center justify-center w-2/4 gap-3">
           <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-md hover:shadow-lg transition-all pl-6 pr-2 py-1.5 w-full max-w-md group">

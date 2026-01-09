@@ -112,10 +112,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       });
       const data = response.data?.data;
       const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Host reservations raw:', data);
-        console.log('First reservation:', list[0]);
-      }
       setPendingReservations(list);
     } catch (error) {
       console.error('Error fetching reservations:', error);

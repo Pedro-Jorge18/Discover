@@ -48,7 +48,13 @@
 /* --- SCROLLBAR MANAGEMENT --- */
 /* Completely hides scrollbars while maintaining scroll functionality */
 .no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+  /* Performance optimization for smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
 
 /* --- UI HELPERS --- */
 .card-shadow-hover {
@@ -97,3 +103,21 @@
 }
 
 .react-datepicker__navigation { top: 20px !important; }
+
+/* --- PERFORMANCE OPTIMIZATIONS --- */
+/* Optimize scrolling performance */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Content visibility for better rendering performance */
+.grid > div {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
