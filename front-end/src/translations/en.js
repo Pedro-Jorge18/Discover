@@ -500,6 +500,8 @@ export default {
     contact: 'Contact',
     phoneContact: 'Phone or mobile',
     updated: 'Your data has been updated successfully.',
+    dataUpdated: 'Data updated successfully!',
+    requiredFields: 'Please fill in all required fields',
     admin: 'Settings',
     user: 'User',
     property: 'Property',

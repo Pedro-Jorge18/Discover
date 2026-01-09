@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\User;
+namespace App\Actions\Profile;
 
 use App\Models\User;
 use App\DTOs\User\Profile\UpdateUserDto;

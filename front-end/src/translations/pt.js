@@ -502,6 +502,8 @@ export default {
     contact: 'Contacto',
     phoneContact: 'Telemóvel ou telefone',
     updated: 'Os dados foram atualizados com sucesso.',
+    dataUpdated: 'Dados atualizados com sucesso!',
+    requiredFields: 'Por favor, preencha todos os campos obrigatórios',
     admin: 'Definições',
     user: 'Utilizador',
     property: 'Imóvel',

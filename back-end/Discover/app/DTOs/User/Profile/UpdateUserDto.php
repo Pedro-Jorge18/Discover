@@ -8,8 +8,9 @@ class UpdateUserDto
 {
     public function __construct(
         public ?string $name,
-        public ?string $lastname,
-        public ?string $contact,
+        public ?string $last_name,
+        public ?string $phone,
+        public ?string $email,
     ) {}
 
     public static function fromRequest(Request $request): self
@@ -18,6 +19,7 @@ class UpdateUserDto
             $request->input('name'),
             $request->input('lastname'),
             $request->input('contact'),
+            $request->input('email'),
         );
     }
 
@@ -25,8 +27,9 @@ class UpdateUserDto
     {
         return array_filter([
             'name' => $this->name,
-            'lastname' => $this->lastname,
-            'contact' => $this->contact,
+            'last_name' => $this->last_name,
+            'phone' => $this->phone,
+            'email' => $this->email,
         ]);
     }
 }
