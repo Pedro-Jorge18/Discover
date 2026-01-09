@@ -8,6 +8,7 @@ import { Plus, Loader2, Home, Eye, Calendar, TrendingUp, Clock, Check, X, User, 
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 import { useTranslation } from '../../contexts/TranslationContext';
+import { pushUserNotification } from '../../utils/userNotifications';
 
 function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const { t } = useTranslation();
@@ -128,10 +129,60 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleReservationAction = async (reservationId, action) => {
     try {
       setProcessingReservation(reservationId);
+      
+      // Get the reservation data to access guest info
+      const reservation = pendingReservations.find(r => r.id === reservationId);
+      console.log('🔔 Reservation data:', reservation);
+      console.log('🔔 Reservation user_id:', reservation?.user_id);
+      console.log('🔔 Reservation user:', reservation?.user);
+      
       if (action === 'accept') {
         await api.post(`/reservations/${reservationId}/confirm`);
+        
+        // Send notification to guest (client)
+        // Try both user_id and user.id
+        const guestId = reservation?.user_id || reservation?.user?.id;
+        console.log('🔔 Guest ID to notify:', guestId);
+        
+        if (reservation && guestId) {
+          console.log('📢 Sending acceptance notification to guest:', guestId);
+          pushUserNotification({
+            userId: guestId,
+            type: 'reservation_accepted',
+            title: t('userNotifications.acceptedTitle'),
+            message: `${t('userNotifications.acceptedBody')} em ${reservation.property?.title || 'uma propriedade'}`,
+            reservationId: reservation.id,
+            meta: {
+              propertyTitle: reservation.property?.title,
+              checkInDate: reservation.check_in,
+              checkOutDate: reservation.check_out,
+            }
+          });
+        } else {
+          console.warn('⚠️ Could not send notification - missing reservation or guest ID');
+        }
       } else {
         await api.delete(`/reservations/${reservationId}`);
+        
+        // Send notification to guest about rejection
+        const guestId = reservation?.user_id || reservation?.user?.id;
+        console.log('🔔 Guest ID to notify (rejection):', guestId);
+        
+        if (reservation && guestId) {
+          console.log('📢 Sending rejection notification to guest:', guestId);
+          pushUserNotification({
+            userId: guestId,
+            type: 'reservation_rejected',
+            title: t('userNotifications.rejectedTitle'),
+            message: `${t('userNotifications.rejectedBody')} em ${reservation.property?.title || 'uma propriedade'}`,
+            reservationId: reservation.id,
+            meta: {
+              propertyTitle: reservation.property?.title,
+            }
+          });
+        } else {
+          console.warn('⚠️ Could not send notification - missing reservation or guest ID');
+        }
       }
 
       notify(

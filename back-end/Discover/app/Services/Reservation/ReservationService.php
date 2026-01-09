@@ -303,6 +303,13 @@ class ReservationService
             'confirmed_at' => now()
         ]);
 
+        Log::info('Reservation confirmed', [
+            'reservation_id' => $reservationId,
+            'user_id' => $reservation->user_id,
+            'property_id' => $reservation->property_id,
+            'confirmed_at' => $reservation->confirmed_at,
+        ]);
+
         return $reservation->fresh();
     }
 

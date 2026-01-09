@@ -167,7 +167,6 @@ function NotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin 
           </div>
         )}
       </main>
-      <Footer />
     </div>
   );
 }
