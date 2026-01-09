@@ -63,6 +63,9 @@ export default function Registration() {
 
       console.log("REGISTER RESPONSE:", response.data);
 
+      // Check for redirect after login
+      localStorage.removeItem('propertyRedirect');
+
       notify(t('auth.createSuccess'), "success");
       navigate("/login");
 
