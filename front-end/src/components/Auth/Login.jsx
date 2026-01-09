@@ -214,7 +214,7 @@ export default function Login({ setUser }) {
                 />
                 {t('auth.rememberMe')}
               </label>
-              <button type="button" onClick={() => window.location.href="/forgotpassword"} className="text-sm font-medium text-blue-600 hover:text-blue-500">
+              <button type="button" onClick={() => navigate("/forgotpassword")} className="text-sm font-medium text-blue-600 hover:text-blue-500">
                 {t('auth.forgotPassword')}
               </button>
             </div>
@@ -231,7 +231,7 @@ export default function Login({ setUser }) {
           {/* Link to register */}
           <p className="mt-6 text-center text-sm text-gray-600">
             {t('auth.dontHaveAccount')} {" "}
-            <button type="button" onClick={() => window.location.href="/register"} className="font-medium text-blue-600 hover:text-blue-500">
+            <button type="button" onClick={() => navigate("/register")} className="font-medium text-blue-600 hover:text-blue-500">
               {t('auth.signUpNow')}
             </button>
           </p>

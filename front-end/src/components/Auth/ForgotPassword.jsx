@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { useTranslation } from '../../contexts/TranslationContext';
 
@@ -44,7 +45,7 @@ export default function ForgotPassword() {
           </h3>
           {/* Close button */}
           <button
-            onClick={() => (window.location.href = "/login")}
+            onClick={() => navigate("/login")}
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
             aria-label="Fechar"
           >
@@ -92,7 +93,7 @@ export default function ForgotPassword() {
               )}
 
               <button
-                onClick={() => (window.location.href = "/login")}
+                onClick={() => navigate("/login")}
                 className="w-full rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-300 focus:ring-4 focus:ring-gray-400 focus:outline-none transition ease-in duration-500"
               >
                 {t('common.back')}

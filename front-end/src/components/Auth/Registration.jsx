@@ -195,7 +195,7 @@ export default function Registration() {
           {/* Link to login */}
           <p className="mt-6 text-center text-sm text-gray-600">
             {t('auth.alreadyHaveAccount')} {" "}
-            <button onClick={() => window.location.href = "/login"}
+            <button onClick={() => navigate("/login")}
               className="font-medium text-blue-600 hover:text-blue-500">
               {t('auth.login')}
             </button>

@@ -54,8 +54,6 @@ export default function RemovePost({ listMaxH = 'max-h-56' }) {
       setProperties(prev => prev.filter(p => p.id !== id));
       setSuccess(t('settings.propertyDeleted'));
       setConfirm(null);
-      // refresh page shortly after successful deletion
-      setTimeout(() => window.location.reload(), 700);
     } catch (err) {
       const msg = err?.response?.data?.error || err?.response?.data?.message || t('settings.deletePropertyError');
       setError(msg);

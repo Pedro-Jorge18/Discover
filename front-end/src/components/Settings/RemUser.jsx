@@ -59,8 +59,6 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
       setSuccess(t('settings.userDeleted'));
       notify(t('settings.userDeleted'), "success");
       setConfirm(null);
-      // Refresh page shortly after successful deletion
-      setTimeout(() => window.location.reload(), 700);
     } catch (err) {
       const msg = err?.response?.data?.error || err?.response?.data?.message || t('settings.deleteUserError');
       setError(msg);

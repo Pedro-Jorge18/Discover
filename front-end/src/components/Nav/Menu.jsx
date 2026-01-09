@@ -1,11 +1,12 @@
 import React from 'react';
 import { LogIn, HelpCircle, House, Cog, MessageSquare, UserStar, Briefcase } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   
   // Standard classes for menu items to maintain consistency
   const itemClasses = "px-4 py-3 font-semibold text-gray-500 hover:bg-gray-100 flex items-center gap-3 w-full text-left transition-colors";
@@ -26,8 +27,8 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
 
       if (typeof onCloseMenu === 'function') onCloseMenu();
       
-      // Reload to ensure all private states are cleared
-      window.location.reload();
+      // Navigate to home to clear private states
+      navigate('/', { replace: true });
     } catch (error) {
       // clear local token and user state anyway so the UI is consistent.
       const status = error?.response?.status;
@@ -36,7 +37,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
         sessionStorage.removeItem("token");
         setUser(null);
         if (typeof onCloseMenu === 'function') onCloseMenu();
-        window.location.reload();
+        navigate('/', { replace: true });
         return;
       }
 
