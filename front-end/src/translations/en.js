@@ -44,7 +44,7 @@ export default {
   },
   header: {
     searchPlaceholder: 'Where do you want to go?',
-    myReservations: 'My reservations',
+    myReservations: 'My trips',
     myProperties: 'My properties',
     myReviews: 'My reviews',
     profile: 'Profile',
@@ -174,7 +174,7 @@ export default {
   },
   reservation: {
     title: 'Reservations',
-    myReservations: 'My reservations',
+    myReservations: 'My trips',
     upcoming: 'Upcoming',
     current: 'Current',
     past: 'Past',

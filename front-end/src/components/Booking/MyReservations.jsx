@@ -31,17 +31,24 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                     return {
                         ...r,
                         ...updated,
-                        status: updated?.status ?? 'Cancelada',
-                        status_name: updated?.status ?? 'Cancelada',
+                        status: updated?.status_name ?? updated?.status ?? 'Cancelada',
+                        status_name: updated?.status_name ?? updated?.status ?? 'Cancelada',
                         cancelled_at: updated?.cancelled_at ?? new Date().toISOString(),
                     };
                 }));
 
                 setShowCancelConfirm(false);
                 setCancelTarget(null);
+                
+                // Disparar evento para atualizar outras páginas
+                window.dispatchEvent(new CustomEvent('reservationStatusChanged', { 
+                    detail: { reservationId: cancelTarget.id, action: 'cancel' } 
+                }));
+                
+                notify('Reserva cancelada com sucesso', 'success');
             } catch (err) {
                 console.error('Erro a cancelar:', err);
-                alert('Erro ao cancelar reserva.');
+                notify('Erro ao cancelar reserva', 'error');
             }
         };
 
@@ -85,6 +92,17 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
         }
       };
       fetchReservas();
+      
+      // Event listener para atualizar quando uma reserva mudar de status
+      const handleReservationUpdate = () => {
+        fetchReservas();
+      };
+      
+      window.addEventListener('reservationStatusChanged', handleReservationUpdate);
+      
+      return () => {
+        window.removeEventListener('reservationStatusChanged', handleReservationUpdate);
+      };
     }, [user]);
 
     const checkDeletedProperties = async (reservations) => {
@@ -172,7 +190,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
             <main className="grow max-w-[1200px] w-full mx-auto px-6 pt-32 pb-20">
                 <div className="mb-12">
                     <h1 className="text-5xl font-black italic uppercase tracking-tighter text-gray-900 leading-none">
-                        {t('myReservations')} <span className="text-transparent" style={{ WebkitTextStroke: '1px #111' }}></span>
+                        {t('header.myReservations')} <span className="text-transparent" style={{ WebkitTextStroke: '1px #111' }}></span>
                     </h1>
                     <div className="h-1 w-20 bg-blue-600 mt-2"></div>
                 </div>
@@ -222,17 +240,22 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end justify-center">
+                                    {/* Badge de Status */}
                                     <span className={`${
-                                        res.cancellation_reason?.includes('removida') || res.property?.deleted
+                                        ['Cancelada', 'Cancelled'].includes(res.status_name || res.status)
+                                            ? 'bg-red-100 text-red-600'
+                                            : res.cancellation_reason?.includes('removida') || res.property?.deleted
                                             ? 'bg-orange-100 text-orange-600'
-                                            : res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' 
-                                            ? 'bg-green-100 text-green-600' 
+                                            : ['Confirmada', 'Confirmed'].includes(res.status_name || res.status)
+                                            ? 'bg-green-100 text-green-600'
                                             : 'bg-yellow-100 text-yellow-600'
                                     } text-[9px] font-black uppercase px-4 py-1.5 rounded-full`}>
-                                        {res.cancellation_reason?.includes('removida') || res.property?.deleted
+                                        {['Cancelada', 'Cancelled'].includes(res.status_name || res.status)
+                                            ? 'CANCELADA'
+                                            : res.cancellation_reason?.includes('removida') || res.property?.deleted
                                             ? 'DEVOLVIDO'
-                                            : res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' 
-                                            ? 'PAGO' 
+                                            : ['Confirmada', 'Confirmed'].includes(res.status_name || res.status)
+                                            ? 'CONFIRMADA' 
                                             : 'PENDENTE'}
                                     </span>
                                     <p className="text-2xl font-black italic text-gray-900 leading-none">

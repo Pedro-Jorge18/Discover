@@ -6,7 +6,9 @@ import { useTranslation } from '../../contexts/TranslationContext';
  */
 function Footer() {
   const { t } = useTranslation();
-  const year = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
+  const startYear = 2024;
+  const yearDisplay = currentYear > startYear ? `${startYear} - ${currentYear}` : startYear;
   
   // Array for footer links (Portuguese of Portugal)
   const links = [
@@ -21,7 +23,7 @@ function Footer() {
         
         {/* Copyright Section */}
         <p className="mb-2">
-          © {year} {t('footer.brand')}
+          © {yearDisplay} {t('footer.brand')}
         </p>
 
         {/* Links Section */}
