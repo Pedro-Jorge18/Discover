@@ -22,12 +22,88 @@ function SearchPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         
         const params = new URLSearchParams(location.search);
         const q = params.get('q')?.toLowerCase() || "";
+        const maxPrice = Number(params.get('price')) || Infinity;
+        const propertyType = params.get('type');
+        const amenities = params.get('amenities')?.split(',').filter(Boolean) || [];
 
-        const filtered = all.filter(p => 
-          p.title?.toLowerCase().includes(q) || 
-          p.city?.name?.toLowerCase().includes(q) ||
-          p.location?.city?.name?.toLowerCase().includes(q)
-        );
+        console.log('Filters applied:', { q, maxPrice, propertyType, amenities });
+
+        const filtered = all.filter(p => {
+          // Published only
+          const isPublished = p.settings?.published ?? p.published ?? false;
+          if (!isPublished) return false;
+
+          // Text search (q)
+          const matchesSearch = !q || 
+            p.title?.toLowerCase().includes(q) || 
+            p.city?.name?.toLowerCase().includes(q) ||
+            p.location?.city?.name?.toLowerCase().includes(q);
+
+          // Price filter
+          const price = Number(p.price?.per_night ?? p.price_per_night ?? 0);
+          const matchesPrice = price <= maxPrice;
+
+          // Type filter
+          const typeMap = { 
+            'Apartamento': ['apartment', 'apartamento'],
+            'Moradia': ['house', 'moradia', 'casa'],
+            'Chale': ['cabin', 'chale', 'chalé'],
+            'Hotel Room': ['hotel_room', 'hotel room', 'quarto de hotel'],
+            'Todos': 'all' 
+          };
+          
+          const filterType = propertyType ? typeMap[propertyType] : null;
+          let matchesType = true;
+          
+          if (filterType && filterType !== 'all') {
+            // Check both property_type (direct) and types.property_type.name (nested)
+            const propTypeName = (p.types?.property_type?.name || p.property_type || '').toLowerCase();
+            const typesToMatch = Array.isArray(filterType) ? filterType : [filterType];
+            matchesType = typesToMatch.some(t => propTypeName.includes(t) || t.includes(propTypeName));
+          }
+
+          // Amenities filter - normalize comparison with mapping
+          const amenityMap = {
+            'wi-fi': ['wi-fi', 'wifi', 'internet'],
+            'piscina': ['piscina', 'pool', 'swimming pool'],
+            'estacionamento': ['estacionamento', 'parking', 'garage', 'garagem'],
+            'ac': ['ac', 'ar condicionado', 'ar-condicionado', 'air conditioning']
+          };
+          
+          const propertyAmenities = p.amenities?.map(a => {
+            const name = (a.name || '').toLowerCase().trim();
+            return name;
+          }) || [];
+          
+          const matchesAmenities = amenities.length === 0 || 
+            amenities.every(reqAmenity => {
+              const normalized = reqAmenity.toLowerCase().trim();
+              const variants = amenityMap[normalized] || [normalized];
+              
+              const matches = propertyAmenities.some(pAmenity => 
+                variants.some(variant => pAmenity.includes(variant) || variant.includes(pAmenity))
+              );
+              return matches;
+            });
+
+          const matches = matchesSearch && matchesPrice && matchesType && matchesAmenities;
+          
+          if (!matches && (amenities.length > 0 || propertyType !== 'Todos')) {
+            console.log('Property filtered out:', {
+              id: p.id,
+              title: p.title,
+              price: Number(p.price?.per_night ?? p.price_per_night ?? 0),
+              type: p.property_type,
+              amenities: propertyAmenities,
+              matchesSearch,
+              matchesPrice,
+              matchesType,
+              matchesAmenities
+            });
+          }
+
+          return matches;
+        });
 
         setResults(filtered);
       } catch (err) {
