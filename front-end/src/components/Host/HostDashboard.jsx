@@ -60,6 +60,17 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       await fetchPendingReservations();
     };
     loadData();
+    
+    // Event listener para atualizar quando propriedade é deletada
+    const handlePropertyDeleted = () => {
+      fetchPendingReservations();
+    };
+    
+    window.addEventListener('propertyDeleted', handlePropertyDeleted);
+    
+    return () => {
+      window.removeEventListener('propertyDeleted', handlePropertyDeleted);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -444,7 +455,14 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       notify(t('host.propertyDeleted'), 'success');
       setShowDeleteModal(false);
       setPropertyToDelete(null);
-      fetchHostProperties();
+      
+      // Disparar evento para atualizar lista de reservas pendentes
+      window.dispatchEvent(new CustomEvent('propertyDeleted', { 
+        detail: { propertyId: propertyToDelete.id } 
+      }));
+      
+      await fetchHostProperties();
+      await fetchPendingReservations(); // Atualizar imediatamente
     } catch (error) {
       console.error('Error deleting property:', error);
       notify(t('host.deleteError'), 'error');
@@ -496,7 +514,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                 <Home size={24} />
@@ -507,7 +525,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <p className="text-blue-100 font-medium text-sm">{t('host.totalProperties')}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                 <Eye size={24} />
@@ -520,7 +538,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <p className="text-green-100 font-medium text-sm">{t('host.activeProperties')}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                 <Calendar size={24} />
@@ -531,7 +549,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             <p className="text-purple-100 font-medium text-sm">{t('host.pendingReservations')}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                 <TrendingUp size={24} />
@@ -561,7 +579,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               <p className="text-gray-600">{t('common.loading')}</p>
             </div>
           ) : pendingReservations.length === 0 ? (
-            <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-md p-16 text-center border-2 border-purple-100">
+            <div className="bg-linear-to-br from-purple-50 to-white rounded-2xl shadow-md p-16 text-center border-2 border-purple-100">
               <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Calendar className="text-purple-600" size={40} />
               </div>
@@ -588,7 +606,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                 return (
                 <div 
                   key={reservation.id}
-                  className="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-100 p-6 hover:shadow-xl transition"
+                  className="bg-linear-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-100 p-6 hover:shadow-xl transition"
                 >
                   {/* Property Info */}
                   <div className="flex items-start justify-between mb-4">
@@ -611,7 +629,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   {/* Guest Info */}
                   <div className="bg-white/80 rounded-xl p-4 mb-4">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="w-10 h-10 bg-linear-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
                         <User size={20} />
                       </div>
                       <div>
@@ -638,7 +656,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                   </div>
 
                   {/* Total Price */}
-                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-3 mb-4 text-white text-center">
+                  <div className="bg-linear-to-r from-purple-500 to-purple-600 rounded-xl p-3 mb-4 text-white text-center">
                     <p className="text-xs font-semibold opacity-90 uppercase tracking-wide mb-1">{t('property.total')}</p>
                     <p className="text-2xl font-black">€{Number(totalPrice).toFixed(2)}</p>
                   </div>
@@ -648,7 +666,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                     <button
                       onClick={() => handleReservationAction(reservation.id, 'accept')}
                       disabled={processingReservation === reservation.id}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-4 rounded-xl font-black text-sm uppercase tracking-wide hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                      className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-green-500 to-green-600 text-white px-4 py-4 rounded-xl font-black text-sm uppercase tracking-wide hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
                     >
                       <Check size={20} strokeWidth={3} />
                       {processingReservation === reservation.id ? t('common.processing') : t('host.acceptReservation')}
@@ -656,7 +674,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                     <button
                       onClick={() => handleReservationAction(reservation.id, 'reject')}
                       disabled={processingReservation === reservation.id}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-4 rounded-xl font-black text-sm uppercase tracking-wide hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                      className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-red-500 to-red-600 text-white px-4 py-4 rounded-xl font-black text-sm uppercase tracking-wide hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
                     >
                       <X size={20} strokeWidth={3} />
                       {processingReservation === reservation.id ? t('common.processing') : t('host.rejectReservation')}

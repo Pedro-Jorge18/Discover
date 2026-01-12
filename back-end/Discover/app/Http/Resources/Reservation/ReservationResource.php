@@ -11,6 +11,7 @@ class ReservationResource extends JsonResource
         return [
             'id' => $this->id,
             'reservation_code' => $this->reservation_code,
+            'property_id' => $this->property_id,  // Necessário para verificar se propriedade foi deletada
 
             // DATAS E PERÍODO
             'check_in' => $this->check_in->format('Y-m-d'),
@@ -53,9 +54,11 @@ class ReservationResource extends JsonResource
             // DETALHES
             'special_requests' => $this->special_requests,
             'status' => $this->status->name,
+            'status_name' => $this->status->name,  // Alias para compatibilidade
             'confirmed_at' => $this->confirmed_at?->format('Y-m-d H:i:s'),
             'cancelled_at' => $this->cancelled_at?->format('Y-m-d H:i:s'),
             'cancellation_reason' => $this->cancellation_reason,
+            'total_amount' => (float) $this->total_amount,  // Também no nível principal para fácil acesso
 
             // RELACIONAMENTOS
             'property' => $this->whenLoaded('property', function () {

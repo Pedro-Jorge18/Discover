@@ -1,7 +1,9 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { Star, Info, ChevronDown } from 'lucide-react';
 import { pt } from 'date-fns/locale';
+import { addYears, addMonths } from 'date-fns';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 const BookingWidget = ({ 
@@ -24,7 +26,7 @@ const BookingWidget = ({
           </div>
         </div>
 
-        <div className="border-2 border-gray-100 rounded-[1.8rem] mb-6 overflow-visible">
+        <div className="border-2 border-gray-100 rounded-[1.8rem] mb-6">
           <div className="grid grid-cols-2 border-b-2 border-gray-100">
             {/* Input Check-in */}
             <div className="p-4 border-r-2 border-gray-100 hover:bg-gray-50 transition-colors rounded-tl-[1.6rem]">
@@ -33,10 +35,18 @@ const BookingWidget = ({
                 selected={startDate} 
                 onChange={setStartDate} 
                 placeholderText={t('property.choose')}
-                className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer" 
+                className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer"
+                wrapperClassName="w-full"
+                popperClassName="datepicker-popper"
                 locale={pt} 
                 dateFormat="dd/MM/yyyy"
-                popperPlacement="bottom-start"
+                minDate={new Date()}
+                maxDate={addYears(new Date(), 1)}
+                showPopperArrow={false}
+                shouldCloseOnSelect={true}
+                isClearable={false}
+                withPortal
+                portalId="root-portal"
               />
             </div>
             {/* Input Check-out */}
@@ -46,11 +56,18 @@ const BookingWidget = ({
                 selected={endDate} 
                 onChange={setEndDate} 
                 placeholderText={t('property.choose')}
-                className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer" 
+                className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer"
+                wrapperClassName="w-full"
+                popperClassName="datepicker-popper"
                 locale={pt} 
                 dateFormat="dd/MM/yyyy" 
                 minDate={startDate}
-                popperPlacement="bottom-end"
+                maxDate={startDate ? addMonths(startDate, 2) : addYears(new Date(), 1)}
+                showPopperArrow={false}
+                shouldCloseOnSelect={true}
+                isClearable={false}
+                withPortal
+                portalId="root-portal"
               />
             </div>
           </div>

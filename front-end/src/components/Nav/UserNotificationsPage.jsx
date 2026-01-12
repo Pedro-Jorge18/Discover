@@ -1,16 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
-import Footer from '../Layout/Footer.jsx';
 import { Bell, CheckCircle, Trash2, CheckCheck, Check } from 'lucide-react';
-import {
-  getUserNotifications,
-  markUserNotificationsRead,
-  markSingleUserNotificationRead,
-  removeUserNotification,
-  clearUserNotifications,
-  userNotificationEventName,
-} from '../../utils/userNotifications';
+import api from '../../api/axios';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 const formatTimeAgo = (isoDate, language) => {
@@ -37,10 +29,18 @@ function UserNotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAd
   const { t, language } = useTranslation();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = () => {
+  const fetchNotifications = async () => {
     if (!user?.id) return;
-    setNotifications(getUserNotifications(user.id));
+    try {
+      const response = await api.get('/notifications');
+      setNotifications(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -48,48 +48,46 @@ function UserNotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAd
       navigate('/login');
       return;
     }
-    refresh();
-  }, [user]);
-
-  useEffect(() => {
-    if (!user?.id) return undefined;
-
-    const handleUpdate = (event) => {
-      const targetId = event?.detail?.userId;
-      if (targetId && targetId !== user.id) return;
-      refresh();
-    };
-
-    window.addEventListener(userNotificationEventName, handleUpdate);
-    window.addEventListener('storage', handleUpdate);
-
-    return () => {
-      window.removeEventListener(userNotificationEventName, handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
-    };
+    fetchNotifications();
   }, [user]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const unreadLabel = `${t('userNotifications.unread')}: ${unreadCount}`;
 
-  const handleMarkAllRead = () => {
-    markUserNotificationsRead(user.id);
-    refresh();
+  const handleMarkAllRead = async () => {
+    try {
+      await api.post('/notifications/read-all');
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
   };
 
-  const handleClearAll = () => {
-    clearUserNotifications(user.id);
-    refresh();
+  const handleClearAll = async () => {
+    try {
+      await api.delete('/notifications');
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+    }
   };
 
-  const handleMarkSingle = (id) => {
-    markSingleUserNotificationRead(user.id, id);
-    refresh();
+  const handleMarkSingle = async (id) => {
+    try {
+      await api.post(`/notifications/${id}/read`);
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error marking as read:', error);
+    }
   };
 
-  const handleRemoveSingle = (id) => {
-    removeUserNotification(user.id, id);
-    refresh();
+  const handleRemoveSingle = async (id) => {
+    try {
+      await api.delete(`/notifications/${id}`);
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error removing notification:', error);
+    }
   };
 
   return (
@@ -162,7 +160,6 @@ function UserNotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAd
           </div>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

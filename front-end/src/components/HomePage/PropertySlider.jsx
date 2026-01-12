@@ -39,7 +39,7 @@ const PropertySlider = memo(function PropertySlider({ title, subtitle, propertie
       {/* Horizontal Scroll Area */}
       <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory no-scrollbar scroll-smooth">
         {displayProperties.map((property) => (
-          <div key={property.id} className="min-w-[280px] max-w-[280px] snap-start flex-shrink-0">
+          <div key={property.id} className="min-w-[280px] max-w-[280px] snap-start shrink-0">
             {/* IMPORTANT: Pass the user prop down to the card */}
             <PropertyCard property={property} user={user} />
           </div>

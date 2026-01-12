@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../Nav/Header.jsx';
-import Footer from '../Layout/Footer.jsx';
 import api from '../../api/axios';
 import { Calendar, MapPin, Loader2, ChevronRight, Briefcase } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
+import { pushUserNotification } from '../../utils/userNotifications';
+import notify from '../../utils/notify';
 
 const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) => {
     const { t } = useTranslation();
@@ -70,8 +71,12 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
             }
           }
           
-          
           setReservas(reservasArray);
+          
+          // Verificar propriedades deletadas
+          if (user && user.id) {
+            await checkDeletedProperties(reservasArray);
+          }
         } catch (error) {
           console.error("Erro ao carregar viagens:", error);
           setReservas([]);
@@ -80,7 +85,79 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
         }
       };
       fetchReservas();
-    }, []);
+    }, [user]);
+
+    const checkDeletedProperties = async (reservations) => {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      
+      const reservationsToCheck = reservations.filter(r => {
+        const status = r.status_name || r.status || '';
+        const isCancelled = ['Cancelada', 'Cancelled'].includes(status);
+        
+        if (!isCancelled) {
+          return true;
+        }
+        
+        const cancelledAt = r.cancelled_at ? new Date(r.cancelled_at) : null;
+        const shouldCheck = cancelledAt && cancelledAt > thirtyDaysAgo;
+        return shouldCheck;
+      });
+
+      for (const reservation of reservationsToCheck) {
+        const storageKey = `notified_refund_${user.id}_${reservation.id}`;
+        if (localStorage.getItem(storageKey)) {
+          continue;
+        }
+
+        try {
+          await api.get(`/properties/${reservation.property_id}?_t=${Date.now()}`);
+        } catch (error) {
+          if (error.response?.status === 404) {
+            const wasConfirmed = ['Confirmada', 'Confirmed'].includes(reservation.status_name || reservation.status || '');
+            const propertyTitle = reservation.property?.title || 'Propriedade removida';
+            const amount = reservation.total_amount || 0;
+            
+            const message = wasConfirmed
+              ? `A propriedade "${propertyTitle}" foi apagada. A sua reserva foi cancelada e o valor de €${amount} foi devolvido.`
+              : `A propriedade "${propertyTitle}" foi apagada antes da confirmação. O valor de €${amount} foi devolvido.`;
+
+            notify(message, 'warning');
+
+            pushUserNotification({
+              userId: user.id,
+              title: '💰 Dinheiro Devolvido',
+              message: message,
+              type: 'refund',
+              reservationId: reservation.id,
+              meta: {
+                amount: amount,
+                propertyTitle: propertyTitle,
+                propertyId: reservation.property_id
+              }
+            });
+            
+            localStorage.setItem(storageKey, new Date().toISOString());
+
+            setReservas(prev => prev.map(r => {
+              if (r.id === reservation.id) {
+                return {
+                  ...r,
+                  status: 'Cancelada',
+                  status_name: 'Cancelada',
+                  cancellation_reason: 'Propriedade foi removida pelo host',
+                  property: {
+                    ...r.property,
+                    title: propertyTitle,
+                    deleted: true
+                  }
+                };
+              }
+              return r;
+            }));
+          }
+        }
+      }
+    };
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-white">
@@ -121,6 +198,9 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                 <div className="grow flex flex-col justify-center">
                                     <h3 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 leading-none">
                                         {res.property?.title || 'Alojamento'}
+                                        {res.property?.deleted && (
+                                            <span className="ml-2 text-xs text-red-500 font-bold">(REMOVIDA)</span>
+                                        )}
                                     </h3>
                                     <div className="flex items-center gap-1.5 mt-1">
                                         <MapPin size={12} className="text-blue-500" />
@@ -128,6 +208,13 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                             {res.property?.city?.name || 'Localização'}
                                         </span>
                                     </div>
+                                    {res.cancellation_reason && (
+                                        <div className="mt-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl">
+                                            <p className="text-xs text-red-700 font-semibold">
+                                                ⚠️ {res.cancellation_reason}
+                                            </p>
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-4 mt-6 text-gray-400 font-bold text-xs uppercase">
                                         <div className="flex items-center gap-1"><Calendar size={14}/> {new Date(res.check_in).toLocaleDateString()}</div>
                                         <ChevronRight size={14}/>
@@ -135,8 +222,18 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end justify-center">
-                                    <span className="bg-green-100 text-green-600 text-[9px] font-black uppercase px-4 py-1.5 rounded-full">
-                                        {res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' ? 'PAGO' : 'PENDENTE'}
+                                    <span className={`${
+                                        res.cancellation_reason?.includes('removida') || res.property?.deleted
+                                            ? 'bg-orange-100 text-orange-600'
+                                            : res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' 
+                                            ? 'bg-green-100 text-green-600' 
+                                            : 'bg-yellow-100 text-yellow-600'
+                                    } text-[9px] font-black uppercase px-4 py-1.5 rounded-full`}>
+                                        {res.cancellation_reason?.includes('removida') || res.property?.deleted
+                                            ? 'DEVOLVIDO'
+                                            : res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' 
+                                            ? 'PAGO' 
+                                            : 'PENDENTE'}
                                     </span>
                                     <p className="text-2xl font-black italic text-gray-900 leading-none">
                                         €{(res.pricing?.total_amount ?? res.total_amount ?? 0).toFixed ? (res.pricing?.total_amount ?? res.total_amount ?? 0).toFixed(2) : (res.pricing?.total_amount ?? res.total_amount ?? 0)}

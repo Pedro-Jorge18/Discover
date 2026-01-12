@@ -129,7 +129,7 @@ function HelpCenter({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pt-44 pb-16">
+      <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white pt-44 pb-16">
         <div className="max-w-4xl mx-auto px-5 sm:px-10">
           <div className="flex items-center gap-3 mb-6">
             <HelpCircle className="w-10 h-10" />
@@ -212,7 +212,7 @@ function HelpCenter({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
                     {faq.question}
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform ${
+                    className={`w-5 h-5 text-gray-500 shrink-0 transition-transform ${
                       expandedFaq === index ? 'transform rotate-180' : ''
                     }`}
                   />
@@ -237,7 +237,7 @@ function HelpCenter({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         </div>
 
         {/* Additional Help */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200">
+        <div className="bg-linear-to-r from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
             {t('helpCenter.additionalHelp.title')}
           </h3>
