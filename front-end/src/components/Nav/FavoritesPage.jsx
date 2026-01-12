@@ -52,7 +52,6 @@ function FavoritesPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </div>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

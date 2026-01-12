@@ -112,10 +112,43 @@ class ReservationService
         try {
             return DB::transaction(function () use ($data, $userId) {
                 
+                // 1. VERIFICAR DISPONIBILIDADE PRIMEIRO
+                $checkIn = Carbon::parse($data['check_in']);
+                $checkOut = Carbon::parse($data['check_out']);
+                
+                $availability = $this->checkAvailability->execute(
+                    intval($data['property_id']),
+                    $checkIn,
+                    $checkOut,
+                    intval($data['adults'] ?? 1),
+                    intval($data['children'] ?? 0),
+                    intval($data['infants'] ?? 0)
+                );
+
+                if (!$availability['available']) {
+                    throw new \Exception($availability['message']);
+                }
+                
+                // 2. DOUBLE CHECK - Verificação final antes de criar
+                $finalCheck = Reservation::where('property_id', $data['property_id'])
+                    ->where(function ($query) use ($checkIn, $checkOut) {
+                        $query->where('check_in', '<', $checkOut->format('Y-m-d'))
+                              ->where('check_out', '>', $checkIn->format('Y-m-d'));
+                    })
+                    ->whereHas('status', function ($query) {
+                        $query->whereIn('name', ['Pendente', 'Confirmada', 'Confirmed', 'Em Andamento', 'Pending']);
+                    })
+                    ->lockForUpdate()
+                    ->exists();
+                    
+                if ($finalCheck) {
+                    throw new \Exception('These dates are no longer available. Please select different dates.');
+                }
+                
                 $totalAmount = floatval($data['total_amount'] ?? 0);
                 $nights = intval($data['nights'] ?? 1);
                 
-                // Criar reserva SIMPLES
+                // 3. Criar reserva SIMPLES
                 $reservation = Reservation::create([
                     'property_id' => intval($data['property_id']),
                     'user_id' => $userId,
@@ -133,7 +166,7 @@ class ReservationService
                     'status_id' => 1,
                 ]);
 
-                // Criar pagamento
+                // 4. Criar pagamento
                 if ($reservation->id) {
                     // Save payment and include any safe metadata (payer info)
                     DB::table('payments')->insert([
@@ -201,6 +234,11 @@ class ReservationService
      */
     public function getHostReservations(int $hostId, array $filters = []): Collection
     {
+        Log::info('Getting host reservations', [
+            'host_id' => $hostId,
+            'filters' => $filters
+        ]);
+        
         $query = Reservation::with(['property', 'status', 'user'])
             ->whereHas('property', function ($q) use ($hostId) {
                 $q->where('host_id', $hostId);
@@ -209,7 +247,19 @@ class ReservationService
 
         $this->applyStatusFilter($query, $filters['status'] ?? null);
 
-        return $query->get();
+        $results = $query->get();
+        
+        Log::info('Host reservations results', [
+            'host_id' => $hostId,
+            'count' => $results->count(),
+            'reservations' => $results->map(fn($r) => [
+                'id' => $r->id,
+                'property_id' => $r->property_id,
+                'status' => $r->status->name ?? 'unknown'
+            ])
+        ]);
+
+        return $results;
     }
 
     /**

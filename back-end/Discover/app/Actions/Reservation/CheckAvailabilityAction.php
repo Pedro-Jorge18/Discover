@@ -47,7 +47,8 @@ class CheckAvailabilityAction
 
     private function validateDates(Carbon $checkIn, Carbon $checkOut, Property $property): ?string
     {
-        if ($checkIn->isPast()) {
+        // Allow check-in starting from today (not before today)
+        if ($checkIn->startOfDay()->lt(Carbon::today())) {
             return 'Check-in date cannot be in the past';
         }
 
@@ -81,16 +82,46 @@ class CheckAvailabilityAction
 
     private function hasDateConflicts(int $propertyId, Carbon $checkIn, Carbon $checkOut): bool
     {
-        return Reservation::where('property_id', $propertyId)
-            ->where(function ($query) use ($checkIn, $checkOut) {
-                $query->where('check_in', '<', $checkOut)
-                    ->where('check_out', '>', $checkIn);
-                    
+        // Format dates consistently for database comparison
+        $checkInDate = $checkIn->format('Y-m-d');
+        $checkOutDate = $checkOut->format('Y-m-d');
+        
+        \Log::info('Checking date conflicts', [
+            'property_id' => $propertyId,
+            'requested_checkin' => $checkInDate,
+            'requested_checkout' => $checkOutDate
+        ]);
+        
+        $conflicts = Reservation::where('property_id', $propertyId)
+            ->where(function ($query) use ($checkInDate, $checkOutDate) {
+                // Detect overlaps: Any reservation where the dates overlap
+                // Overlap when: (existing_check_in < new_check_out) AND (existing_check_out > new_check_in)
+                // This blocks same dates and overlapping dates
+                $query->whereRaw('check_in < ?', [$checkOutDate])
+                      ->whereRaw('check_out > ?', [$checkInDate]);
             })
             ->whereHas('status', function ($query) {
-                $query->whereIn('name', ['Pendente', 'Confirmada']);
+                // Only check active reservations (not cancelled or completed)
+                $query->whereIn('name', ['Pendente', 'Confirmada', 'Confirmed', 'Em Andamento', 'Pending']);
             })
-            ->exists();
+            ->lockForUpdate() // Row-level lock to prevent race conditions
+            ->get();
+            
+        // Log all results for debugging
+        \Log::info('Conflict check results', [
+            'property_id' => $propertyId,
+            'requested_checkin' => $checkInDate,
+            'requested_checkout' => $checkOutDate,
+            'conflicts_found' => $conflicts->count(),
+            'conflicts' => $conflicts->map(fn($r) => [
+                'id' => $r->id,
+                'check_in' => $r->check_in,
+                'check_out' => $r->check_out,
+                'status' => $r->status->name ?? 'unknown'
+            ])
+        ]);
+        
+        return $conflicts->count() > 0;
     }
 
     private function error(string $message): array

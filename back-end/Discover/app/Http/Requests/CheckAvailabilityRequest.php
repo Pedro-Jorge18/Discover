@@ -9,7 +9,8 @@ class CheckAvailabilityRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check();
+        // Allow anyone to check availability (public endpoint)
+        return true;
     }
 
     public function rules(): array

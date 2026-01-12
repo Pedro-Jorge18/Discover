@@ -86,6 +86,8 @@ export default {
     acceptedBody: 'Your booking request has been accepted',
     rejectedTitle: 'Reservation rejected',
     rejectedBody: 'Unfortunately your request was not accepted',
+    reservationTitle: 'Reservation created',
+    reservationBody: 'Your reservation has been created for',
     viewAll: 'View all notifications',
     pageTitle: 'Reservation Notifications',
     pageSubtitle: 'Track the status of your bookings',

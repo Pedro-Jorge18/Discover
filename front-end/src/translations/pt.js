@@ -86,6 +86,8 @@ export default {
     acceptedBody: 'O seu pedido de reserva foi aceite',
     rejectedTitle: 'Reserva rejeitada',
     rejectedBody: 'Infelizmente o seu pedido não foi aceite',
+    reservationTitle: 'Reserva criada',
+    reservationBody: 'A sua reserva foi criada para',
     viewAll: 'Ver todas as notificações',
     pageTitle: 'Notificações de Reserva',
     pageSubtitle: 'Acompanhe o estado das suas reservas',

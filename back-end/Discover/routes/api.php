@@ -35,6 +35,11 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 });
 
+// Rotas de disponibilidade (públicas - não requerem autenticação)
+Route::get('/properties/{id}/availability', [ReservationController::class, 'checkAvailability']);
+Route::get('/properties/{id}/check-availability', [ReservationController::class, 'checkAvailability']);
+Route::post('/properties/availability/batch', [ReservationController::class, 'checkMultipleAvailability']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -85,10 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [ReservationController::class, 'destroy']);
         Route::post('/{id}/confirm', [ReservationController::class, 'confirm']);
     });
-
-    // Rotas de disponibilidade
-    Route::get('/properties/{id}/availability', [ReservationController::class, 'checkAvailability']);
-    Route::post('/properties/availability/batch', [ReservationController::class, 'checkMultipleAvailability']);
 
     // Reservas da propriedade (host)
     Route::get('/properties/{id}/reservations', [ReservationController::class, 'propertyReservations']);

@@ -103,6 +103,12 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $result = $this->getAuthenticatedUserAction->execute($request->user());
+        
+        Log::info('Auth /me endpoint called', [
+            'user_id' => $request->user()->id,
+            'role' => $request->user()->role,
+            'result_role' => $result['user']->role ?? 'not set'
+        ]);
 
         return response()->json([
             'user' => new UserResource($result['user']),
