@@ -47,8 +47,7 @@ function SearchPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           const typeMap = { 
             'Apartamento': ['apartment', 'apartamento'],
             'Moradia': ['house', 'moradia', 'casa'],
-            'Chale': ['cabin', 'chale', 'chalé'],
-            'Hotel Room': ['hotel_room', 'hotel room', 'quarto de hotel'],
+            'Quarto': ['hotel_room', 'hotel room', 'quarto de hotel', 'quarto', 'room'],
             'Todos': 'all' 
           };
           

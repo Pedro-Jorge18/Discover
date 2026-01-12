@@ -109,6 +109,17 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
     return `${base}/storage/${raw.replace(/^\/storage\//, '')}`;
   }, [property.images, randomImageIndex]);
 
+  // Gerar URL de fallback aleatória baseada no ID da propriedade
+  const fallbackImageUrl = useMemo(() => {
+    const fallbackImages = [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
+      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800'
+    ];
+    const seed = parseInt(property.id) || 0;
+    return fallbackImages[seed % fallbackImages.length];
+  }, [property.id]);
+
   return (
     <div 
       onClick={() => navigate(`/property/${property.id}`)}
@@ -120,7 +131,7 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
           loading="lazy"
           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
           alt={property.title}
-          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800'; }}
+          onError={(e) => { e.target.src = fallbackImageUrl; }}
         />
         
         <button 

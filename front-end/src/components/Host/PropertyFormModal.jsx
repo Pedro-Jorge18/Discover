@@ -22,7 +22,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
+        <div className="bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-2xl font-black text-gray-900 uppercase">
             {isEditing ? t('host.editProperty') : t('host.publishNewProperty')}
           </h2>
@@ -38,7 +38,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
         <form onSubmit={onSubmit} className="p-6 space-y-6">
           {/* Título */}
           <div>
-            <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               {t('host.propertyTitle')} *
             </label>
             <input
@@ -54,7 +54,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
           {/* Descrição */}
           <div>
-            <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               {t('host.description')}
             </label>
             <textarea
@@ -70,7 +70,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Grid para campos numéricos */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.pricePerNight')} (€) *
               </label>
               <input
@@ -87,7 +87,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.cleaningFee')} (€)
               </label>
               <input
@@ -104,9 +104,9 @@ import { useTranslation } from '../../contexts/TranslationContext';
           </div>
 
           {/* Grid para capacidades */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('common.guests')}
               </label>
               <input
@@ -121,7 +121,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('common.bedrooms')}
               </label>
               <input
@@ -136,8 +136,8 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
-                {t('common.beds')} *
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                {t('common.beds')} 
               </label>
               <input
                 type="number"
@@ -152,7 +152,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('common.bathrooms')}
               </label>
               <input
@@ -170,7 +170,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Tipo de Propriedade e Listing Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.propertyType')} *
               </label>
               <select
@@ -188,7 +188,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.listingType')} *
               </label>
               <select
@@ -208,7 +208,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Check-in e Check-out Times */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.checkInTime')} *
               </label>
               <input
@@ -222,7 +222,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.checkOutTime')} *
               </label>
               <input
@@ -239,7 +239,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* País, Cidade, Bairro */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.country')}
               </label>
               <select
@@ -261,7 +261,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.city')} *
               </label>
               <input
@@ -276,7 +276,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.neighborhood')} *
               </label>
               <select
@@ -301,7 +301,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Morada e Código Postal */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.address')}
               </label>
               <input
@@ -315,7 +315,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 {t('host.postalCode')} *
               </label>
               <input
@@ -332,7 +332,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
           {/* Upload de Imagens */}
           <div>
-            <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
               {isEditing ? t('host.addNewImages') : t('host.propertyImages')}
             </label>
             <div className="flex items-center justify-center w-full">

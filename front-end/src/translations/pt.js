@@ -549,7 +549,7 @@ export default {
     all: 'Todos',
     apartment: 'Apartamento',
     house: 'Moradia',
-    villa: 'Chale',
+    villa: 'Quarto',
     amenities: 'Comodidades Essenciais',
     wifi: 'Wi-Fi',
     pool: 'Piscina',
