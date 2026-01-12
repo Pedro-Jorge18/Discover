@@ -25,13 +25,13 @@ function FilterModal({ onClose }) {
     { label: 'Piscina', text: t('filter.pool'), icon: <Waves size={14}/> },
     { label: 'Estacionamento', text: t('filter.parking'), icon: <Car size={14}/> },
     { label: 'AC', text: t('filter.ac'), icon: <Wind size={14}/> }
-  ];*/}
+  ];
 
   const toggleExtra = (label) => {
     setSelectedExtras(prev => 
       prev.includes(label) ? prev.filter(i => i !== label) : [...prev, label]
     );
-  };
+  };*/}
 
   const handleApply = () => {
     const currentQ = queryParams.get('q');
