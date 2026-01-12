@@ -66,10 +66,17 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       fetchPendingReservations();
     };
     
+    // Event listener para atualizar quando status de reserva muda
+    const handleReservationStatusChanged = () => {
+      fetchPendingReservations();
+    };
+    
     window.addEventListener('propertyDeleted', handlePropertyDeleted);
+    window.addEventListener('reservationStatusChanged', handleReservationStatusChanged);
     
     return () => {
       window.removeEventListener('propertyDeleted', handlePropertyDeleted);
+      window.removeEventListener('reservationStatusChanged', handleReservationStatusChanged);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -200,6 +207,11 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       );
       // Refresh reservations list
       fetchPendingReservations();
+      
+      // Disparar evento para atualizar a página de reservas do utilizador
+      window.dispatchEvent(new CustomEvent('reservationStatusChanged', { 
+        detail: { reservationId, action } 
+      }));
     } catch (error) {
       console.error('Error updating reservation:', error);
       notify(t('host.reservationError'), 'error');
