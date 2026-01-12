@@ -102,9 +102,9 @@ class CheckAvailabilityAction
             })
             ->whereHas('status', function ($query) {
                 // Only check active reservations (not cancelled or completed)
-                $query->whereIn('name', ['Pendente', 'Confirmada', 'Confirmed', 'Em Andamento', 'Pending']);
+                $query->whereIn('name', ['Pendente', 'Confirmada', 'Confirmed', 'Em Andamento', 'Pending', 'Devolvido']);
             })
-            ->lockForUpdate() // Row-level lock to prevent race conditions
+            ->with('status')
             ->get();
             
         // Log all results for debugging
