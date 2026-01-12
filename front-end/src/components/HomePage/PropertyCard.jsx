@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../contexts/TranslationContext';
@@ -62,7 +62,6 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
 
     // If user is null, undefined or has no ID, redirect to login
     if (!user || !user.id) {
-      console.log("No user session found, redirecting to login...");
       navigate('/login');
       return;
     }
@@ -83,14 +82,32 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
     window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   }, [user, storageKey, property.id, navigate]);
 
-  const getImageUrl = useCallback(() => {
-    const image = property.images?.[0];
+  // Gerar um índice aleatório mas consistente baseado no ID da propriedade
+  const randomImageIndex = useMemo(() => {
+    if (!property.images || property.images.length === 0) return 0;
+    if (property.images.length === 1) return 0;
+    
+    // Usar combinação de ID + timestamp arredondado para gerar índice aleatório
+    // Arredonda para dia para manter consistência durante o dia, mas variar entre dias
+    const dayTimestamp = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    const seed = parseInt(property.id) * 31 + dayTimestamp;
+    
+    // Algoritmo de hash melhorado
+    let hash = seed;
+    hash = ((hash << 13) ^ hash) >>> 0;
+    hash = (hash * (hash * hash * 15731 + 789221) + 1376312589) >>> 0;
+    
+    return hash % property.images.length;
+  }, [property.id, property.images?.length]);
+
+  const getImageUrl = useMemo(() => {
+    const image = property.images?.[randomImageIndex];
     const raw = image?.thumbnail_url || image?.image_url || image?.url || image?.image_path || image?.path;
     if (!raw) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800';
     if (raw.startsWith('http')) return raw;
     const base = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     return `${base}/storage/${raw.replace(/^\/storage\//, '')}`;
-  }, [property.images]);
+  }, [property.images, randomImageIndex]);
 
   return (
     <div 
@@ -99,7 +116,7 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
     >
       <div className="relative aspect-square overflow-hidden rounded-[2.5rem] mb-4 shadow-sm group-hover:shadow-xl transition-shadow duration-300">
         <img 
-          src={getImageUrl()} 
+          src={getImageUrl} 
           loading="lazy"
           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
           alt={property.title}

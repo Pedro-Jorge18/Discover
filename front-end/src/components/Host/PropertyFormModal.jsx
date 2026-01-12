@@ -38,7 +38,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
         <form onSubmit={onSubmit} className="p-6 space-y-6">
           {/* Título */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
               {t('host.propertyTitle')} *
             </label>
             <input
@@ -54,7 +54,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
           {/* Descrição */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
               {t('host.description')}
             </label>
             <textarea
@@ -67,12 +67,10 @@ import { useTranslation } from '../../contexts/TranslationContext';
             />
           </div>
 
-          {/* Resumo removido conforme pedido */}
-
           {/* Grid para campos numéricos */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.pricePerNight')} (€) *
               </label>
               <input
@@ -89,7 +87,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.cleaningFee')} (€)
               </label>
               <input
@@ -106,9 +104,9 @@ import { useTranslation } from '../../contexts/TranslationContext';
           </div>
 
           {/* Grid para capacidades */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('common.guests')}
               </label>
               <input
@@ -123,7 +121,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('common.bedrooms')}
               </label>
               <input
@@ -138,7 +136,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('common.beds')} *
               </label>
               <input
@@ -154,7 +152,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('common.bathrooms')}
               </label>
               <input
@@ -172,7 +170,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Tipo de Propriedade e Listing Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.propertyType')} *
               </label>
               <select
@@ -190,7 +188,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.listingType')} *
               </label>
               <select
@@ -210,7 +208,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Check-in e Check-out Times */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.checkInTime')} *
               </label>
               <input
@@ -224,7 +222,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.checkOutTime')} *
               </label>
               <input
@@ -241,7 +239,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* País, Cidade, Bairro */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.country')}
               </label>
               <select
@@ -263,7 +261,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.city')} *
               </label>
               <input
@@ -278,7 +276,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.neighborhood')} *
               </label>
               <select
@@ -303,7 +301,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
           {/* Morada e Código Postal */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.address')}
               </label>
               <input
@@ -317,7 +315,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
                 {t('host.postalCode')} *
               </label>
               <input
@@ -334,7 +332,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
           {/* Upload de Imagens */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">
               {isEditing ? t('host.addNewImages') : t('host.propertyImages')}
             </label>
             <div className="flex items-center justify-center w-full">
