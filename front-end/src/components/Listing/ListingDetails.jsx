@@ -14,6 +14,7 @@ import ReviewForm from '../Review/ReviewForm.jsx';
 import ListingInfo from './ListingInfo.jsx';
 import PaymentModal from '../Booking/PaymentModal.jsx';
 import { pushHostNotification } from '../../utils/hostNotifications';
+import { pushUserNotification } from '../../utils/userNotifications';
 import { useTranslation } from '../../contexts/TranslationContext';
 
 function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSettingsAdmin }) {
@@ -201,22 +202,44 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
   const nightsPrice = nights * pricePerNight;
   const totalPrice = nights > 0 ? (nightsPrice + cleaningFee + serviceFee) : 0;
 
-  const handleOpenModal = () => {
+  const handleOpenModal = async () => {
     if (!user) { 
       if (typeof onOpenLogin === 'function') onOpenLogin();
       else navigate("/login"); 
       return; 
     }
-    // Validar datas
+
+    // Verificar se as datas foram selecionadas
     if (!startDate || !endDate) {
-      notify(t('property.selectDates') || 'Por favor, selecione as datas de check-in e check-out', 'error');
+      notify('Por favor, selecione as datas de check-in e check-out', 'error');
       return;
     }
-    if (nights <= 0) {
-      notify(t('property.invalidDates') || 'As datas selecionadas são inválidas', 'error');
-      return;
+
+    // Verificar disponibilidade antes de abrir o modal
+    try {
+      setBookingLoading(true);
+      const response = await api.get(`/properties/${id}/check-availability`, {
+        params: {
+          check_in: startDate.toISOString().split('T')[0],
+          check_out: endDate.toISOString().split('T')[0],
+          adults: parseInt(hospedes),
+          children: 0,
+          infants: 0
+        }
+      });
+
+      if (!response.data.available) {
+        notify('Datas indisponíveis', 'error');
+        return;
+      }
+
+      setShowModal(true);
+    } catch (error) {
+      console.error('Erro ao verificar disponibilidade:', error);
+      notify('Datas indisponíveis', 'error');
+    } finally {
+      setBookingLoading(false);
     }
-    setShowModal(true);
   };
 
   const handleOpenPayment = () => {
@@ -276,13 +299,27 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
         });
       }
 
+      // Send notification to user
+      if (user?.id) {
+        pushUserNotification({
+          userId: user.id,
+          type: 'reservation_request',
+          title: t('userNotifications.reservationTitle') || 'Reserva criada',
+          message: `${t('userNotifications.reservationBody') || 'A sua reserva foi criada para'} ${alojamento?.title || ''} (${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()})`,
+          reservationId: response.data?.data?.id,
+          meta: { nights, totalPrice }
+        });
+      }
+
       navigate('/payment/success');
     } else {
-      throw new Error('Erro ao criar reserva');
+      const errorMsg = response.data?.message || 'Erro ao criar reserva';
+      throw new Error(errorMsg);
     }
   } catch (error) {
     console.error('Erro:', error);
-    notify('Erro ao criar reserva', 'error');
+    const errorMessage = error.response?.data?.message || error.message || 'Erro ao processar reserva. Tente novamente.';
+    notify(errorMessage, 'error');
   } finally {
     setBookingLoading(false);
   }
@@ -370,6 +407,10 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
                 <span className="text-gray-400">{t('property.checkOut')}</span>
                 <span className="text-gray-800">{formatTime(alojamento.check_out_time, '11:00')}</span>
+              </span>
+              <span className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
+                <span className="text-gray-400">{t('property.type')}</span>
+                <span className="text-gray-800">{alojamento.property_type.name}</span>
               </span>
             </div>
 

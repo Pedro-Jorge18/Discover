@@ -26,7 +26,7 @@ class CreateReservationAction
             $checkIn = Carbon::parse($reservationData['check_in']);
             $checkOut = Carbon::parse($reservationData['check_out']);
 
-            // 2. VERIFICA DISPONIBILIDADE
+            // 2. VERIFICA DISPONIBILIDADE (com lock)
             $availability = $this->checkAvailability->execute(
                 $reservationData['property_id'],
                 $checkIn,
@@ -38,6 +38,23 @@ class CreateReservationAction
 
             if (!$availability['available']) {
                 throw new \Exception($availability['message']);
+            }
+            
+            // 2.5 DOUBLE CHECK - Verificação final antes de criar
+            $finalCheck = Reservation::where('property_id', $reservationData['property_id'])
+                ->where(function ($query) use ($checkIn, $checkOut) {
+                    // Same overlap logic: block real overlaps but allow check-in = check-out
+                    $query->where('check_in', '<', $checkOut->format('Y-m-d'))
+                          ->where('check_out', '>', $checkIn->format('Y-m-d'));
+                })
+                ->whereHas('status', function ($query) {
+                    $query->whereIn('name', ['Pendente', 'Confirmada', 'Confirmed', 'Em Andamento', 'Pending']);
+                })
+                ->lockForUpdate()
+                ->exists();
+                
+            if ($finalCheck) {
+                throw new \Exception('These dates are no longer available. Please select different dates.');
             }
 
             // 3. BUSCA PROPRIEDADE

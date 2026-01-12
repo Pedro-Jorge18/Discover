@@ -12,7 +12,6 @@ export default function Login({ setUser }) {
   const [twoFACode, setTwoFACode] = useState("");
   const [tempToken, setTempToken] = useState("");
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState("");
 
   // Load user if saved token exists
   useEffect(() => {
@@ -25,7 +24,6 @@ export default function Login({ setUser }) {
           navigate("/");
         })
         .catch(err => {
-          console.error("Erro ao carregar user:", err);
           localStorage.removeItem("token");
           sessionStorage.removeItem("token");
         });
@@ -44,8 +42,7 @@ export default function Login({ setUser }) {
       // If 2FA enabled, show popup and save temp token
       if (response.data.two_factor_required) {
           if (!response.data.temp_token) {
-          console.error("Temp token não fornecido pelo backend.");
-          notify(t('auth.twoFactorError'), "error");
+          notify(t('auth.twoFactorError'), 'error');
           return;
         }
         setTempToken(response.data.temp_token); 
@@ -56,8 +53,7 @@ export default function Login({ setUser }) {
       // Normal login
       const token = response.data.token;
       if (!token) {
-        console.error("Token não fornecido pelo backend.");
-        notify(t('auth.noToken'), "error");
+        notify(t('auth.noToken'), 'error');
         return;
       }
 
@@ -84,9 +80,9 @@ export default function Login({ setUser }) {
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        setErrorMessage(t('auth.invalidCredentials'));
+        notify("Credenciais inválidas. Verifique o email e a palavra-passe.", 'error');
       } else {
-        setErrorMessage(t('auth.serverError'));
+        notify("Erro no servidor. Tente novamente mais tarde.", 'error');
       }
     }
   };
@@ -98,18 +94,15 @@ export default function Login({ setUser }) {
         headers: { Authorization: `Bearer ${tempToken}` }
       });
 
-      console.log("Resposta 2FA:", res.data);
-
       if (!res.data.status) {
-        notify(t('auth.twoFactorAuthError'), "error");
+        notify(t('auth.twoFactorAuthError'), 'error');
         return;
       }
 
       const token = res.data.token;
 
       if (!token) {
-        console.error("Token não fornecido pelo backend após 2FA.");
-        notify(t('auth.twoFactorAuthError'), "error");
+        notify(t('auth.twoFactorAuthError'), 'error');
         return;
       }
 
@@ -135,9 +128,9 @@ export default function Login({ setUser }) {
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        setErrorMessage(t('auth.invalidCode'));
+        notify("Código inválido. Tente novamente.", 'error');
       } else {
-        setErrorMessage(t('auth.serverError'));
+        notify("Erro no servidor. Tente novamente mais tarde.", 'error');
       }
     }
   };
@@ -257,7 +250,6 @@ export default function Login({ setUser }) {
                   }
                   window.location.href = url;
                 } catch (err) {
-                  console.error('Erro Google redirect:', err);
                   notify(t('auth.googleStartError'), 'error');
                 }
               }} className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg text-blue-600 text-sm font-medium hover:border-gray-900 hover:bg-gray-300 transition duration-300">
@@ -289,25 +281,6 @@ export default function Login({ setUser }) {
               className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus:ring-4 focus:ring-indigo-400 transition duration-300 w-full"
             >
               {t('common.confirm')}
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {errorMessage && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full text-center border border-gray-700 shadow-lg">
-            <h4 className="text-white font-semibold mb-3">{t('common.error')}</h4>
-
-            <p className="text-gray-300 text-sm mb-6">
-              {errorMessage}
-            </p>
-
-            <button
-              onClick={() => setErrorMessage("")}
-              className="w-full rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition"
-            >
-              {t('common.ok')}
             </button>
           </div>
         </div>

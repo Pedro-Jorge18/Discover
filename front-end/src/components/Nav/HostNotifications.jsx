@@ -57,7 +57,7 @@ function HostNotifications({ user }) {
       return;
     }
     refresh();
-  }, [user]);
+  }, [user?.id, user?.role]);
 
   useEffect(() => {
     if (!user?.id || user.role !== 'host') return undefined;
@@ -83,7 +83,7 @@ function HostNotifications({ user }) {
       window.removeEventListener('storage', handleUpdate);
       window.removeEventListener('click', handleClickOutside);
     };
-  }, [user]);
+  }, [user?.id, user?.role]);
 
   if (!user || user.role !== 'host') return null;
 

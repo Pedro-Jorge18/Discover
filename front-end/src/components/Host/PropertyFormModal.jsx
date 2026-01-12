@@ -22,7 +22,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
+        <div className="bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-2xl font-black text-gray-900 uppercase">
             {isEditing ? t('host.editProperty') : t('host.publishNewProperty')}
           </h2>
@@ -66,8 +66,6 @@ import { useTranslation } from '../../contexts/TranslationContext';
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
             />
           </div>
-
-          {/* Resumo removido conforme pedido */}
 
           {/* Grid para campos numéricos */}
           <div className="grid grid-cols-2 gap-4">
@@ -139,7 +137,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                {t('common.beds')} *
+                {t('common.beds')} 
               </label>
               <input
                 type="number"
