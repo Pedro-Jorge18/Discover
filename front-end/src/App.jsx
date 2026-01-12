@@ -5,6 +5,7 @@ import ToastContainer from './components/Ui/ToastContainer.jsx';
 import api from './api/axios';
 import SettingsMain from './components/Settings/SettingsMain.jsx';
 import SettingsAdmin from './components/Settings/SettingsAdmin.jsx';
+import { usePropertyDeletionCheck } from './hooks/usePropertyDeletionCheck';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -13,6 +14,9 @@ function App() {
   const [termoPesquisa, setTermoPesquisa] = useState(""); 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsOpenAdmin, setSettingsOpenAdmin] = useState(false);
+
+  // Hook para verificar propriedades deletadas e processar devoluções
+  usePropertyDeletionCheck(user);
 
   useEffect(() => {
     const sessionToken = sessionStorage.getItem("token");

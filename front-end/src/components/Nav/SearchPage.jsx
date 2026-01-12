@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from './Header.jsx';
-import Footer from '../Layout/Footer.jsx';
 import PropertyCard from '../HomePage/PropertyCard.jsx';
 import PropertySkeleton from '../HomePage/PropertySkeleton.jsx';
 import api from '../../api/axios';
@@ -50,7 +49,6 @@ function SearchPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           }
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

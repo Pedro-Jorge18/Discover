@@ -20,15 +20,12 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
   const fetchReviews = useCallback(async () => {
     try {
       const response = await api.get(`/properties/${propertyId}/reviews`);
-      console.log('Reviews API Response:', response.data);
       const data = response.data;
 
       let reviewsData = [];
       if (data?.reviews) {
-
         reviewsData = data.reviews?.data || data.reviews;
       }
-      console.log('Reviews Data:', reviewsData);
       setReviews(Array.isArray(reviewsData) ? reviewsData : []);
       setStats(data?.stats || null);
       
