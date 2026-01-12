@@ -66,17 +66,10 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       fetchPendingReservations();
     };
     
-    // Event listener para atualizar quando status de reserva muda
-    const handleReservationStatusChanged = () => {
-      fetchPendingReservations();
-    };
-    
     window.addEventListener('propertyDeleted', handlePropertyDeleted);
-    window.addEventListener('reservationStatusChanged', handleReservationStatusChanged);
     
     return () => {
       window.removeEventListener('propertyDeleted', handlePropertyDeleted);
-      window.removeEventListener('reservationStatusChanged', handleReservationStatusChanged);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

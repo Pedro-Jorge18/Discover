@@ -92,17 +92,6 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
         }
       };
       fetchReservas();
-      
-      // Event listener para atualizar quando uma reserva mudar de status
-      const handleReservationUpdate = () => {
-        fetchReservas();
-      };
-      
-      window.addEventListener('reservationStatusChanged', handleReservationUpdate);
-      
-      return () => {
-        window.removeEventListener('reservationStatusChanged', handleReservationUpdate);
-      };
     }, [user]);
 
     const checkDeletedProperties = async (reservations) => {
@@ -240,22 +229,17 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end justify-center">
-                                    {/* Badge de Status */}
                                     <span className={`${
-                                        ['Cancelada', 'Cancelled'].includes(res.status_name || res.status)
-                                            ? 'bg-red-100 text-red-600'
-                                            : res.cancellation_reason?.includes('removida') || res.property?.deleted
+                                        res.cancellation_reason?.includes('removida') || res.property?.deleted
                                             ? 'bg-orange-100 text-orange-600'
-                                            : ['Confirmada', 'Confirmed'].includes(res.status_name || res.status)
-                                            ? 'bg-green-100 text-green-600'
+                                            : res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' 
+                                            ? 'bg-green-100 text-green-600' 
                                             : 'bg-yellow-100 text-yellow-600'
                                     } text-[9px] font-black uppercase px-4 py-1.5 rounded-full`}>
-                                        {['Cancelada', 'Cancelled'].includes(res.status_name || res.status)
-                                            ? 'CANCELADA'
-                                            : res.cancellation_reason?.includes('removida') || res.property?.deleted
+                                        {res.cancellation_reason?.includes('removida') || res.property?.deleted
                                             ? 'DEVOLVIDO'
-                                            : ['Confirmada', 'Confirmed'].includes(res.status_name || res.status)
-                                            ? 'CONFIRMADA' 
+                                            : res.is_paid || res.payment?.status === 'paid' || res.payment?.status === 'completed' 
+                                            ? 'PAGO' 
                                             : 'PENDENTE'}
                                     </span>
                                     <p className="text-2xl font-black italic text-gray-900 leading-none">
