@@ -44,7 +44,7 @@ export default {
   },
   header: {
     searchPlaceholder: 'Para onde quer ir?',
-    myReservations: 'As minhas reservas',
+    myReservations: 'As minhas viagens',
     myProperties: 'As minhas propriedades',
     myReviews: 'As minhas avaliações',
     profile: 'Perfil',
@@ -176,7 +176,7 @@ export default {
   },
   reservation: {
     title: 'Reservas',
-    myReservations: 'As minhas reservas',
+    myReservations: 'As minhas viagens',
     upcoming: 'Próximas',
     current: 'Em curso',
     past: 'Passadas',

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../Nav/Header.jsx';
-import Footer from '../Layout/Footer.jsx';
+
 import { Star, Loader2, Users, Bed, Bath, X, CreditCard, Share2, Heart } from 'lucide-react';
 import api from '../../api/axios';
 import notify from '../../utils/notify';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { pt } from 'date-fns/locale';
-import { differenceInDays, addDays, startOfDay } from 'date-fns';
+import { differenceInDays, addDays, startOfDay, addYears, addMonths } from 'date-fns';
 import ReviewsList from '../Review/ReviewsList.jsx';
 import ReviewForm from '../Review/ReviewForm.jsx';
 import ListingInfo from './ListingInfo.jsx';
@@ -500,11 +500,41 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                 <div className="grid grid-cols-2 border-b-2 border-gray-100">
                   <div className="p-4 border-r-2 border-gray-100 hover:bg-gray-50 transition-colors">
                     <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">{t('property.checkIn')}</label>
-                    <DatePicker selected={startDate} onChange={d => setStartDate(d)} minDate={new Date()} locale={pt} dateFormat="dd/MM/yyyy" className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer" />
+                    <DatePicker 
+                      selected={startDate} 
+                      onChange={d => setStartDate(d)} 
+                      minDate={new Date()} 
+                      maxDate={addYears(new Date(), 1)} 
+                      locale={pt} 
+                      dateFormat="dd/MM/yyyy" 
+                      className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer"
+                      wrapperClassName="w-full"
+                      popperClassName="datepicker-popper"
+                      showPopperArrow={false}
+                      shouldCloseOnSelect={true}
+                      isClearable={false}
+                      withPortal
+                      portalId="root-portal"
+                    />
                   </div>
                   <div className="p-4 hover:bg-gray-50 transition-colors">
                     <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">{t('property.checkOut')}</label>
-                    <DatePicker selected={endDate} onChange={d => setEndDate(d)} minDate={addDays(startDate, 1)} locale={pt} dateFormat="dd/MM/yyyy" className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer" />
+                    <DatePicker 
+                      selected={endDate} 
+                      onChange={d => setEndDate(d)} 
+                      minDate={addDays(startDate, 1)} 
+                      maxDate={startDate ? addMonths(startDate, 2) : addYears(new Date(), 1)} 
+                      locale={pt} 
+                      dateFormat="dd/MM/yyyy" 
+                      className="w-full bg-transparent text-sm font-bold outline-none cursor-pointer"
+                      wrapperClassName="w-full"
+                      popperClassName="datepicker-popper"
+                      showPopperArrow={false}
+                      shouldCloseOnSelect={true}
+                      isClearable={false}
+                      withPortal
+                      portalId="root-portal"
+                    />
                   </div>
                 </div>
                 <div className="p-4 hover:bg-gray-50 transition-colors">

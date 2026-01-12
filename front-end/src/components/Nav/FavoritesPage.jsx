@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header.jsx';
-import Footer from '../Layout/Footer.jsx';
 import PropertyCard from '../HomePage/PropertyCard.jsx';
 import { useNavigate } from 'react-router-dom';
 import { HeartOff } from 'lucide-react';

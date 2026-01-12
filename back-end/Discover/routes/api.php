@@ -5,6 +5,7 @@ use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\UserNotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
@@ -110,6 +111,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{review}', [ReviewController::class, 'destroy']); // Deletar review
         Route::put('/{review}', [ReviewController::class, 'update']); // Atualizar review ou adicionar resposta do host
         Route::get('/{review}', [ReviewController::class, 'show']); // DEVE SER A ÚLTIMA - captura qualquer ID
+    });
+
+    // Rotas de NOTIFICAÇÕES
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [UserNotificationController::class, 'index']);
+        Route::post('/{id}/read', [UserNotificationController::class, 'markAsRead']);
+        Route::post('/read-all', [UserNotificationController::class, 'markAllAsRead']);
+        Route::delete('/{id}', [UserNotificationController::class, 'delete']);
+        Route::delete('/', [UserNotificationController::class, 'deleteAll']);
     });
 });
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
-import Footer from '../Layout/Footer.jsx';
 import { Bell, CreditCard, MessageSquare, Trash2, CheckCheck, Check, Calendar } from 'lucide-react';
 import {
   getHostNotifications,

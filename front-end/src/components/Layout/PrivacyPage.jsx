@@ -25,7 +25,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         {/* Introduction */}
         <div className="mb-12 p-6 bg-blue-50 border-l-4 border-blue-600 rounded-r-lg">
           <div className="flex items-start gap-3">
-            <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+            <Info className="w-6 h-6 text-blue-600 shrink-0 mt-1" />
             <div>
               <p className="text-gray-800 leading-relaxed mb-3">
                 {t('privacy.introText')}

@@ -152,7 +152,7 @@ function HostNotifications({ user }) {
                   {!item.read && (
                     <button
                       onClick={(e) => handleMarkSingleRead(item.id, e)}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
+                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors shrink-0"
                       title={t('hostNotifications.markAsRead')}
                     >
                       <Check className="w-4 h-4" />
