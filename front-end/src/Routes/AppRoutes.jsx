@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ScrollToTop from '../components/Layout/ScrollToTop.jsx';
 import Home from '../components/HomePage/Home.jsx'; 
 import ListingDetails from '../components/Listing/ListingDetails.jsx';
 import Login from '../components/Auth/Login.jsx';
@@ -38,6 +39,7 @@ function AppRoutes({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSetti
 
     return (
         <BrowserRouter>
+            <ScrollToTop />
             <Routes>
                 {/* Home Route */}
                 <Route 

@@ -67,8 +67,6 @@ import { useTranslation } from '../../contexts/TranslationContext';
             />
           </div>
 
-          {/* Resumo removido conforme pedido */}
-
           {/* Grid para campos numéricos */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -139,7 +137,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
-                {t('common.beds')} *
+                {t('common.beds')} 
               </label>
               <input
                 type="number"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Home, Building2, Tent, Warehouse, Waves, Wifi, Car, Wind } from 'lucide-react';
+import { X, Home, Building2, Tent, Warehouse, Waves, Wifi, Car, Wind, Bed } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../../contexts/TranslationContext';
 
@@ -17,10 +17,10 @@ function FilterModal({ onClose }) {
     { label: 'Todos', text: t('filter.all'), icon: <Home size={20}/> },
     { label: 'Apartamento', text: t('filter.apartment'), icon: <Building2 size={20}/> },
     { label: 'Moradia', text: t('filter.house'), icon: <Warehouse size={20}/> },
-    { label: 'Chale', text: t('filter.villa'), icon: <Tent size={20}/> }
+    { label: 'Quarto', text: t('filter.villa'), icon: <Bed size={20}/> }
   ];
 
-  const extrasList = [
+  {/*const extrasList = [
     { label: 'Wi-Fi', text: t('filter.wifi'), icon: <Wifi size={14}/> },
     { label: 'Piscina', text: t('filter.pool'), icon: <Waves size={14}/> },
     { label: 'Estacionamento', text: t('filter.parking'), icon: <Car size={14}/> },
@@ -31,7 +31,7 @@ function FilterModal({ onClose }) {
     setSelectedExtras(prev => 
       prev.includes(label) ? prev.filter(i => i !== label) : [...prev, label]
     );
-  };
+  };*/}
 
   const handleApply = () => {
     const currentQ = queryParams.get('q');
@@ -74,7 +74,7 @@ function FilterModal({ onClose }) {
               ))}
             </div>
           </div>
-          <div>
+         {/* <div>
             <h3 className="text-lg font-black uppercase tracking-widest mb-6 italic">{t('filter.amenities')}</h3>
             <div className="flex flex-wrap gap-3">
               {extrasList.map((item) => (
@@ -82,8 +82,8 @@ function FilterModal({ onClose }) {
                   {item.icon} {item.text}
                 </button>
               ))}
-            </div>
-          </div>
+            </div> 
+          </div>*/}
         </div>
         <div className="p-8 bg-gray-50 flex justify-between items-center">
           <button onClick={() => { setPrice(1000); setType('Todos'); setSelectedExtras([]); }} className="text-gray-400 font-black uppercase text-xs tracking-widest underline">{t('filter.clearFilters')}</button>

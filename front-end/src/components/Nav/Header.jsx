@@ -103,8 +103,8 @@ function Header({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             )}
           </button>
 
-          {user?.role === 'host' && <HostNotifications user={user} />}
-          {user?.role !== 'host' && user && <UserNotifications user={user} />}
+          {user && (user?.role === 'host' ? <HostNotifications user={user} /> : <UserNotifications user={user} />)}
+          {!user?.role && user && <HostNotifications user={user} />}
 
           <LanguageSwitcher />
           

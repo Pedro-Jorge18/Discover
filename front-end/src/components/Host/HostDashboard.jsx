@@ -144,22 +144,14 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     try {
       setProcessingReservation(reservationId);
       
-      // Get the reservation data to access guest info
       const reservation = pendingReservations.find(r => r.id === reservationId);
-      console.log('🔔 Reservation data:', reservation);
-      console.log('🔔 Reservation user_id:', reservation?.user_id);
-      console.log('🔔 Reservation user:', reservation?.user);
       
       if (action === 'accept') {
         await api.post(`/reservations/${reservationId}/confirm`);
         
-        // Send notification to guest (client)
-        // Try both user_id and user.id
+        // Send notification to guest
         const guestId = reservation?.user_id || reservation?.user?.id;
-        console.log('🔔 Guest ID to notify:', guestId);
-        
-        if (reservation && guestId) {
-          console.log('📢 Sending acceptance notification to guest:', guestId);
+        if (guestId) {
           pushUserNotification({
             userId: guestId,
             type: 'reservation_accepted',
@@ -172,18 +164,13 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               checkOutDate: reservation.check_out,
             }
           });
-        } else {
-          console.warn('⚠️ Could not send notification - missing reservation or guest ID');
         }
       } else {
         await api.delete(`/reservations/${reservationId}`);
         
         // Send notification to guest about rejection
         const guestId = reservation?.user_id || reservation?.user?.id;
-        console.log('🔔 Guest ID to notify (rejection):', guestId);
-        
-        if (reservation && guestId) {
-          console.log('📢 Sending rejection notification to guest:', guestId);
+        if (guestId) {
           pushUserNotification({
             userId: guestId,
             type: 'reservation_rejected',
@@ -194,8 +181,6 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
               propertyTitle: reservation.property?.title,
             }
           });
-        } else {
-          console.warn('⚠️ Could not send notification - missing reservation or guest ID');
         }
       }
 

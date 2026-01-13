@@ -10,6 +10,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
   const [alojamentos, setAlojamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [displayLimit, setDisplayLimit] = useState(15); // Show only 15 properties initially
+  const [activeCategory, setActiveCategory] = useState(null); // Track active category filter
   const { t } = useTranslation();
   const loaderRef = useRef(null); // Ref for infinite scroll trigger
 
@@ -36,8 +37,9 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
 }, []);
 
   // Memoized handler for "Ver Tudo" button
-  const handleVerTudo = useCallback((keyword) => {
-    setTermoPesquisa(keyword);
+  const handleVerTudo = useCallback((category) => {
+    setActiveCategory(category);
+    setTermoPesquisa(''); // Clear search term
     const section = document.getElementById('resultados-pesquisa');
     if (section) {
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -72,7 +74,16 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
 
   // Dynamic search logic for global listings - memoized
   const filtrados = useMemo(() => {
+    // If category is active, return the specific category
+    if (activeCategory === 'porto') return porto;
+    if (activeCategory === 'madrid') return madrid;
+    if (activeCategory === 'economicos') return economicos;
+    if (activeCategory === 'luxo') return luxo;
+    
+    // If no category and no search term, return all
     if (!termoPesquisa) return publicados;
+    
+    // Otherwise, use search term logic
     const q = String(termoPesquisa).trim().toLowerCase();
     const qNum = Number(q);
     const isNumber = !Number.isNaN(qNum);
@@ -87,7 +98,7 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
       const title = String(a.title ?? '').toLowerCase();
       return city.includes(q) || title.includes(q);
     });
-  }, [publicados, termoPesquisa]);
+  }, [publicados, termoPesquisa, activeCategory, porto, madrid, economicos, luxo]);
 
   // Paginated results for performance - only show limited properties
   const displayedProperties = useMemo(() => 
@@ -149,10 +160,10 @@ function Home({ user, setUser, termoPesquisa, setTermoPesquisa, onOpenSettings, 
       <Header user={user} setUser={setUser} termoPesquisa={termoPesquisa} setTermoPesquisa={setTermoPesquisa} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
 
       <main className="max-w-[1790px] mx-auto px-5 sm:px-10 py-6 text-left">
-        <PropertySlider user={user} title={t('home.featuredPorto')} subtitle={t('home.featuredPortoSubtitle')} properties={porto} onVerTudo={() => handleVerTudo('Porto')} />
-        <PropertySlider user={user} title={t('home.economicalStays')} subtitle={t('home.economicalStaysSubtitle')} properties={economicos} onVerTudo={() => handleVerTudo('60')} />
-        <PropertySlider user={user} title={t('home.featuredMadrid')} subtitle={t('home.featuredMadridSubtitle')} properties={madrid} onVerTudo={() => handleVerTudo('Madri')} />
-        <PropertySlider user={user} title={t('home.luxuryExperiences')} subtitle={t('home.luxuryExperiencesSubtitle')} properties={luxo} onVerTudo={() => handleVerTudo('150')} />
+        <PropertySlider user={user} title={t('home.featuredPorto')} subtitle={t('home.featuredPortoSubtitle')} properties={porto} onVerTudo={() => handleVerTudo('porto')} />
+        <PropertySlider user={user} title={t('home.economicalStays')} subtitle={t('home.economicalStaysSubtitle')} properties={economicos} onVerTudo={() => handleVerTudo('economicos')} />
+        <PropertySlider user={user} title={t('home.featuredMadrid')} subtitle={t('home.featuredMadridSubtitle')} properties={madrid} onVerTudo={() => handleVerTudo('madrid')} />
+        <PropertySlider user={user} title={t('home.luxuryExperiences')} subtitle={t('home.luxuryExperiencesSubtitle')} properties={luxo} onVerTudo={() => handleVerTudo('luxo')} />
 
         <hr className="my-16 border-gray-100" />
         
