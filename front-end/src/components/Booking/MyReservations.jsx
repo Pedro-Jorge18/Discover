@@ -186,6 +186,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
     return (
         <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans text-left">
             <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+            <title>Discover - As Minhas Viagens</title>
             
             <main className="grow max-w-[1200px] w-full mx-auto px-6 pt-32 pb-20">
                 <div className="mb-12">
