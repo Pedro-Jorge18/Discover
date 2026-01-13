@@ -7,7 +7,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 function Footer() {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
-  const startYear = 2024;
+  const startYear = 2025;
   const yearDisplay = currentYear > startYear ? `${startYear} - ${currentYear}` : startYear;
   
   // Array for footer links (Portuguese of Portugal)
