@@ -103,7 +103,7 @@ function UserNotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAd
             </div>
           </div>
           <button
-            onClick={() => navigate('/my-reservations')}
+            onClick={() => navigate('/minhas-reservas')}
             className="inline-flex items-center gap-2 px-4 py-3 rounded-full border border-gray-200 text-gray-800 font-semibold hover:bg-gray-50"
           >
             {t('userNotifications.viewReservations')}

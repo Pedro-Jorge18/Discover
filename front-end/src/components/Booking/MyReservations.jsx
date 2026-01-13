@@ -14,6 +14,32 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
         const [selected, setSelected] = useState(null);
         const [showCancelConfirm, setShowCancelConfirm] = useState(false);
         const [cancelTarget, setCancelTarget] = useState(null);
+        const [loadingDetails, setLoadingDetails] = useState(false);
+
+        const openDetails = async (reservation) => {
+            setSelected(reservation);
+            setShowDetails(true);
+            
+            // Buscar detalhes completos da propriedade
+            if (reservation.property_id) {
+                setLoadingDetails(true);
+                try {
+                    const response = await api.get(`/properties/${reservation.property_id}`);
+                    const fullProperty = response.data?.data || response.data;
+                    setSelected(prev => ({
+                        ...prev,
+                        property: {
+                            ...prev.property,
+                            ...fullProperty
+                        }
+                    }));
+                } catch (error) {
+                    console.error('Erro ao carregar detalhes da propriedade:', error);
+                } finally {
+                    setLoadingDetails(false);
+                }
+            }
+        };
 
         const openCancelConfirm = (reservation) => {
             setCancelTarget(reservation);
@@ -186,6 +212,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
     return (
         <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans text-left">
             <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
+            <title>Discover - As Minhas Viagens</title>
             
             <main className="grow max-w-[1200px] w-full mx-auto px-6 pt-32 pb-20">
                 <div className="mb-12">
@@ -223,7 +250,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                     <div className="flex items-center gap-1.5 mt-1">
                                         <MapPin size={12} className="text-blue-500" />
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                            {res.property?.city?.name || 'Localização'}
+                                            {res.property?.street || res.property?.city?.name || 'Localização'} | {res.property?.country || 'Portugal'}
                                         </span>
                                     </div>
                                     {res.cancellation_reason && (
@@ -266,7 +293,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                     </p>
                                     <div className="mt-4 flex gap-2">
                                         <button
-                                            onClick={() => { setSelected(res); setShowDetails(true); }}
+                                            onClick={() => openDetails(res)}
                                             className="px-4 py-2 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase"
                                         >
                                             Detalhes
@@ -307,9 +334,16 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                             </div>
                         </div>
 
-                        <div className="mt-6">
-                            <p className="text-sm font-bold">Hóspedes</p>
-                            <p className="text-gray-700">Adultos: {selected.guests?.adults ?? selected.adults} | Crianças: {selected.guests?.children ?? selected.children}</p>
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-sm font-bold">Localização</p>
+                                <p className="text-gray-700">{selected.property?.street || selected.property?.city?.name }</p>
+                                <p className="text-xs text-gray-400">{selected.property?.country || 'Portugal'}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold">Hóspedes</p>
+                                <p className="text-gray-700">Adultos: {selected.guests?.adults ?? selected.adults}</p>
+                            </div>
                         </div>
 
                         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
