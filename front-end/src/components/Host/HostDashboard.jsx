@@ -266,10 +266,34 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     
-    const requiredFields = ['title','price_per_night','neighborhood','postal_code','beds','city_name'];
-    const missing = requiredFields.find((field) => !formData[field]);
-    if (missing) {
-      notify(t('host.requiredFields'), 'error');
+    // Validar campos obrigatórios
+    if (!formData.title || formData.title.trim() === '') {
+      notify('O título da propriedade é obrigatório', 'error');
+      return;
+    }
+    
+    if (!formData.price_per_night || parseFloat(formData.price_per_night) <= 0) {
+      notify('O preço por noite deve ser maior que zero', 'error');
+      return;
+    }
+    
+    if (!formData.neighborhood || formData.neighborhood.trim() === '') {
+      notify('O bairro é obrigatório', 'error');
+      return;
+    }
+    
+    if (!formData.postal_code || formData.postal_code.trim() === '') {
+      notify('O código postal é obrigatório', 'error');
+      return;
+    }
+    
+    if (!formData.beds || parseInt(formData.beds) <= 0) {
+      notify('O número de camas deve ser maior que zero', 'error');
+      return;
+    }
+    
+    if (!formData.city_name || formData.city_name.trim() === '') {
+      notify('A cidade é obrigatória', 'error');
       return;
     }
 

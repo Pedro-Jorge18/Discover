@@ -323,6 +323,7 @@ export default {
     samePassword: 'You are changing the password to the same one.',
     oldPasswordIncorrect: 'Current password is incorrect',
     passwordRequired: 'Please enter your password.',
+    incorrectPassword: 'Incorrect password',
     passwordChanged: 'Password changed successfully!',
     show: 'Show',
     hide: 'Hide',
@@ -626,7 +627,7 @@ export default {
   companyInfo: {
     title: 'Company Information',
     about: 'About Us',
-    description: 'Discover is an innovative platform dedicated to connecting people with unique accommodation experiences. Since 2024, we have been working to offer our customers the best accommodation options in Portugal and beyond.',
+    description: 'Discover is an innovative platform dedicated to connecting people with unique accommodation experiences. Since 2025, we have been working to offer our customers the best accommodation options in Portugal and beyond.',
     mission: 'Our mission is to transform the way people find and book accommodation, providing a simple, secure, and transparent experience for both guests and hosts.',
     contactTitle: 'Contact',
     email: 'Email',
