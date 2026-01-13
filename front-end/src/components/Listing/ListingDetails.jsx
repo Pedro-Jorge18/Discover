@@ -344,7 +344,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
           <div>
             <h1 className="text-4xl font-black tracking-tighter uppercase italic">{alojamento.title}</h1>
             <p className="text-gray-400 font-bold mt-2 italic underline decoration-blue-400 decoration-2 underline-offset-4">
-              📍 {alojamento.city?.name || t('property.locationNotDefined')}
+              📍 {alojamento.city?.name ? `${alojamento.city.name}, ${alojamento.city.state?.country?.name || ''}` : t('property.locationNotDefined')}
             </p>
           </div>
           <div className="flex gap-3">
@@ -415,12 +415,13 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
             </div>
 
             <ListingInfo
-              city={alojamento.location?.city?.name}
+              city={alojamento.city?.name}
+              country={alojamento.city?.state?.country?.name}
               description={alojamento.description || 'Sem descrição disponível.'}
               guests={alojamento.max_guests}
               bedrooms={alojamento.bedrooms}
               bathrooms={alojamento.bathrooms || 1}
-              address={alojamento.location?.address || alojamento.address}
+              address={alojamento.address}
             />
 
             {/* Reviews Section */}

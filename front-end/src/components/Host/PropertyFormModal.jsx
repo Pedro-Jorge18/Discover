@@ -342,10 +342,21 @@ import { useTranslation } from '../../contexts/TranslationContext';
                   <p className="mb-2 text-sm text-gray-500">
                     <span className="font-semibold">{t('host.clickToUpload')}</span> {t('host.orDragImages')}
                   </p>
-                  <p className="text-xs text-gray-500">{t('host.uploadFormats')}</p>
-                  {selectedImages.length > 0 && (
-                    <p className="mt-2 text-xs text-blue-600 font-semibold">
-                      {t('host.imagesSelected', { count: selectedImages.length })}
+                  <p className="text-xs text-gray-500">PNG, JPG, WebP (exatamente 4 imagens, 2MB cada)</p>
+                  {selectedImages.length > 0 ? (
+                    <p className={`mt-2 text-xs font-semibold ${
+                      !isEditing && selectedImages.length === 4 
+                        ? 'text-green-600' 
+                        : !isEditing && selectedImages.length !== 4
+                        ? 'text-red-600'
+                        : 'text-blue-600'
+                    }`}>
+                      {selectedImages.length} imagem(ns) selecionada(s)
+                      {!isEditing && selectedImages.length !== 4 && ' - Necessário: 4 imagens'}
+                    </p>
+                  ) : !isEditing && (
+                    <p className="mt-2 text-xs text-red-600 font-semibold">
+                      * Obrigatório: 4 imagens
                     </p>
                   )}
                 </div>
@@ -360,8 +371,8 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
             <p className="text-xs text-gray-500 mt-2">
               {isEditing 
-                ? t('host.imagesNoteEdit')
-                : t('host.imagesNoteCreate')
+                ? 'Adicione novas imagens (as existentes serão mantidas)'
+                : 'É obrigatório adicionar exatamente 4 imagens para criar a propriedade.'
               }
             </p>
           </div>

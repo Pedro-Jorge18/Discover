@@ -212,8 +212,16 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 5) {
-      notify(t('host.maxImages'), 'warning');
+    
+    // Se não está editando, exigir exatamente 4 imagens
+    if (!editingProperty && files.length !== 4) {
+      notify('Selecione exatamente 4 imagens para criar a propriedade', 'error');
+      return;
+    }
+    
+    // Se está editando, permitir até 4 imagens adicionais
+    if (editingProperty && files.length > 4) {
+      notify('Máximo de 4 imagens por vez', 'warning');
       return;
     }
     
@@ -262,6 +270,12 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     const missing = requiredFields.find((field) => !formData[field]);
     if (missing) {
       notify(t('host.requiredFields'), 'error');
+      return;
+    }
+
+    // Validar que tenha exatamente 4 imagens ao criar propriedade
+    if (!editingProperty && selectedImages.length !== 4) {
+      notify('É obrigatório adicionar exatamente 4 imagens para criar a propriedade', 'error');
       return;
     }
 
@@ -462,7 +476,10 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       await fetchPendingReservations(); // Atualizar imediatamente
     } catch (error) {
       console.error('Error deleting property:', error);
-      notify(t('host.deleteError'), 'error');
+      // Only show error if it's a real server error (400+)
+      if (error.response && error.response.status >= 400) {
+        notify(error.response?.data?.message || t('host.deleteError'), 'error');
+      }
     }
   };
 

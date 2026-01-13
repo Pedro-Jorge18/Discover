@@ -35,7 +35,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
       }
     } catch (err) {
       console.error('Error fetching reviews:', err);
-      notify(t('review.errorLoadingReviews'), 'error');
+      // Don't show error notification for temporary network delays
       setReviews([]);
     } finally {
       setLoading(false);
