@@ -423,7 +423,6 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                     onSuccess={() => {
                       setShowReviewForm(false);
                       setCanReview(false);
-                      notify(t('review.reviewSubmittedSuccessfully'), 'success');
                       // Trigger ReviewsList to refresh
                       setReviewRefreshTrigger(prev => prev + 1);
                     }}
@@ -438,6 +437,10 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
                 onStatsUpdate={handleStatsUpdate}
                 user={user}
                 propertyHostId={alojamento?.host?.id}
+                onReviewDeleted={() => {
+                  // Check if user can review again after deletion
+                  checkReviewEligibility();
+                }}
               />
             </div>
           </div>
