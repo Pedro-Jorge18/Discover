@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, CreditCard, Lock, Loader2, User, Mail, Phone, Calendar } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
+import notify from '../../utils/notify';
 
 const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
     const { t } = useTranslation();
@@ -44,6 +45,32 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Validação: 16 dígitos do cartão
+        const cardDigits = formData.cardNumber.replace(/\s/g, '');
+        if (cardDigits.length !== 16) {
+            notify('O número do cartão deve ter 16 dígitos', 'error');
+            return;
+        }
+        
+        // Validação: 3 dígitos do CVC
+        if (formData.cvc.length !== 3) {
+            notify('O CVC deve ter 3 dígitos', 'error');
+            return;
+        }
+        
+        // Validação: Validade no formato MM/YY
+        if (formData.expiry.length !== 5 || !formData.expiry.includes('/')) {
+            notify('A validade deve estar no formato MM/AA', 'error');
+            return;
+        }
+        
+        // Validação: 9 dígitos do contacto
+        if (formData.phone.length !== 9) {
+            notify('O contacto deve ter 9 dígitos', 'error');
+            return;
+        }
+        
         // Send the clean data to the parent
         onConfirm(formData);
     };

@@ -171,6 +171,10 @@ export default {
     cvcPlaceholder: '123',
     totalToPay: 'Total to pay',
     confirmPayment: 'Confirm Payment',
+    cardNumberMustBe16Digits: 'Card number must have 16 digits',
+    cvcMustBe3Digits: 'CVC must have 3 digits',
+    expiryMustBeValid: 'Expiry must be in MM/YY format',
+    phoneMustBe9Digits: 'Phone must have 9 digits',
   },
   reservation: {
     title: 'Reservations',
