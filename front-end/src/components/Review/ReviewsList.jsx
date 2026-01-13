@@ -4,7 +4,7 @@ import api from '../../api/axios';
 import notify from '../../utils/notify';
 import { useTranslation } from '../../contexts/TranslationContext';
 
-function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
+function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReviewDeleted }) {
   const { t } = useTranslation();
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState(null);
@@ -61,7 +61,11 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
       await api.delete(`/reviews/${reviewId}`);
       notify(t('review.deleted'), 'success');
       // Refresh reviews list without reloading the page
-      fetchReviews();
+      await fetchReviews();
+      // Notify parent that review was deleted (so user can review again)
+      if (onReviewDeleted) {
+        onReviewDeleted();
+      }
     } catch (err) {
       console.error('Error deleting review:', err);
       notify(err.response?.data?.message || t('review.deleteError'), 'error');
@@ -230,14 +234,54 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
                 </button>
               )}
               {canDeleteReview(review) && (
-                <button
-                  onClick={() => handleDeleteReview(review.id)}
-                  disabled={deleting === review.id}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
-                  title="Apagar avaliação"
-                >
-                  <Trash2 size={18} />
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => handleDeleteReview(review.id)}
+                    disabled={deleting === review.id}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                    title="Apagar avaliação"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                  
+                  {/* Delete Confirmation Dropdown */}
+                  {confirmDelete === review.id && (
+                    <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 z-50">
+                      <div className="flex items-start gap-3 mb-4">
+                        <div className="flex-shrink-0 p-2 bg-red-100 rounded-lg">
+                          <AlertCircle size={20} className="text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-base font-bold text-gray-900 mb-1">Apagar Avaliação</h3>
+                          <p className="text-xs text-gray-600">Esta ação não pode ser desfeita.</p>
+                        </div>
+                        <button
+                          onClick={() => setConfirmDelete(null)}
+                          className="flex-shrink-0 p-1 hover:bg-gray-100 rounded-lg transition"
+                          aria-label="Fechar"
+                        >
+                          <X size={16} className="text-gray-500" />
+                        </button>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setConfirmDelete(null)}
+                          className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={confirmDeleteReview}
+                          disabled={deleting === confirmDelete}
+                          className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deleting === confirmDelete ? 'A apagar...' : 'Apagar'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -334,45 +378,6 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId }) {
           </div>
         ))}
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <AlertCircle size={24} className="text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-black text-gray-900">Apagar Avaliação</h3>
-                <p className="text-sm text-gray-600 mt-1">Esta ação não pode ser desfeita.</p>
-              </div>
-              <button
-                onClick={() => setConfirmDelete(null)}
-                className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex gap-3 pt-4 border-t border-gray-200">
-              <button
-                onClick={() => setConfirmDelete(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDeleteReview}
-                disabled={deleting === confirmDelete}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {deleting === confirmDelete ? 'A apagar...' : 'Apagar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

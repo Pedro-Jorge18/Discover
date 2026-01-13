@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Bell, CheckCircle, CheckCheck, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../contexts/TranslationContext';
-import api from '../../api/axios';
+import {
+  getUserNotifications,
+  markUserNotificationsRead,
+  markSingleUserNotificationRead,
+  userNotificationEventName,
+} from '../../utils/userNotifications';
 
 const formatTimeAgo = (isoDate, language) => {
   if (!isoDate) return '';
@@ -32,14 +37,9 @@ function UserNotifications({ user }) {
 
   const unreadCount = notifications.filter((item) => !item.read).length;
 
-  const fetchNotifications = async () => {
+  const refresh = () => {
     if (!user?.id) return;
-    try {
-      const response = await api.get('/notifications');
-      setNotifications(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    }
+    setNotifications(getUserNotifications(user.id));
   };
 
   useEffect(() => {
@@ -48,15 +48,17 @@ function UserNotifications({ user }) {
       setIsOpen(false);
       return;
     }
-    fetchNotifications();
-    
-    // Poll a cada 30 segundos para novas notificações
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+    refresh();
   }, [user]);
 
   useEffect(() => {
     if (!user?.id) return undefined;
+
+    const handleUpdate = (event) => {
+      const targetId = event?.detail?.userId;
+      if (targetId && targetId !== user.id) return;
+      refresh();
+    };
 
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -64,8 +66,15 @@ function UserNotifications({ user }) {
       }
     };
 
+    window.addEventListener(userNotificationEventName, handleUpdate);
+    window.addEventListener('storage', handleUpdate);
     window.addEventListener('click', handleClickOutside);
-    return () => window.removeEventListener('click', handleClickOutside);
+
+    return () => {
+      window.removeEventListener(userNotificationEventName, handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('click', handleClickOutside);
+    };
   }, [user]);
 
   if (!user) return null;
@@ -74,27 +83,19 @@ function UserNotifications({ user }) {
     const nextState = !isOpen;
     setIsOpen(nextState);
     if (nextState) {
-      fetchNotifications();
+      refresh();
     }
   };
 
-  const handleMarkAllRead = async () => {
-    try {
-      await api.post('/notifications/read-all');
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error marking all as read:', error);
-    }
+  const handleMarkAllRead = () => {
+    markUserNotificationsRead(user.id);
+    refresh();
   };
 
-  const handleMarkSingleRead = async (notificationId, e) => {
+  const handleMarkSingleRead = (notificationId, e) => {
     e.stopPropagation();
-    try {
-      await api.post(`/notifications/${notificationId}/read`);
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error marking as read:', error);
-    }
+    markSingleUserNotificationRead(user.id, notificationId);
+    refresh();
   };
 
   return (

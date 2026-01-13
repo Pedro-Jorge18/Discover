@@ -22,7 +22,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-2xl font-black text-gray-900 uppercase">
             {isEditing ? t('host.editProperty') : t('host.publishNewProperty')}
           </h2>
