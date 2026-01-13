@@ -20,8 +20,8 @@ export const TranslationProvider = ({ children }) => {
     localStorage.setItem('language', language);
   }, [language]);
 
-  // Translation function
-  const t = (key) => {
+  // Translation function with interpolation support
+  const t = (key, variables = {}) => {
     const keys = key.split('.');
     let value = translations[language];
     
@@ -30,7 +30,15 @@ export const TranslationProvider = ({ children }) => {
       if (value === undefined) break;
     }
     
-    return value || key;
+    if (!value) return key;
+    
+    // Support for {{variable}} interpolation
+    let result = value;
+    Object.entries(variables).forEach(([varName, varValue]) => {
+      result = result.replace(new RegExp(`{{\\s*${varName}\\s*}}`, 'g'), varValue);
+    });
+    
+    return result;
   };
 
   const switchLanguage = (lang) => {

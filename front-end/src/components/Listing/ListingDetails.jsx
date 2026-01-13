@@ -211,7 +211,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
     // Verificar se as datas foram selecionadas
     if (!startDate || !endDate) {
-      notify('Por favor, selecione as datas de check-in e check-out', 'error');
+      notify(t('errors.selectDates'), 'error');
       return;
     }
 
@@ -229,7 +229,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       });
 
       if (!response.data.available) {
-        notify('Datas indisponíveis', 'error');
+        notify(t('errors.dateUnavailable'), 'error');
         return;
       }
 

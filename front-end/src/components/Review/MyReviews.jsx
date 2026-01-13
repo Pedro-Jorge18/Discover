@@ -210,14 +210,14 @@ export default function MyReviews({ user, setUser, onOpenSettings, onOpenSetting
 
                   {review.recommend && (
                     <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold mb-3">
-                      ✓ Recomenda esta propriedade
+                      {t('review.recommendsProperty')}
                     </div>
                   )}
 
                   {/* Host Reply */}
                   {review.host_reply && (
                     <div className="mt-4 pl-4 border-l-2 border-gray-200">
-                      <p className="text-sm font-semibold text-gray-900 mb-1">Resposta do anfitrião:</p>
+                      <p className="text-sm font-semibold text-gray-900 mb-1">{t('review.hostReply')}</p>
                       <p className="text-sm text-gray-700">{review.host_reply}</p>
                     </div>
                   )}

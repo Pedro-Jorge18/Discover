@@ -54,7 +54,7 @@ const PropertySlider = memo(function PropertySlider({ title, subtitle, propertie
         <button
           onClick={() => scroll('left')}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:scale-110"
-          aria-label="Scroll left"
+          aria-label={t('common.scrollLeft')}
         >
           <ChevronLeft size={20} className="text-gray-900" />
         </button>
@@ -63,7 +63,7 @@ const PropertySlider = memo(function PropertySlider({ title, subtitle, propertie
         <button
           onClick={() => scroll('right')}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:scale-110"
-          aria-label="Scroll right"
+          aria-label={t('common.scrollRight')}
         >
           <ChevronRight size={20} className="text-gray-900" />
         </button>

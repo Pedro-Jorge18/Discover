@@ -215,13 +215,13 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     
     // Se não está editando, exigir exatamente 4 imagens
     if (!editingProperty && files.length !== 4) {
-      notify('Selecione exatamente 4 imagens para criar a propriedade', 'error');
+      notify(t('errors.selectExactlyFourImages'), 'error');
       return;
     }
     
     // Se está editando, permitir até 4 imagens adicionais
     if (editingProperty && files.length > 4) {
-      notify('Máximo de 4 imagens por vez', 'warning');
+      notify(t('errors.maxFourImagesPerTime'), 'warning');
       return;
     }
     
@@ -268,38 +268,38 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     
     // Validar campos obrigatórios
     if (!formData.title || formData.title.trim() === '') {
-      notify('O título da propriedade é obrigatório', 'error');
+      notify(t('errors.propertyTitleRequired'), 'error');
       return;
     }
     
     if (!formData.price_per_night || parseFloat(formData.price_per_night) <= 0) {
-      notify('O preço por noite deve ser maior que zero', 'error');
+      notify(t('errors.priceGreaterThanZero'), 'error');
       return;
     }
     
     if (!formData.neighborhood || formData.neighborhood.trim() === '') {
-      notify('O bairro é obrigatório', 'error');
+      notify(t('errors.neighborhoodRequired'), 'error');
       return;
     }
     
     if (!formData.postal_code || formData.postal_code.trim() === '') {
-      notify('O código postal é obrigatório', 'error');
+      notify(t('errors.postalCodeRequired'), 'error');
       return;
     }
     
     if (!formData.beds || parseInt(formData.beds) <= 0) {
-      notify('O número de camas deve ser maior que zero', 'error');
+      notify(t('errors.bedsGreaterThanZero'), 'error');
       return;
     }
     
     if (!formData.city_name || formData.city_name.trim() === '') {
-      notify('A cidade é obrigatória', 'error');
+      notify(t('errors.cityRequired'), 'error');
       return;
     }
 
     // Validar que tenha exatamente 4 imagens ao criar propriedade
     if (!editingProperty && selectedImages.length !== 4) {
-      notify('É obrigatório adicionar exatamente 4 imagens para criar a propriedade', 'error');
+      notify(t('errors.selectExactlyFourImages'), 'error');
       return;
     }
 

@@ -71,10 +71,10 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                     detail: { reservationId: cancelTarget.id, action: 'cancel' } 
                 }));
                 
-                notify('Reserva cancelada com sucesso', 'success');
+                notify(t('errors.reservationCancelledSuccess'), 'success');
             } catch (err) {
                 console.error('Erro a cancelar:', err);
-                notify('Erro ao cancelar reserva', 'error');
+                notify(t('errors.reservationCancelError'), 'error');
             }
         };
 
@@ -225,7 +225,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                 {(!reservas || reservas.length === 0) ? (
                     <div className="py-20 bg-white rounded-[3rem] shadow-sm border border-gray-100 text-center">
                         <Briefcase className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Sem reservas encontradas</p>
+                        <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">{t('reservation.noReservationsFound')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6">
@@ -296,7 +296,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                                             onClick={() => openDetails(res)}
                                             className="px-4 py-2 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase"
                                         >
-                                            Detalhes
+                                            {t('reservation.details')}
                                         </button>
                                         {(res.status === 'Pendente' || res.status === 'Pending' || (res.status_name && (res.status_name === 'Pendente' || res.status_name === 'Pending'))) && (
                                             <button
@@ -319,8 +319,8 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/50" onClick={() => setShowDetails(false)}></div>
                     <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 shadow-2xl z-60">
-                        <button onClick={() => setShowDetails(false)} className="absolute top-6 right-6 text-gray-400 hover:text-black">Fechar</button>
-                        <h3 className="text-2xl font-black mb-4">Detalhes da Reserva</h3>
+                        <button onClick={() => setShowDetails(false)} className="absolute top-6 right-6 text-gray-400 hover:text-black">{t('common.close')}</button>
+                        <h3 className="text-2xl font-black mb-4">{t('reservation.reservationDetails')}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <p className="text-sm font-bold">Alojamento</p>
@@ -377,11 +377,11 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/50" onClick={() => setShowCancelConfirm(false)}></div>
                     <div className="relative bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl z-60">
-                        <h3 className="text-xl font-black text-gray-900 text-center mb-2">Confirmar cancelamento</h3>
-                        <p className="text-gray-600 text-center mb-6">Tem a certeza que pretende cancelar a reserva <span className="font-bold">{cancelTarget.reservation_code}</span>?</p>
+                        <h3 className="text-xl font-black text-gray-900 text-center mb-2">{t('reservation.confirmCancellation')}</h3>
+                        <p className="text-gray-600 text-center mb-6">{t('reservation.sureCancelReservation')} <span className="font-bold">{cancelTarget.reservation_code}</span>?</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setShowCancelConfirm(false)} className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition">Cancelar</button>
-                            <button onClick={handleConfirmCancel} className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition">Confirmar cancelamento</button>
+                            <button onClick={() => setShowCancelConfirm(false)} className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition">{t('common.cancel')}</button>
+                            <button onClick={handleConfirmCancel} className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition">{t('reservation.confirmCancellationBtn')}</button>
                         </div>
                     </div>
                 </div>

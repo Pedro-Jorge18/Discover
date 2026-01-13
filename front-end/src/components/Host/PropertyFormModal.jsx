@@ -344,7 +344,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
                   </p>
                   <p className="text-xs text-gray-500">PNG, JPG, WebP (exatamente 4 imagens, 2MB cada)</p>
                   {selectedImages.length > 0 ? (
-                    <p className={`mt-2 text-xs font-semibold ${
+                    <div className={`mt-2 text-xs font-semibold ${
                       !isEditing && selectedImages.length === 4 
                         ? 'text-green-600' 
                         : !isEditing && selectedImages.length !== 4
@@ -352,11 +352,15 @@ import { useTranslation } from '../../contexts/TranslationContext';
                         : 'text-blue-600'
                     }`}>
                       {selectedImages.length} imagem(ns) selecionada(s)
-                      {!isEditing && selectedImages.length !== 4 && ' - Necessário: 4 imagens'}
-                    </p>
+                      {selectedImages.length !== 4 && (
+                        <p className="mt-2 text-xs text-red-600 font-semibold">
+                          {selectedImages.length !== 4 ? t('host.exactlyFourImages') : t('host.requiredFourImages')}
+                        </p>
+                      )}
+                    </div>
                   ) : !isEditing && (
                     <p className="mt-2 text-xs text-red-600 font-semibold">
-                      * Obrigatório: 4 imagens
+                      {t('host.requiredFourImages')}
                     </p>
                   )}
                 </div>
@@ -371,8 +375,8 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
             <p className="text-xs text-gray-500 mt-2">
               {isEditing 
-                ? 'Adicione novas imagens (as existentes serão mantidas)'
-                : 'É obrigatório adicionar exatamente 4 imagens para criar a propriedade.'
+                ? t('host.addNewImagesEdit')
+                : t('host.fourImagesRequired')
               }
             </p>
           </div>

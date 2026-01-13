@@ -228,7 +228,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
                   onClick={() => handleEditReview(review)}
                   disabled={editingId === review.id || saving === review.id}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition disabled:opacity-50"
-                  title="Editar comentário"
+                  title={t('common.editTooltip')}
                 >
                   <Edit2 size={18} />
                 </button>
@@ -239,7 +239,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
                     onClick={() => handleDeleteReview(review.id)}
                     disabled={deleting === review.id}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
-                    title="Apagar avaliação"
+                    title={t('common.deleteTooltip')}
                   >
                     <Trash2 size={18} />
                   </button>
@@ -252,13 +252,13 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
                           <AlertCircle size={20} className="text-red-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-base font-bold text-gray-900 mb-1">Apagar Avaliação</h3>
-                          <p className="text-xs text-gray-600">Esta ação não pode ser desfeita.</p>
+                          <h3 className="text-base font-bold text-gray-900 mb-1">{t('review.deleteReview')}</h3>
+                          <p className="text-xs text-gray-600">{t('review.deleteReviewConfirm')}</p>
                         </div>
                         <button
                           onClick={() => setConfirmDelete(null)}
                           className="flex-shrink-0 p-1 hover:bg-gray-100 rounded-lg transition"
-                          aria-label="Fechar"
+                          aria-label={t('common.close')}
                         >
                           <X size={16} className="text-gray-500" />
                         </button>
@@ -269,14 +269,14 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
                           onClick={() => setConfirmDelete(null)}
                           className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition"
                         >
-                          Cancelar
+                          {t('common.cancel')}
                         </button>
                         <button
                           onClick={confirmDeleteReview}
                           disabled={deleting === confirmDelete}
                           className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {deleting === confirmDelete ? 'A apagar...' : 'Apagar'}
+                          {deleting === confirmDelete ? t('review.deleting') : t('common.delete')}
                         </button>
                       </div>
                     </div>
@@ -332,7 +332,7 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
                     className="w-4 h-4 rounded cursor-pointer"
                   />
                   <label htmlFor={`recommend-${editingId}`} className="text-sm font-semibold text-green-700 cursor-pointer">
-                    ✓ Recomendo esta propriedade
+                    {t('review.recommendEdit')}
                   </label>
                 </div>
 
@@ -342,13 +342,13 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
                     disabled={saving === editingId}
                     className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
                   >
-                    {saving === editingId ? 'A guardar...' : 'Guardar'}
+                    {saving === editingId ? t('review.saving') : t('common.save')}
                   </button>
                   <button
                     onClick={handleCancelEdit}
                     className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition"
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
@@ -359,14 +359,14 @@ function ReviewsList({ propertyId, onStatsUpdate, user, propertyHostId, onReview
             {/* Recommend Badge */}
             {review.recommend && (
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold mb-3">
-                ✓ Recomenda esta propriedade
+                {t('review.recommendsProperty')}
               </div>
             )}
 
             {/* Host Reply */}
             {review.host_reply && (
               <div className="mt-4 pl-4 border-l-2 border-gray-200">
-                <p className="text-sm font-semibold text-gray-900 mb-1">Resposta do anfitrião:</p>
+                <p className="text-sm font-semibold text-gray-900 mb-1">{t('reservation.hostReply')}</p>
                 <p className="text-sm text-gray-700">{review.host_reply}</p>
                 {review.host_replied_at && (
                   <p className="text-xs text-gray-500 mt-1">
