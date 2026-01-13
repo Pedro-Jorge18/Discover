@@ -123,6 +123,7 @@ export default {
     securityDeposit: 'Security deposit',
     checkIn: 'Check-in',
     checkOut: 'Check-out',
+    type: 'Type',
     choose: 'Choose',
     reserve: 'Reserve',
     reserveNow: 'Reserve now',

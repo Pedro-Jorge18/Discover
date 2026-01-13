@@ -123,6 +123,7 @@ export default {
     securityDeposit: 'Depósito de segurança',
     checkIn: 'Check-in',
     checkOut: 'Check-out',
+    type: 'Tipo',
     choose: 'Escolher',
     reserve: 'Reservar',
     reserveNow: 'Reservar agora',
