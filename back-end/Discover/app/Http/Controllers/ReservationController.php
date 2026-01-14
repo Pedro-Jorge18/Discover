@@ -237,6 +237,15 @@ class ReservationController extends Controller
                 $request->infants
             );
 
+            // Se não está disponível, retornar erro 422 com a mensagem
+            if (!$result['available']) {
+                return response()->json([
+                    'success' => false,
+                    'available' => false,
+                    'message' => $result['message'] ?? 'Datas indisponíveis'
+                ], 422);
+            }
+
             return response()->json([
                 'success' => true,
                 'available' => $result['available'],
