@@ -89,31 +89,31 @@ export default function GoogleCallback({ setUser }) {
 
       {/* Modal container */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-gray-800 p-6 rounded-xl text-center shadow-lg">
-          {error && <div className="text-red-400 mb-4">{error}</div>}
+        <div className="w-full max-w-md bg-white p-6 rounded-xl text-center shadow-lg">
+          {error && <div className="text-red-600 mb-4">{error}</div>}
 
           {tempToken ? (
             <div>
               <div className="flex items-center justify-center mb-4">
                 <div className="text-left">
-                  <p className="text-gray-200 font-semibold">{t('auth.welcomeUser', { name: userInfo?.name || '' }).replace('  ', ' ').trim()}</p>
-                  <p className="text-gray-400 text-sm">{t('auth.chooseAccountType')}</p>
+                  <p className="text-gray-900 font-semibold">{t('auth.welcomeUser', { name: userInfo?.name || '' }).replace('  ', ' ').trim()}</p>
+                  <p className="text-gray-600 text-sm">{t('auth.chooseAccountType')}</p>
                 </div>
               </div>
 
               <div className="flex gap-3 justify-center mb-4">
-                <button onClick={() => setAccountType('guest')} className={`px-4 py-2 rounded ${accountType==='guest' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>{t('auth.client')}</button>
-                <button onClick={() => setAccountType('host')} className={`px-4 py-2 rounded ${accountType==='host' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'}`}>{t('auth.host')}</button>
+                <button onClick={() => setAccountType('guest')} className={`px-4 py-2 rounded ${accountType==='guest' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900'}`}>{t('auth.client')}</button>
+                <button onClick={() => setAccountType('host')} className={`px-4 py-2 rounded ${accountType==='host' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900'}`}>{t('auth.host')}</button>
               </div>
 
               <div className="flex gap-3 justify-center">
-                <button onClick={completeSignup} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white">{t('common.next')}</button>
-                <button onClick={() => { navigate('/'); }} className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200">{t('common.cancel')}</button>
+                <button onClick={completeSignup} className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white">{t('common.next')}</button>
+                <button onClick={() => { navigate('/'); }} className="rounded-lg bg-gray-200 px-6 py-2 text-sm font-semibold text-gray-900">{t('common.cancel')}</button>
               </div>
             </div>
           ) : (
             <div>
-              <p className="text-gray-200">{t('auth.googleAuthIncomplete')}</p>
+              <p className="text-gray-900">{t('auth.googleAuthIncomplete')}</p>
             </div>
           )}
         </div>
@@ -122,22 +122,22 @@ export default function GoogleCallback({ setUser }) {
       {/* Set password modal shown after signup via Google */}
       {showSetPassword && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-gray-800 p-6 rounded-xl text-center shadow-lg">
-            <h3 className="text-lg font-semibold text-white mb-3">{t('auth.setPasswordTitle')}</h3>
-            <p className="text-gray-400 text-sm mb-4">{t('auth.setPasswordDescription')}</p>
+          <div className="w-full max-w-md bg-white p-6 rounded-xl text-center shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('auth.setPasswordTitle')}</h3>
+            <p className="text-gray-600 text-sm mb-4">{t('auth.setPasswordDescription')}</p>
 
-            {passwordError && <div className="text-red-400 mb-3">{passwordError}</div>}
+            {passwordError && <div className="text-red-600 mb-3">{passwordError}</div>}
 
             <div className="relative mb-3">
-              <input type={showPassword ? 'text' : 'password'} placeholder={t('auth.newPasswordPlaceholder')} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400" />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400">
+              <input type={showPassword ? 'text' : 'password'} placeholder={t('auth.newPasswordPlaceholder')} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-500">
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
 
             <div className="relative mb-4">
-              <input type={showPasswordConfirm ? 'text' : 'password'} placeholder={t('auth.confirmPasswordPlaceholder')} value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-gray-100 placeholder-gray-400" />
-              <button type="button" onClick={() => setShowPasswordConfirm(!showPasswordConfirm)} className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400">
+              <input type={showPasswordConfirm ? 'text' : 'password'} placeholder={t('auth.confirmPasswordPlaceholder')} value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400" />
+              <button type="button" onClick={() => setShowPasswordConfirm(!showPasswordConfirm)} className="absolute inset-y-0 end-0 flex items-center px-3 text-gray-500">
                 {showPasswordConfirm ? '🙈' : '👁️'}
               </button>
             </div>
@@ -156,7 +156,7 @@ export default function GoogleCallback({ setUser }) {
                 } catch (err) {
                   setPasswordError(err?.response?.data?.message || t('auth.googleSetPasswordError'));
                 }
-              }} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white">{t('auth.setPassword')}</button>
+              }} className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white">{t('auth.setPassword')}</button>
 
             </div>
           </div>
