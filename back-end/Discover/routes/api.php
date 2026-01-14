@@ -1,6 +1,5 @@
 <?php
 
-<<<<<<< HEAD
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\ReservationController;
@@ -133,11 +132,3 @@ Route::prefix('auth/google')->middleware('throttle:60,1')->group(function () {
     Route::get('/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
     Route::post('/complete-signup', [GoogleAuthController::class, 'completeGoogleSignup']);
 });
-=======
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
->>>>>>> d9f48908a5dc12b5997c564275660a9fd0e337c1
