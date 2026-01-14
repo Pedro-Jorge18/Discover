@@ -236,7 +236,9 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       setShowModal(true);
     } catch (error) {
       console.error('Erro ao verificar disponibilidade:', error);
-      notify('Datas indisponíveis', 'error');
+      // Usar a mensagem de erro personalizada do backend, se disponível
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Datas indisponíveis';
+      notify(errorMessage, 'error');
     } finally {
       setBookingLoading(false);
     }
@@ -552,6 +554,10 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
               <button onClick={handleOpenModal} className="w-full bg-blue-600 text-white font-black py-5 rounded-[1.8rem] uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
                 {t('property.reserveNow')}
               </button>
+
+              <p className="text-center text-xs text-gray-400 mt-3 font-semibold italic">
+                Máximo 30 noites
+              </p>
 
               <div className="mt-8 space-y-4 text-sm font-bold text-gray-500">
                 <div className="flex justify-between items-center italic">

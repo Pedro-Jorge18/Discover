@@ -49,8 +49,9 @@ class CheckAvailabilityAction
         }
 
         // 4. CHECK FOR CONFLICTS
-        if ($this->hasDateConflicts($propertyId, $checkIn, $checkOut)) {
-            return $this->error('Selected dates are not available');
+        $conflictInfo = $this->hasDateConflicts($propertyId, $checkIn, $checkOut);
+        if ($conflictInfo !== false) {
+            return $this->error($conflictInfo);
         }
 
         // 5. SUCCESS - CAN RESERVE
@@ -79,7 +80,7 @@ class CheckAvailabilityAction
         }
 
         if ($property->max_nights && $nights > $property->max_nights) {
-            return "Maximum stay is {$property->max_nights} nights";
+            return "Datas com mais de {$property->max_nights} noites não são permitidas!";
         }
 
         return null;
@@ -100,7 +101,7 @@ class CheckAvailabilityAction
         return null;
     }
 
-    private function hasDateConflicts(int $propertyId, Carbon $checkIn, Carbon $checkOut): bool
+    private function hasDateConflicts(int $propertyId, Carbon $checkIn, Carbon $checkOut)
     {
         // Format dates consistently for database comparison
         $checkInDate = $checkIn->format('Y-m-d');
@@ -141,7 +142,16 @@ class CheckAvailabilityAction
             ])
         ]);
         
-        return $conflicts->count() > 0;
+        if ($conflicts->count() > 0) {
+            // Formatar mensagem com datas específicas do conflito
+            $firstConflict = $conflicts->first();
+            $conflictCheckIn = Carbon::parse($firstConflict->check_in)->format('d/m/Y');
+            $conflictCheckOut = Carbon::parse($firstConflict->check_out)->format('d/m/Y');
+            
+            return "As datas selecionadas conflituam com uma reserva existente ({$conflictCheckIn} - {$conflictCheckOut})";
+        }
+        
+        return false;
     }
 
     private function error(string $message): array
