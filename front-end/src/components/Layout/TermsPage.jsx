@@ -1,16 +1,88 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../Nav/Header.jsx';
 import Footer from './Footer.jsx';
-import { Scale, FileText, Info } from 'lucide-react';
+import { Scale, FileText, Info, ArrowUp, List } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
+import { Link } from 'react-router-dom';
 
 function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const { t } = useTranslation();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showToc, setShowToc] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const sections = [
+    { id: 'acceptance', title: t('terms.section1.title') },
+    { id: 'services', title: t('terms.section2.title') },
+    { id: 'accounts', title: t('terms.section3.title') },
+    { id: 'payments', title: t('terms.section4.title') },
+    { id: 'cancellations', title: t('terms.section5.title') },
+    { id: 'host', title: t('terms.section6.title') },
+    { id: 'guest', title: t('terms.section7.title') },
+  ];
 
   return (
     <div className="min-h-screen bg-white text-left">
       <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
-      <main className="max-w-4xl mx-auto px-5 sm:px-10 pt-44 pb-20">
+      
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all transform hover:scale-110"
+          aria-label="Scroll to top"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </button>
+      )}
+
+      <main className="max-w-7xl mx-auto px-5 sm:px-10 pt-44 pb-20">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Table of Contents - Sidebar */}
+          <aside className="lg:w-64 shrink-0">
+            <div className="lg:sticky lg:top-32 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+              <button
+                onClick={() => setShowToc(!showToc)}
+                className="flex items-center gap-2 font-bold text-gray-900 mb-4 lg:cursor-default"
+              >
+                <List className="w-5 h-5 text-blue-600" />
+                {t('common.tableOfContents') || 'Table of Contents'}
+              </button>
+              <nav className={`space-y-2 ${showToc ? 'block' : 'hidden lg:block'}`}>
+                {sections.map((section, idx) => (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                  >
+                    {idx + 1}. {section.title}
+                  </button>
+                ))}
+              </nav>
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <Link to="/privacy" className="text-sm text-blue-600 hover:underline block mb-2">
+                  📄 {t('footer.privacy') || 'Privacy Policy'}
+                </Link>
+                <Link to="/help" className="text-sm text-blue-600 hover:underline block">
+                  ❓ {t('footer.helpCenter') || 'Help Center'}
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -38,7 +110,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         <div className="space-y-12">
           
           {/* Section 1: Acceptance */}
-          <section>
+          <section id="acceptance" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Scale className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -52,7 +124,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 2: Services */}
-          <section>
+          <section id="services" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               2. {t('terms.section2.title')}
             </h2>
@@ -64,7 +136,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 3: User Accounts */}
-          <section>
+          <section id="accounts" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               3. {t('terms.section3.title')}
             </h2>
@@ -80,7 +152,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 4: Bookings and Payments */}
-          <section>
+          <section id="payments" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               4. {t('terms.section4.title')}
             </h2>
@@ -97,7 +169,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 5: Cancellations and Refunds */}
-          <section>
+          <section id="cancellations" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               5. {t('terms.section5.title')}
             </h2>
@@ -116,7 +188,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 6: Host Responsibilities */}
-          <section>
+          <section id="host" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               6. {t('terms.section6.title')}
             </h2>
@@ -133,7 +205,7 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 7: Guest Responsibilities */}
-          <section>
+          <section id="guest" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               7. {t('terms.section7.title')}
             </h2>
@@ -236,7 +308,8 @@ function TermsPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             {t('terms.footerNote')}
           </p>
         </div>
-
+          </div>
+        </div>
       </main>
     </div>
   );

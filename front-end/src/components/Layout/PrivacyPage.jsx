@@ -1,16 +1,93 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../Nav/Header.jsx';
 import Footer from './Footer.jsx';
-import { Shield, FileText, Info, Lock, Eye, Users, Globe, Mail, Scale } from 'lucide-react';
+import { Shield, FileText, Info, Lock, Eye, Users, Globe, Mail, Scale, ArrowUp, List } from 'lucide-react';
 import { useTranslation } from '../../contexts/TranslationContext';
+import { Link } from 'react-router-dom';
 
 function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const { t } = useTranslation();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showToc, setShowToc] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const sections = [
+    { id: 'collection', title: t('privacy.section1.title') },
+    { id: 'usage', title: t('privacy.section2.title') },
+    { id: 'sharing', title: t('privacy.section3.title') },
+    { id: 'security', title: t('privacy.section4.title') },
+    { id: 'rights', title: t('privacy.section5.title') },
+    { id: 'cookies', title: t('privacy.section6.title') },
+    { id: 'children', title: t('privacy.section7.title') },
+    { id: 'retention', title: t('privacy.section8.title') },
+    { id: 'international', title: t('privacy.section9.title') },
+    { id: 'thirdparty', title: t('privacy.section10.title') },
+    { id: 'changes', title: t('privacy.section11.title') },
+    { id: 'contact', title: t('privacy.section12.title') },
+  ];
 
   return (
     <div className="min-h-screen bg-white text-left">
       <Header user={user} setUser={setUser} onOpenSettings={onOpenSettings} onOpenSettingsAdmin={onOpenSettingsAdmin} />
-      <main className="max-w-4xl mx-auto px-5 sm:px-10 pt-44 pb-20">
+      
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all transform hover:scale-110"
+          aria-label="Scroll to top"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </button>
+      )}
+
+      <main className="max-w-7xl mx-auto px-5 sm:px-10 pt-44 pb-20">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Table of Contents - Sidebar */}
+          <aside className="lg:w-64 shrink-0">
+            <div className="lg:sticky lg:top-32 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+              <button
+                onClick={() => setShowToc(!showToc)}
+                className="flex items-center gap-2 font-bold text-gray-900 mb-4 lg:cursor-default"
+              >
+                <List className="w-5 h-5 text-blue-600" />
+                {t('common.tableOfContents') || 'Table of Contents'}
+              </button>
+              <nav className={`space-y-2 ${showToc ? 'block' : 'hidden lg:block'}`}>
+                {sections.map((section, idx) => (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                  >
+                    {idx + 1}. {section.title}
+                  </button>
+                ))}
+              </nav>
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <Link to="/terms" className="text-sm text-blue-600 hover:underline block mb-2">
+                  📄 {t('footer.terms') || 'Terms'}
+                </Link>
+                <Link to="/help" className="text-sm text-blue-600 hover:underline block">
+                  ❓ {t('footer.helpCenter') || 'Help Center'}
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -41,7 +118,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         <div className="space-y-12">
           
           {/* Section 1: Information We Collect */}
-          <section>
+          <section id="collection" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Eye className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -82,7 +159,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 2: How We Use Your Information */}
-          <section>
+          <section id="usage" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -104,7 +181,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 3: Sharing Your Information */}
-          <section>
+          <section id="sharing" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Users className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -127,7 +204,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 4: Data Security */}
-          <section>
+          <section id="security" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Lock className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -147,7 +224,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 5: Your Rights (GDPR) */}
-          <section>
+          <section id="rights" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Scale className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -172,7 +249,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 6: Cookies and Tracking */}
-          <section>
+          <section id="cookies" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               6. {t('privacy.section6.title')}
             </h2>
@@ -192,7 +269,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 7: Data Retention */}
-          <section>
+          <section id="retention" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               7. {t('privacy.section7.title')}
             </h2>
@@ -203,7 +280,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 8: International Transfers */}
-          <section>
+          <section id="international" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Globe className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -217,7 +294,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 9: Children's Privacy */}
-          <section>
+          <section id="children" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               9. {t('privacy.section9.title')}
             </h2>
@@ -228,7 +305,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 10: Third-Party Links */}
-          <section>
+          <section id="thirdparty" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               10. {t('privacy.section10.title')}
             </h2>
@@ -238,7 +315,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 11: Changes to Privacy Policy */}
-          <section>
+          <section id="changes" className="scroll-mt-32">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               11. {t('privacy.section11.title')}
             </h2>
@@ -249,7 +326,7 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </section>
 
           {/* Section 12: Contact */}
-          <section>
+          <section id="contact" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-4">
               <Mail className="w-6 h-6 text-blue-600" />
               <h2 className="text-2xl font-bold text-gray-900">
@@ -276,7 +353,8 @@ function PrivacyPage({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             {t('privacy.footerNote')}
           </p>
         </div>
-
+          </div>
+        </div>
       </main>
     </div>
   );
