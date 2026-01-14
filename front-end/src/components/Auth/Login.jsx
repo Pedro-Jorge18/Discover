@@ -69,7 +69,7 @@ export default function Login({ setUser }) {
       // Update user and navigate
       setUser(response.data.user);
       
-      // Se há um redirect pendente, faz o redirect
+      // If there is a pending redirect, do the redirect
       const redirectPath = localStorage.getItem('propertyRedirect');
       if (redirectPath) {
         localStorage.removeItem('propertyRedirect');
@@ -117,7 +117,7 @@ export default function Login({ setUser }) {
       setUser(res.data.user);
       setShow2FAPopup(false);
       
-      // Se há um redirect pendente, faz o redirect
+      // If there is a pending redirect, do the redirect
       const redirectPath = localStorage.getItem('propertyRedirect');
       if (redirectPath) {
         localStorage.removeItem('propertyRedirect');

@@ -6,8 +6,28 @@ use App\Models\Property;
 use App\Models\Reservation;
 use Carbon\Carbon;
 
+/**
+ * CheckAvailabilityAction - Validates property availability for given dates and guests
+ * 
+ * This action performs comprehensive validation:
+ * - Property existence
+ * - Date range validity (min/max nights, advance booking)
+ * - Guest capacity limits
+ * - Date conflict detection with existing reservations
+ */
 class CheckAvailabilityAction
 {
+    /**
+     * Checks if a property is available for booking
+     * 
+     * @param int $propertyId Property ID to check
+     * @param Carbon $checkIn Check-in date
+     * @param Carbon $checkOut Check-out date
+     * @param int $adults Number of adults
+     * @param int $children Number of children (default: 0)
+     * @param int $infants Number of infants (default: 0)
+     * @return array Result with 'available' boolean and message/data
+     */
     public function execute(int $propertyId, Carbon $checkIn, Carbon $checkOut, int $adults, int $children = 0, int $infants = 0): array
     {
         // 1. FIND PROPERTY

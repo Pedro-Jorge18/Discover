@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('payment_method_id')->nullable()->constrained()->onDelete('set null');
 
-            // Informações do pagamento
+            // Payment information
             $table->string('payment_gateway'); // stripe, mercado_pago, etc
             $table->string('gateway_payment_id')->nullable(); // ID no gateway
             $table->string('gateway_intent_id')->nullable(); // ID do intent (Stripe)
@@ -39,7 +39,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Índices
+            // Indexes
             $table->index(['reservation_id', 'status']);
             $table->index(['user_id', 'created_at']);
             $table->index('gateway_payment_id');

@@ -11,7 +11,7 @@ class UpdateReviewRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Verifica se é o dono da review ou o host da propriedade (para reply)
+        // Check if it's the review owner or property host (for reply)
         $review = $this->route('review');
         
         return $review->user_id === auth()->id() || 

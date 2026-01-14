@@ -43,7 +43,7 @@ class StoreReservationRequest extends FormRequest
             'check_out.required' => 'Check-out date is required.',
             'check_out.after' => 'Check-out date must be after check-in date.',
 
-            // Hóspedes
+            // Guests
             'adults.required' => 'Number of adults is required.',
             'adults.min' => 'At least 1 adult is required.',
             'adults.max' => 'Maximum 10 adults allowed.',

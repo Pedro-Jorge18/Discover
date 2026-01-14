@@ -5,16 +5,32 @@ namespace App\Actions\Reservation;
 use App\Models\Property;
 use Carbon\Carbon;
 
+/**
+ * CalculatePricingAction - Calculates all financial values for a reservation
+ * 
+ * Handles:
+ * - Nightly rates calculation
+ * - Cleaning fees
+ * - Service fees
+ * - Security deposits
+ * - Total amount calculation
+ * - Formatted values for display
+ */
 class CalculatePricingAction
 {
     /**
-     * Calcula todos os valores financeiros para uma reserva
+     * Calculates all financial values for a reservation
+     * 
+     * @param Property $property Property being booked
+     * @param Carbon $checkIn Check-in date
+     * @param Carbon $checkOut Check-out date
+     * @return array Array with pricing breakdown and formatted values
      */
     public function execute(Property $property, Carbon $checkIn, Carbon $checkOut): array
     {
         $nights = $checkIn->diffInDays($checkOut);
 
-        // Cálculos principais
+        // Main calculations
         $subtotal = $this->calculateSubtotal($property->price_per_night, $nights);
         $totalAmount = $this->calculateTotalAmount($subtotal, $property->cleaning_fee, $property->service_fee);
 
@@ -27,7 +43,7 @@ class CalculatePricingAction
             'subtotal' => $subtotal,
             'total_amount' => $totalAmount,
 
-            // Valores formatados para exibição
+            // Formatted values for display
             'formatted' => [
                 'price_per_night' => number_format($property->price_per_night, 2, '.', ''),
                 'cleaning_fee' => number_format($property->cleaning_fee, 2, '.', ''),

@@ -12,7 +12,7 @@ class UpdatePropertyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Só donos da propiedade podem atualizar
+        // Only property owners can update
        // $property = Property::find($this->route('property'));
        // return $property && $property->host_id === auth()->id();
         return true;
@@ -26,18 +26,18 @@ class UpdatePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // INFORMAÇÕES BÁSICAS
+            // BASIC INFORMATION
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string|max:10000',
             'summary' => 'sometimes|nullable|string|max:500',
             'price_per_night' => 'sometimes|numeric|min:1',
 
-            // HOST E HORÁRIOS
+            // HOST AND SCHEDULES
             'host_id' => 'sometimes|integer|exists:users,id',
             'check_in_time' => 'sometimes|date_format:H:i',
             'check_out_time' => 'sometimes|date_format:H:i',
 
-            // LOCALIZAÇÃO
+            // LOCATION
             'address' => 'sometimes|string|max:255',
             'neighborhood' => 'sometimes|string|max:255',
             'postal_code' => 'sometimes|string|max:20',
@@ -45,7 +45,7 @@ class UpdatePropertyRequest extends FormRequest
             'latitude' => 'sometimes|nullable|numeric|min:-90|max:90',
             'longitude' => 'sometimes|nullable|numeric|min:-180|max:180',
 
-            // CARACTERÍSTICAS DA PROPRIEDADE
+            // PROPERTY CHARACTERISTICS
             'property_type_id' => 'sometimes|integer|exists:property_types,id',
             'listing_type_id' => 'sometimes|integer|exists:listing_types,id',
             'max_guests' => 'sometimes|integer|min:1',
@@ -53,7 +53,7 @@ class UpdatePropertyRequest extends FormRequest
             'beds' => 'sometimes|integer|min:1',
             'bathrooms' => 'sometimes|integer|min:0',
 
-            // TAXAS E CONFIGURAÇÕES
+            // FEES AND SETTINGS
             'cleaning_fee' => 'sometimes|nullable|numeric|min:0',
             'service_fee' => 'sometimes|nullable|numeric|min:0',
             'security_deposit' => 'sometimes|nullable|numeric|min:0',
@@ -62,7 +62,7 @@ class UpdatePropertyRequest extends FormRequest
             'min_nights' => 'sometimes|nullable|integer|min:1',
             'max_nights' => 'sometimes|nullable|integer|min:1',
 
-            // Publicação
+            // Publication
             'published' => 'sometimes|boolean',
         ];
     }

@@ -11,7 +11,7 @@ $providers = $config['providers'] ?? [];
 
 echo "1. PROVIDERS REGISTRADOS: " . count($providers) . "\n";
 
-// 2. Verifica se DatabaseServiceProvider está registrado
+// 2. Check if DatabaseServiceProvider is registered
 $dbProvider = 'Illuminate\Database\DatabaseServiceProvider';
 if (in_array($dbProvider, $providers)) {
     echo "   - ✓ DatabaseServiceProvider já está registrado\n";
@@ -19,7 +19,7 @@ if (in_array($dbProvider, $providers)) {
     echo "   - ✗ DatabaseServiceProvider NÃO está registrado\n";
 
     // Adiciona o provider
-    array_splice($providers, 3, 0, [$dbProvider]); // Insere após os primeiros providers
+    array_splice($providers, 3, 0, [$dbProvider]); // Insert after first providers
     $config['providers'] = $providers;
 
     // Salva o arquivo
@@ -28,7 +28,7 @@ if (in_array($dbProvider, $providers)) {
     echo "   - ✓ DatabaseServiceProvider adicionado ao config/app.php\n";
 }
 
-// 3. Testa o database após correção
+// 3. Test database after fix
 echo "\n2. TESTE DO DATABASE:\n";
 try {
     // Registra manualmente para teste imediato

@@ -26,7 +26,7 @@ class PropertyResource extends JsonResource
             'check_in_time' => $this->check_in_time ? $this->check_in_time->format('H:i') : null,
             'check_out_time' => $this->check_out_time ? $this->check_out_time->format('H:i') : null,
 
-            // definição dos preços
+            // price definitions
             'price' => [
                 'per_night' => (float)$this->price_per_night,
                 'cleaning_fee' => (float)$this->cleaning_fee,
@@ -42,7 +42,7 @@ class PropertyResource extends JsonResource
                     'first_night_total' => (float)$this->price_per_night + $this->cleaning_fee + $this->service_fee, // ✅ Primeira noite com taxas
                 ]
             ],
-            // definir o endereço
+            // define the address
             'location' => [
                 'address' => $this->address,
                 'neighborhood' => $this->neighborhood,
@@ -124,7 +124,7 @@ class PropertyResource extends JsonResource
                 });
             }),
 
-            // configurações
+            // configuration
             'settings' => [
                 'instant_book' => (bool) $this->instant_book,
                 'published' => (bool) $this->published,

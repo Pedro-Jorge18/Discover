@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('type'); // credit_card, debit_card, pix, paypal
             $table->string('provider'); // stripe, mercado_pago, etc
-            $table->string('last_four', 4)->nullable(); // Últimos 4 dígitos do cartão
+            $table->string('last_four', 4)->nullable(); // Last 4 card digits
             $table->string('brand')->nullable(); // Visa, Mastercard, etc
             $table->boolean('is_default')->default(false);
             $table->boolean('active')->default(true);

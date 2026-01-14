@@ -28,7 +28,7 @@ class GetAuthenticatedUserAction
 
             $user = $this->loadRelations($user);
 
-            // Obtém estatísticas e permissões
+            // Get statistics and permissions
             $statistics = $this->getUserStatistics($user);
             $permissions = $this->getUserPermissions($user);
 
@@ -53,7 +53,7 @@ class GetAuthenticatedUserAction
 
     protected function loadRelations(User $user): User
     {
-        $relations = ['roles']; // relações básicas
+        $relations = ['roles']; // basic relations
 
         return $user->load($relations);
     }

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->foreignId('amenity_id')->constrained()->onDelete('cascade');
             $table->boolean('value_boolean')->nullable(); // Para comodidades booleanas
-            $table->decimal('value_numeric', 10, 2)->nullable(); // Para valores numéricos
+            $table->decimal('value_numeric', 10, 2)->nullable(); // For numeric values
             $table->text('value_text')->nullable(); // Para valores textuais
             $table->timestamps();
 

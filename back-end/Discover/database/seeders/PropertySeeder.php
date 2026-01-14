@@ -48,7 +48,7 @@ class PropertySeeder extends Seeder
             return;
         }
 
-        // LIMPAR APENAS SE ESTIVER VAZIO (para não duplicar)
+        // CLEAN ONLY IF EMPTY (to avoid duplicates)
         $existingCount = Property::count();
         if ($existingCount > 0) {
             $this->command->info("⚠️  Já existem {$existingCount} propriedades. Pulando criação...");
@@ -135,7 +135,7 @@ class PropertySeeder extends Seeder
             $this->command->info("✅ Propriedade fixa: {$property->title}");
         }
 
-        // CRIAR 10 PROPRIEDADES ALEATÓRIAS
+        // CREATE 10 RANDOM PROPERTIES
         $this->createRandomProperties($host, [
             'property_types' => [$houseType, $apartmentType, $cabinType, $hotelType],
             'listing_types' => [$entirePlace, $privateRoom, $sharedRoom],

@@ -44,7 +44,7 @@ class PropertyImageSeeder extends Seeder
                     'image_path' => $image['image_path'],
                     'image_name' => $image['image_name'],
                     'order' => $index,
-                    'is_primary' => $index === 0, // Primeira imagem é principal
+                    'is_primary' => $index === 0, // First image is primary
                     'caption' => $image['caption'],
                     'alt_text' => $image['alt_text'],
                     'file_size' => 2048000, // 2MB

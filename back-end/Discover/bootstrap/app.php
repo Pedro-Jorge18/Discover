@@ -37,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //     EnsureFrontendRequestsAreStateful::class,
         // ]);
 
-        // // Adicionar alias para o middleware de autenticação (route middleware)
+        // // Add alias for authentication middleware (route middleware)
         // $middleware->alias([
         //     'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         // ]);

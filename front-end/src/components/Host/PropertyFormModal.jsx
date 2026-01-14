@@ -36,7 +36,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
 
         {/* Modal Body */}
         <form onSubmit={onSubmit} className="p-6 space-y-6">
-          {/* Título */}
+          {/* Title */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               {t('host.propertyTitle')} *
@@ -52,7 +52,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             />
           </div>
 
-          {/* Descrição */}
+          {/* Description */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               {t('host.description')}
@@ -67,7 +67,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             />
           </div>
 
-          {/* Grid para campos numéricos */}
+          {/* Grid for numeric fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -236,7 +236,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
           </div>
 
-          {/* País, Cidade, Bairro */}
+          {/* Country, City, Neighborhood */}
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -298,7 +298,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </div>
           </div>
 
-          {/* Morada e Código Postal */}
+          {/* Address and Postal Code */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -381,7 +381,7 @@ import { useTranslation } from '../../contexts/TranslationContext';
             </p>
           </div>
 
-          {/* Botões de ação */}
+          {/* Action buttons */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"

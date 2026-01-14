@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         User::observe(UserObserver::class);
         
-        // Custom validator para verificar se o utilizador já avaliou a propriedade
+        // Custom validator to check if user has already reviewed the property
         Validator::extend('unique_review', function ($attribute, $value, $parameters, $validator) {
             $userId = $parameters[0] ?? null;
             if (!$userId) {
@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
                 ->where('user_id', $userId)
                 ->exists();
             
-            return !$exists; // Retorna true se NÃO existe (validação passa)
+            return !$exists; // Returns true if DOES NOT exist (validation passes)
         });
         
         Validator::replacer('unique_review', function ($message, $attribute, $rule, $parameters) {

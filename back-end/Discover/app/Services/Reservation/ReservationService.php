@@ -40,7 +40,7 @@ class ReservationService
                 $infants
             );
 
-            // Se disponível, calcula preços também
+            // If available, calculate prices too
             if ($result['available']) {
                 $property = Property::find($propertyId);
                 $pricing = $this->calculatePricing->execute(
@@ -129,7 +129,7 @@ class ReservationService
                     throw new \Exception($availability['message']);
                 }
                 
-                // 2. DOUBLE CHECK - Verificação final antes de criar
+                // 2. DOUBLE CHECK - Final verification before creating
                 $finalCheck = Reservation::where('property_id', $data['property_id'])
                     ->where(function ($query) use ($checkIn, $checkOut) {
                         $query->where('check_in', '<', $checkOut->format('Y-m-d'))
@@ -162,7 +162,7 @@ class ReservationService
                     'subtotal' => $totalAmount,
                     'total_amount' => $totalAmount,
                     'reservation_code' => 'RES-' . strtoupper(bin2hex(random_bytes(4))),
-                    // deixar Pendente; o host confirmará manualmente
+                    // leave Pending; the host will manually confirm
                     'status_id' => 1,
                 ]);
 

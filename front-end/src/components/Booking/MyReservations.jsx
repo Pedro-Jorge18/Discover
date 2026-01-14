@@ -8,7 +8,7 @@ import notify from '../../utils/notify';
 
 const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) => {
     const { t } = useTranslation();
-    const [reservas, setReservas] = useState([]); // Começa como array vazio
+    const [reservas, setReservas] = useState([]); // Starts as empty array
     const [loading, setLoading] = useState(true);
         const [showDetails, setShowDetails] = useState(false);
         const [selected, setSelected] = useState(null);
@@ -66,7 +66,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                 setShowCancelConfirm(false);
                 setCancelTarget(null);
                 
-                // Disparar evento para atualizar outras páginas
+                // Dispatch event to update other pages
                 window.dispatchEvent(new CustomEvent('reservationStatusChanged', { 
                     detail: { reservationId: cancelTarget.id, action: 'cancel' } 
                 }));
@@ -90,15 +90,15 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
           if (response.data?.data) {
             const dataContent = response.data.data;
             
-            // Se data.data é um array, usa direto
+            // If data.data is an array, use it directly
             if (Array.isArray(dataContent)) {
               reservasArray = dataContent;
             }
-            // Se é um objeto com propriedade 'data' que é um array
+            // If it's an object with 'data' property that is an array
             else if (dataContent?.data && Array.isArray(dataContent.data)) {
               reservasArray = dataContent.data;
             }
-            // Se é um objeto com propriedade 'data' que é um Collection
+            // If it's an object with 'data' property that is a Collection
             else if (dataContent?.data) {
               reservasArray = Array.isArray(dataContent.data) ? dataContent.data : [];
             }

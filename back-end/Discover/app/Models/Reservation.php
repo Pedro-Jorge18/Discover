@@ -155,13 +155,13 @@ class Reservation extends Model
         return $query->where('check_out', '<', now());
     }
 
-    //  MÉTODOS DE PREÇO
+    //  PRICE METHODS
     public function getRemainingBalance(): float
     {
         return $this->total_amount - $this->amount_paid;
     }
 
-    //  MÉTODOS DE DATA
+    //  DATE METHODS
     public function isUpcoming(): bool
     {
         return $this->check_in > now();
@@ -201,7 +201,7 @@ class Reservation extends Model
         return $checkIn->gte(today());
     }
 
-    // MÉTODOS DE STATUS
+    // STATUS METHODS
     public function confirm(): void
     {
         $this->update([
@@ -228,7 +228,7 @@ class Reservation extends Model
         ]);
     }
 
-    // MÉTODOS ÚTEIS
+    // USEFUL METHODS
     public static function generateReservationCode(): string
     {
         do {

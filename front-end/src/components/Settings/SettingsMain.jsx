@@ -12,7 +12,7 @@ export default function SettingsMain({ onClose, user, setUser }) {
   const menuItems = [
     { id: "perfil", label: t('settings.profile'), icon: IconUser },
     { id: "seguranca", label: t('settings.security'), icon: IconShield },
-    //{ id: "notificacoes", label: "Notificações", icon: IconBell },
+    //{ id: "notificacoes", label: "Notifications", icon: IconBell },
     //{ id: "privacidade", label: "Privacidade", icon: IconLock },
   ];
 

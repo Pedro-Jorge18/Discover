@@ -38,7 +38,7 @@ export default function ReviewForm({ reservation, property, onSuccess, onCancel,
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Verificar se o utilizador está autenticado
+    // Check if user is authenticated
     if (!user || !user.id) {
       notify(t('review.loginToReview'), 'warning');
       navigate('/login');

@@ -39,6 +39,14 @@ class PropertyService
         private ValidatePropertyUpdateAction  $validateUpdateAction,
     ) {}
 
+    /**
+     * Creates a new property with images and amenities
+     * Automatically resolves or creates city/country if not provided
+     * 
+     * @param array $data Property data including images and amenities
+     * @return JsonResponse
+     * @throws \Exception
+     */
     public function createService(array $data): JsonResponse
     {
         $images = $data['images'] ?? [];
@@ -123,7 +131,7 @@ class PropertyService
             if (count($propertyData->amenities) > 0){
                 $this->createAmenitiesAction->execute($property,$propertyData->amenities);
             }
-            // Relações
+            // Relations
             $property->load(['host','propertyType','listingType','city.state.country','images', 'amenities']);
 
             return response()->json([
@@ -147,7 +155,7 @@ class PropertyService
             $property = $this->findPropertyAction->execute($id);
 
             if (!$property) {
-                // Lança exceção padrão do Eloquent para ser capturada pelo Controller (HTTP 404)
+                // Throws standard Eloquent exception to be caught by Controller (HTTP 404)
                 throw new ModelNotFoundException("Property with ID {$id} not found.");
             }
 
@@ -156,13 +164,13 @@ class PropertyService
             return $property;
 
         } catch (\Throwable $exception){
-            // Se for uma ModelNotFoundException, ela é relançada acima.
+            // If it's a ModelNotFoundException, it's re-thrown above.
             Log::error('Error finding property: '.$exception->getMessage());
             throw $exception;
         }
     }
 
-    // Listagem de paginação
+    // Pagination listing
     public function listService(): JsonResponse
     {
         try {

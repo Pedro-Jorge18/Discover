@@ -46,26 +46,26 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Validação: 16 dígitos do cartão
+        // Validation: 16 card digits
         const cardDigits = formData.cardNumber.replace(/\s/g, '');
         if (cardDigits.length !== 16) {
             notify(t('errors.invalidCardNumber'), 'error');
             return;
         }
         
-        // Validação: 3 dígitos do CVC
+        // Validation: 3 CVC digits
         if (formData.cvc.length !== 3) {
             notify(t('errors.invalidCVC'), 'error');
             return;
         }
         
-        // Validação: Validade no formato MM/YY
+        // Validation: Expiry in MM/YY format
         if (formData.expiry.length !== 5 || !formData.expiry.includes('/')) {
             notify(t('errors.invalidExpiryFormat'), 'error');
             return;
         }
         
-        // Validação: 9 dígitos do contacto
+        // Validation: 9 contact digits
         if (formData.phone.length !== 9) {
             notify(t('errors.invalidPhoneNumber'), 'error');
             return;

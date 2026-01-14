@@ -4,6 +4,12 @@ import ptTranslations from '../translations/pt';
 
 const TranslationContext = createContext();
 
+/**
+ * TranslationProvider - Provides translation context to the entire application
+ * Supports English and Portuguese with localStorage persistence
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components
+ */
 export const TranslationProvider = ({ children }) => {
   // Get language from localStorage or default to 'pt'
   const [language, setLanguage] = useState(() => {
@@ -20,7 +26,14 @@ export const TranslationProvider = ({ children }) => {
     localStorage.setItem('language', language);
   }, [language]);
 
-  // Translation function with interpolation support
+  /**
+   * Translation function with interpolation support
+   * @param {string} key - Translation key in dot notation (e.g., 'auth.login')
+   * @param {Object} variables - Variables for interpolation (e.g., { name: 'John' })
+   * @returns {string} Translated string with interpolated variables
+   * @example
+   * t('welcome.message', { name: 'John' }) // Returns: "Welcome, John!"
+   */
   const t = (key, variables = {}) => {
     const keys = key.split('.');
     let value = translations[language];

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
 
-            // Conteúdo
+            // Content
             $table->text('message');
             $table->boolean('is_read')->default(false);
             $table->timestamp('read_at')->nullable();
@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Índices
+            // Indexes
             $table->index(['reservation_id', 'created_at']);
             $table->index(['sender_id', 'receiver_id']);
             $table->index('is_read');

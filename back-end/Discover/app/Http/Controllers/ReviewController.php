@@ -25,7 +25,7 @@ class ReviewController extends Controller
             $query->where('property_id', $request->property_id);
         }
 
-        // Filtrar por usuário
+        // Filter by user
         if ($request->has('user_id')) {
             $query->where('user_id', $request->user_id);
         }
@@ -42,7 +42,7 @@ class ReviewController extends Controller
      */
     public function store(StoreReviewRequest $request): JsonResponse
     {
-        // Verifica se já existe uma avaliação para essa reserva (apenas se reservation_id não for null)
+        // Check if review already exists for this reservation (only if reservation_id is not null)
         if ($request->reservation_id) {
             $existingReview = Review::where('reservation_id', $request->reservation_id)->first();
             
@@ -102,7 +102,7 @@ class ReviewController extends Controller
      */
     public function update(UpdateReviewRequest $request, Review $review): JsonResponse
     {
-        // Se for o dono da review, pode atualizar os ratings e comentário
+        // If it's the review owner, can update ratings and comment
         if ($review->user_id === auth()->id()) {
             $updateData = $request->only([
                 'rating_cleanliness',
@@ -181,7 +181,7 @@ class ReviewController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 10));
 
-        // Calcula estatísticas
+        // Calculate statistics
         $stats = Review::where('property_id', $propertyId)
             ->published()
             ->selectRaw('
@@ -230,7 +230,7 @@ class ReviewController extends Controller
             ], 404);
         }
 
-        // Verifica se é o usuário da reserva
+        // Check if it's the reservation user
         if ($reservation->user_id !== auth()->id()) {
             return response()->json([
                 'can_review' => false,
@@ -238,7 +238,7 @@ class ReviewController extends Controller
             ], 403);
         }
 
-        // Verifica se já existe review
+        // Check if review already exists
         $existingReview = Review::where('reservation_id', $reservationId)->first();
         
         if ($existingReview) {
@@ -249,7 +249,7 @@ class ReviewController extends Controller
             ]);
         }
 
-        // Aqui você pode adicionar mais validações, como verificar se a reserva já foi concluída
+        // Here you can add more validations, like checking if reservation is already completed
         // Por exemplo: $reservation->status === 'completed' && $reservation->checkout_date < now()
 
         return response()->json([

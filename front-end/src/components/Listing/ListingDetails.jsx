@@ -130,12 +130,12 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     );
   };
 
-  // Guardar o pathname para redirecionar após login (apenas se não estiver autenticado)
+  // Save pathname to redirect after login (only if not authenticated)
   useEffect(() => {
     if (!user) {
       localStorage.setItem('propertyRedirect', window.location.pathname);
     } else {
-      // Limpar redirect se já está autenticado
+      // Clear redirect if already authenticated
       localStorage.removeItem('propertyRedirect');
     }
   }, [id, user]);

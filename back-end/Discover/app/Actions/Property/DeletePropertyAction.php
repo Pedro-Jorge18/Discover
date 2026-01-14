@@ -23,7 +23,7 @@ class DeletePropertyAction
 
             Log::info('Deleting property', ['property_id' => $id]);
 
-            // Buscar TODAS as reservas para esta propriedade (não apenas ativas)
+            // Fetch ALL reservations for this property (not just active ones)
             $allReservations = Reservation::where('property_id', $id)
                 ->with(['user', 'payments', 'status', 'property'])
                 ->get();
@@ -33,7 +33,7 @@ class DeletePropertyAction
                 'total_reservations' => $allReservations->count()
             ]);
 
-            // Para cada reserva, processar cancelamento se necessário e criar notificação
+            // For each reservation, process cancellation if necessary and create notification
             foreach ($allReservations as $reservation) {
                 $statusName = $reservation->status->name ?? '';
                 $isActive = in_array($statusName, ['Pendente', 'Pending', 'Confirmada', 'Confirmed']);
@@ -54,7 +54,7 @@ class DeletePropertyAction
                         ]);
                     }
 
-                    // Processar devolução do pagamento
+                    // Process payment refund
                     $payment = $reservation->payments()->where('status', 'completed')->first();
                     if ($payment) {
                         $payment->update([
@@ -73,8 +73,8 @@ class DeletePropertyAction
                     }
                 }
 
-                // Criar notificação para TODAS as reservas (ativas ou não)
-                // Se já foi cancelada, a notificação ajuda o user a entender porque
+                // Create notification for ALL reservations (active or not)
+                // If already cancelled, notification helps user understand why
                 $wasConfirmed = in_array($statusName, ['Confirmada', 'Confirmed']);
                 $propertyTitle = $reservation->property->title ?? 'Propriedade removida';
                 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\PropertyImage; // CORRIGIDO: Deve ser 'App' maiúsculo
+namespace App\Jobs\PropertyImage; // FIXED: Must be 'App' capitalized
 
 use App\Models\PropertyImage;
 use Illuminate\Bus\Queueable;

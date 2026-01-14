@@ -11,7 +11,7 @@ class ReviewSeeder extends Seeder
 {
     public function run(): void
     {
-        // Criar algumas avaliações de exemplo
+        // Create some example reviews
         $reservations = Reservation::take(2)->get();
         $client = User::where('email', 'client@example.com')->first();
 
