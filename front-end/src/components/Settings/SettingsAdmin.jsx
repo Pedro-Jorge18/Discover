@@ -19,14 +19,14 @@ export default function SettingsAdmin({ onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm">
 
       {/* Card */}
-      <div className="w-full max-w-5xl h-[80vh] bg-gray-900 text-white rounded-2xl shadow-2xl flex overflow-hidden">
+      <div className="w-full max-w-5xl h-[80vh] bg-white text-gray-900 rounded-2xl shadow-2xl flex overflow-hidden">
 
         {/* Left Menu  */}
-        <aside className="w-64 bg-gray-800 p-6 flex flex-col gap-3">
-          <h2 className="text-lg font-semibold mb-4 text-gray-200">
+        <aside className="w-64 bg-gray-50 border-r border-gray-200 p-6 flex flex-col gap-3">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">
             {t('settings.settings')}
           </h2>
 
@@ -40,8 +40,8 @@ export default function SettingsAdmin({ onClose }) {
                 onClick={() => setSelected(item.id)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
                   ${active
-                    ? "bg-gray-700 border-l-4 border-indigo-500 text-indigo-400"
-                    : "text-gray-300 hover:bg-gray-700"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
                   }`}
               >
                 <Icon className="w-5 h-5" />
@@ -52,21 +52,21 @@ export default function SettingsAdmin({ onClose }) {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 p-8 relative overflow-y-auto">
+        <main className="flex-1 p-8 relative overflow-y-auto bg-white">
 
           {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white"
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
           >
             <X className="w-6 h-6" />
           </button>
 
-          <h1 className="text-2xl font-bold mb-6">
+          <h1 className="text-2xl font-bold mb-6 text-gray-900">
             {menuItems.find(x => x.id === selected)?.label}
           </h1>
 
-          <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+          <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
             {selected === "utilizador" && (
               <div className="flex flex-col gap-6">
                 <AddAdmin />
