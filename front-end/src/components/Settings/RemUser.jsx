@@ -95,15 +95,15 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
   }
 
   return (
-    <div className="w-full max-w-xl bg-gray-800 p-6 rounded-xl">
-      <h3 className="text-lg font-semibold text-white pb-4 border-b border-gray-700 text-center">
+    <div className="w-full max-w-xl bg-white border border-gray-200 p-6 rounded-xl">
+      <h3 className="text-lg font-semibold text-gray-900 pb-4 border-b border-gray-200 text-center">
         {t('settings.removeUser')}
       </h3>
 
       {/* Inline confirmation panel */}
       {confirm && (
-        <div className="w-full bg-gray-800 p-6 rounded-xl text-center space-y-4 mt-4">
-          <p className="text-red-600 text-sm">{t('settings.attention')} {t('settings.deleteUserMsg')}<p></p><strong className="text-gray-100">{confirm.name} ({getRoleDisplay(confirm.role)})</strong></p>
+        <div className="w-full bg-gray-50 border border-gray-200 p-6 rounded-xl text-center space-y-4 mt-4">
+          <p className="text-red-600 text-sm">{t('settings.attention')} {t('settings.deleteUserMsg')}<p></p><strong className="text-gray-900">{confirm.name} ({getRoleDisplay(confirm.role)})</strong></p>
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={confirmDelete}
@@ -115,7 +115,7 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
 
             <button
               onClick={cancelDelete}
-              className="rounded-lg bg-gray-700 px-6 py-2 text-sm font-semibold text-gray-200 hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 transition"
+              className="rounded-lg bg-gray-200 px-6 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-300 focus:ring-4 focus:ring-gray-400 transition"
             >
               {t('common.cancel')}
             </button>
@@ -126,25 +126,25 @@ export default function RemUser({ listMaxH = 'max-h-56' }) {
       <div className="pt-6 space-y-4">
 
         {/* Messages */}
-        {error && <div className="text-red-400 text-sm text-center">{error}</div>}
-        {success && <div className="text-green-400 text-sm text-center">{success}</div>}
+        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+        {success && <div className="text-green-600 text-sm text-center">{success}</div>}
 
         {/* Users List */}
         {loading ? (
             <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-400 rounded-full animate-spin mx-auto mb-2"></div>
         ) : (
           <div className="space-y-3">
-            <div className={`${listMaxH} overflow-y-auto divide-y divide-gray-700 rounded-lg border border-gray-700`}>
+            <div className={`${listMaxH} overflow-y-auto divide-y divide-gray-200 rounded-lg border border-gray-200`}>
               {users.length === 0 && (
-                <div className="text-gray-400 text-sm text-center py-6">{t('settings.noUsersFound')}</div>
+                <div className="text-gray-500 text-sm text-center py-6">{t('settings.noUsersFound')}</div>
               )}
 
               {users.map((u) => (
-                <div key={u.id} className="flex items-center justify-between py-3 px-3 hover:bg-gray-700 transition rounded-md">
+                <div key={u.id} className="flex items-center justify-between py-3 px-3 hover:bg-gray-50 transition rounded-md">
                   <div className="flex-1 pr-3">
-                    <div className="text-sm font-medium text-gray-100">{u.name} {u.last_name || ''}</div>
-                    <div className="text-xs text-gray-400">{u.email}</div>
-                    <div className="text-xs text-gray-500 mt-1">{t('settings.role')} <span className="text-gray-300">{getRoleDisplay(u.role)}</span></div>
+                    <div className="text-sm font-medium text-gray-900">{u.name} {u.last_name || ''}</div>
+                    <div className="text-xs text-gray-600">{u.email}</div>
+                    <div className="text-xs text-gray-500 mt-1">{t('settings.role')} <span className="text-gray-700">{getRoleDisplay(u.role)}</span></div>
                   </div>
 
                   <div className="flex items-center gap-2">
