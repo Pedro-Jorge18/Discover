@@ -1,34 +1,39 @@
 FROM php:8.2-apache
  
-# Instalar extensões necessárias
+# Instalar dependências do sistema e extensões PHP
+
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl
+
+    libpng-dev libonig-dev libxml2-dev libzip-dev \
+
+    zip unzip git curl
  
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
  
 # Instalar Composer
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
  
-# Configurar diretório de trabalho
 WORKDIR /var/www/html
+
 COPY . .
  
-# Instalar dependências
-RUN composer install --no-dev --optimize-autoloader
+# Instalar dependências ignorando scripts (evita erros de falta de .env no build)
+
+RUN composer install --no-dev --optimize-autoloader --no-scripts
  
-# Dar permissões às pastas do Laravel
+# Dar permissões
+
 RUN chown -R www-data:www-data storage bootstrap/cache
  
-# Configurar o Apache para o Laravel
+# Configurar Apache
+
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/apache2/htdocs!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
 RUN a2enmod rewrite
  
 EXPOSE 80
+
+ 
