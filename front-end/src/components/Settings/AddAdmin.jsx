@@ -249,7 +249,7 @@ export default function AddAdmin({ onSuccess } = {}) {
           </div>
         </div>
 
-        {/* Botão */}
+        {/* Button */}
         <div className="text-center pt-4">
           <button
             type="submit"

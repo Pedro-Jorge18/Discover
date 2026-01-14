@@ -17,17 +17,17 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Webhook\StripeWebHookController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 
-// Rotas públicas ----------------------------------------------------------
+// Public routes ----------------------------------------------------------
 Route::get('cities', [CityController::class, 'index']);
 Route::get('cities/{city}', [CityController::class, 'show']);
 Route::apiResource('properties', PropertyController::class)->only('index', 'show');
 
-// Rotas públicas de reviews (listar reviews de propriedades)
+// Public review routes (list property reviews)
 Route::get('properties/{property}/reviews', [ReviewController::class, 'propertyReviews']);
 Route::get('reviews', [ReviewController::class, 'index']);
 Route::get('reviews-test-public', function() { return response()->json(['message' => 'Public reviews route working']); });
 
-// Autenticação
+// Authentication
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
@@ -36,7 +36,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 });
 
-// Rotas de disponibilidade (públicas - não requerem autenticação)
+// Availability routes (public - no authentication required)
 Route::get('/properties/{id}/availability', [ReservationController::class, 'checkAvailability']);
 Route::get('/properties/{id}/check-availability', [ReservationController::class, 'checkAvailability']);
 Route::post('/properties/availability/batch', [ReservationController::class, 'checkMultipleAvailability']);
@@ -44,7 +44,7 @@ Route::post('/properties/availability/batch', [ReservationController::class, 'ch
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Rotas de Usuário
+    // User Routes
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
             Route::post('change-password', [AuthController::class, 'changePassword']);
@@ -81,7 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas de RESERVAS
     Route::prefix('reservations')->group(function () {
-        // Reservas do usuário
+        // User reservations
         Route::get('/', [ReservationController::class, 'index']);
         Route::get('/host', [ReservationController::class, 'hostReservations']);
         Route::post('/', [ReservationController::class, 'store']);
@@ -105,15 +105,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas de REVIEWS (autenticadas)
     Route::prefix('reviews')->group(function () {
-        Route::get('/my-reviews', [ReviewController::class, 'userReviews']); // Reviews do usuário autenticado
+        Route::get('/my-reviews', [ReviewController::class, 'userReviews']); // Authenticated user reviews
         Route::get('/can-review/{reservation}', [ReviewController::class, 'canReview']); // Verificar se pode avaliar
         Route::post('/', [ReviewController::class, 'store']); // Criar review
         Route::delete('/{review}', [ReviewController::class, 'destroy']); // Deletar review
         Route::put('/{review}', [ReviewController::class, 'update']); // Atualizar review ou adicionar resposta do host
-        Route::get('/{review}', [ReviewController::class, 'show']); // DEVE SER A ÚLTIMA - captura qualquer ID
+        Route::get('/{review}', [ReviewController::class, 'show']); // MUST BE LAST - captures any ID
     });
 
-    // Rotas de NOTIFICAÇÕES
+    // NOTIFICATION Routes
     Route::prefix('notifications')->group(function () {
         Route::get('/', [UserNotificationController::class, 'index']);
         Route::post('/{id}/read', [UserNotificationController::class, 'markAsRead']);
@@ -123,10 +123,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-// Webhook (sem autenticação)
+// Webhook (no authentication)
 Route::withoutMiddleware(['auth:sanctum'])->post('/webhook/stripe', [StripeWebHookController::class, 'handle'])->name('webhook.stripe');
 
-// Rotas de autenticação com Google
+// Google authentication routes
 Route::prefix('auth/google')->middleware('throttle:60,1')->group(function () {
     Route::get('/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
     Route::get('/callback', [GoogleAuthController::class, 'handleGoogleCallback']);

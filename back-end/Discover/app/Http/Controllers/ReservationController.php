@@ -14,6 +14,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * ReservationController
+ * 
+ * Manages reservation lifecycle:
+ * - Availability checking with real-time conflicts
+ * - Reservation creation with pricing calculation
+ * - Guest reservations (bookings made by users)
+ * - Host reservations (bookings for host's properties)
+ * - Status management (pending, confirmed, cancelled, completed)
+ * - Cancellation with refund processing
+ * 
+ * Uses database transactions and locks for date conflict prevention
+ */
 class ReservationController extends Controller
 {
     public function __construct(
@@ -21,7 +34,16 @@ class ReservationController extends Controller
     ) {}
 
     /**
-     * Lista todas as reservas do usuário
+     * List all reservations for the authenticated user (guest view)
+     * 
+     * Supports filters:
+     * - status: Filter by reservation status
+     * - upcoming: Future check-in dates
+     * - past: Past check-out dates
+     * - current: Currently active stays
+     * 
+     * @param Request $request HTTP request with optional filters
+     * @return JsonResponse Collection of user's reservations
      */
     public function index(Request $request): JsonResponse
     {
@@ -49,7 +71,13 @@ class ReservationController extends Controller
     }
 
     /**
-     * Lista reservas das propriedades do host autenticado
+     * List reservations for properties owned by authenticated host
+     * 
+     * Used by hosts to manage incoming booking requests.
+     * Includes guest information and reservation details.
+     * 
+     * @param Request $request HTTP request with optional status filter
+     * @return JsonResponse Collection of host's property reservations
      */
     public function hostReservations(Request $request): JsonResponse
     {

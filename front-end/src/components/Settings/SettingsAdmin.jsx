@@ -14,7 +14,7 @@ export default function SettingsAdmin({ onClose }) {
   const menuItems = [
     { id: "utilizador", label: t('settings.user'), icon: User },
     { id: "imovel", label: t('settings.property'), icon: House },
-    //{ id: "notificacoes", label: "Notificações", icon: IconBell },
+    //{ id: "notificacoes", label: "Notifications", icon: IconBell },
     //{ id: "privacidade", label: "Privacidade", icon: IconLock },
   ];
 

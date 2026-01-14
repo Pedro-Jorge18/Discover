@@ -17,7 +17,7 @@ interface PropertyRepositoryInterface
 
     public function create(array $data): Property;
 
-    // "vai buscar a propriedade pelo id, se não encontrar volta nulo"
+    // "fetch the property by id, if not found return null"
     public function findById(int $id): ?Property;
     public function update(int $id, array $data): bool;
     public function delete(int $id): bool;

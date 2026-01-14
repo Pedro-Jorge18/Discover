@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, ArrowRight, Home } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useTranslation } from '../../contexts/TranslationContext';
 
 const BookingSuccess = () => {
+    const { t } = useTranslation();
 
     useEffect(() => {
         // Trigger confetti celebration on mount
@@ -42,11 +44,11 @@ const BookingSuccess = () => {
                 </div>
 
                 <h1 className="text-4xl font-black italic uppercase tracking-tighter text-gray-900 mb-4">
-                    Pagamento Confirmado
+                    {t('reservation.paymentConfirmed')}
                 </h1>
                 
                 <p className="text-gray-500 font-medium text-lg mb-10 leading-relaxed">
-                    A sua reserva foi processada com sucesso. Pode consultar todos os detalhes na sua área de cliente.
+                    {t('reservation.reservationProcessed')}
                 </p>
 
                 <div className="space-y-4">
@@ -54,14 +56,14 @@ const BookingSuccess = () => {
                         to="/minhas-reservas" 
                         className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-black py-5 rounded-4xl uppercase tracking-widest text-xs shadow-xl hover:bg-blue-700 transition-all active:scale-95"
                     >
-                        Ver as Minhas Reservas <ArrowRight size={18} />
+                        {t('reservation.viewMyReservations')} <ArrowRight size={18} />
                     </Link>
 
                     <Link 
                         to="/" 
                         className="w-full flex items-center justify-center gap-2 bg-gray-50 text-gray-900 font-black py-5 rounded-4xl uppercase tracking-widest text-xs border border-gray-100 hover:bg-gray-100 transition-all"
                     >
-                        <Home size={18} /> Voltar ao Início
+                        <Home size={18} /> {t('reservation.backHome')}
                     </Link>
                 </div>
 

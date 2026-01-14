@@ -1,16 +1,16 @@
-// EXEMPLO: Como enviar notificações para utilizadores (hóspedes)
-// quando uma reserva é aceite ou rejeitada
+// EXAMPLE: How to send notifications to users (guests)
+// when a reservation is accepted or rejected
 //
-// Este exemplo demonstra como usar pushUserNotification() em qualquer componente
-// onde o host pode aceitar ou rejeitar uma reserva.
+// This example demonstrates how to use pushUserNotification() in any component
+// where the host can accept or reject a reservation.
 
 import { pushUserNotification } from '../../utils/userNotifications';
 
 // Exemplo 1: Aceitar uma reserva
 const handleAcceptReservation = (guestId, propertyTitle, reservationDates) => {
   pushUserNotification({
-    userId: guestId,  // ID do hóspede
-    type: 'reservation_accepted',  // Tipo de notificação
+    userId: guestId,  // Guest ID
+    type: 'reservation_accepted',  // Notification type
     title: t('userNotifications.acceptedTitle'),  // "Reserva aceite"
     message: `${t('userNotifications.acceptedBody')} em ${propertyTitle} (${reservationDates})`,
     reservationId: reservationId,  // ID da reserva (opcional)
@@ -32,34 +32,34 @@ const handleRejectReservation = (guestId, propertyTitle, reason) => {
     reservationId: reservationId,
     meta: {
       propertyTitle,
-      reason,  // Guarde o motivo se necessário
+      reason,  // Save the reason if necessary
     }
   });
 };
 
-// Notas importantes:
-// 1. A função pushUserNotification() não requer backend - funciona inteiramente no cliente
-// 2. Os dados são guardados em localStorage com a chave: user_notifications_{userId}
-// 3. Máximo de 50 notificações por utilizador são guardadas (as antigas são removidas)
-// 4. As notificações também disparam um evento custom 'user-notification' para atualizar UI
-// 5. O componente UserNotifications dropdown mostra até 5 notificações mais recentes
-// 6. A página /reservas-notificacoes mostra todas as notificações com opção de gerir
+// Important notes:
+// 1. The pushUserNotification() function doesn't require backend - works entirely on the client
+// 2. Data is stored in localStorage with the key: user_notifications_{userId}
+// 3. Maximum of 50 notifications per user are stored (old ones are removed)
+// 4. Notifications also trigger a custom 'user-notification' event to update UI
+// 5. The UserNotifications dropdown component shows up to 5 most recent notifications
+// 6. The /reservas-notificacoes page shows all notifications with management options
 
-// Tipos de notificação disponíveis:
-// - 'reservation_accepted' - Ícone verde
-// - 'reservation_rejected' - Ícone vermelho
-// - 'info' - Ícone padrão (cinzento)
+// Available notification types:
+// - 'reservation_accepted' - Green icon
+// - 'reservation_rejected' - Red icon
+// - 'info' - Default icon (grey)
 
-// Exemplo de integração em um componente de gerenciar reservas:
+// Example of integration in a reservation management component:
 /*
   function ReservationManager({ reservation, user }) {
     const { t } = useTranslation();
     
     const handleApprove = async () => {
-      // Enviar para API/backend se necessário
+      // Send to API/backend if necessary
       await api.patch(`/reservations/${reservation.id}/approve`, { status: 'approved' });
       
-      // Notificar o hóspede
+      // Notify the guest
       pushUserNotification({
         userId: reservation.guest_id,
         type: 'reservation_accepted',
@@ -77,10 +77,10 @@ const handleRejectReservation = (guestId, propertyTitle, reason) => {
     };
     
     const handleReject = async () => {
-      // Enviar para API/backend se necessário
+      // Send to API/backend if necessary
       await api.patch(`/reservations/${reservation.id}/reject`, { status: 'rejected' });
       
-      // Notificar o hóspede
+      // Notify the guest
       pushUserNotification({
         userId: reservation.guest_id,
         type: 'reservation_rejected',

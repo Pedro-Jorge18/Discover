@@ -8,6 +8,15 @@ use App\Models\Property;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * CreateReservationAction - Handles the creation of new reservations
+ * 
+ * This action:
+ * 1. Validates dates and availability with database locks
+ * 2. Calculates pricing including taxes and fees
+ * 3. Creates reservation with proper status
+ * 4. Handles both instant booking and pending approval
+ */
 class CreateReservationAction
 {
     public function __construct(
@@ -16,7 +25,11 @@ class CreateReservationAction
     ) {}
 
     /**
-     * Cria uma nova reserva
+     * Creates a new reservation with proper validation and pricing
+     * 
+     * @param array $reservationData Reservation data including property_id, dates, guests
+     * @return Reservation
+     * @throws \Exception If dates are unavailable or validation fails
      */
     public function execute(array $reservationData): Reservation
     {
@@ -40,7 +53,7 @@ class CreateReservationAction
                 throw new \Exception($availability['message']);
             }
             
-            // 2.5 DOUBLE CHECK - Verificação final antes de criar
+            // 2.5 DOUBLE CHECK - Final verification before creating
             $finalCheck = Reservation::where('property_id', $reservationData['property_id'])
                 ->where(function ($query) use ($checkIn, $checkOut) {
                     // Same overlap logic: block real overlaps but allow check-in = check-out
@@ -60,7 +73,7 @@ class CreateReservationAction
             // 3. BUSCA PROPRIEDADE
             $property = Property::find($reservationData['property_id']);
 
-            // 4. CALCULA PREÇOS (usando a Action dedicada)
+            // 4. CALCULATE PRICES (using dedicated Action)
             $pricing = $this->calculatePricing->execute($property, $checkIn, $checkOut);
 
             // 5. PREPARA DADOS DA RESERVA
@@ -91,7 +104,7 @@ class CreateReservationAction
         $pendingStatus = ReservationStatus::where('name', 'Pendente')->first();
 
         if (!$pendingStatus) {
-            // Criar status se não existir
+            // Create status if it doesn't exist
             $pendingStatus = ReservationStatus::create([
                 'name' => 'Pendente',
                 'description' => 'Reservation pending confirmation',
@@ -114,7 +127,7 @@ class CreateReservationAction
             'special_requests' => $data['special_requests'] ?? null,
 
 
-            // Dados de preço (calculados)
+            // Price data (calculated)
             'price_per_night' => $pricing['price_per_night'],
             'cleaning_fee' => $pricing['cleaning_fee'],
             'service_fee' => $pricing['service_fee'],

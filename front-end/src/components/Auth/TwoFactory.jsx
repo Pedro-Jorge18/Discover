@@ -228,7 +228,7 @@ export default function TwoFactorAuth() {
         {showPasswordPopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
             <div className="relative bg-white rounded-xl p-6 max-w-sm w-full text-center border border-gray-200 shadow-2xl">
-              {/* Botão fechar */}
+              {/* Close button */}
               <button
                 onClick={() => {
                   setShowPasswordPopup(false);

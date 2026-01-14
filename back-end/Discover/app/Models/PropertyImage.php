@@ -49,7 +49,7 @@ class PropertyImage extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        // Para thumbnail, você pode usar uma versão menor da imagem
+        // For thumbnail, you can use a smaller version of the image
         $thumbnailPath = "properties/{$this->property_id}/thumbnails/" . basename($this->image_path);
 
         if (Storage::disk('public')->exists($thumbnailPath)) {

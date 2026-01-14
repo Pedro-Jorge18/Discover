@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->string('image_path'); // Caminho da imagem
             $table->string('image_name')->nullable(); // Nome original do arquivo
-            $table->integer('order')->default(0); // Ordem de exibição
+            $table->integer('order')->default(0); // Display order
             $table->boolean('is_primary')->default(false); // Imagem principal
             $table->string('caption')->nullable(); // Legenda da imagem
             $table->string('alt_text')->nullable(); // Texto alternativo

@@ -16,10 +16,10 @@ class ValidateReservationAction
      */
     public function execute(ReservationData $data): void
     {
-        // 1. VALIDAÇÕES BÁSICAS (estruturais)
+        // 1. BASIC VALIDATIONS (structural)
         $this->validateBasicRules($data);
 
-        // 2. VALIDAÇÕES DE NEGÓCIO (banco de dados)
+        // 2. BUSINESS VALIDATIONS (database)
         $this->validateBusinessRules($data);
     }
 
@@ -28,12 +28,12 @@ class ValidateReservationAction
      */
     private function validateBasicRules(ReservationData $data): void
     {
-        // IDs válidos
+        // Valid IDs
         if ($data->property_id < 1 || $data->user_id < 1 || $data->status_id < 1) {
             throw new InvalidArgumentException('IDs de propriedade, usuário e status devem ser maiores que 0.');
         }
 
-        // Hóspedes
+        // Guests
         if ($data->adults < 1) {
             throw new InvalidArgumentException('At least one adult is required.');
         }
@@ -44,7 +44,7 @@ class ValidateReservationAction
         // Datas
         $this->validateDates($data);
 
-        // Preços
+        // Prices
         $this->validatePricing($data);
     }
 
@@ -99,7 +99,7 @@ class ValidateReservationAction
             );
         }
 
-        // Verifica se propriedade está ativa
+        // Check if property is active
         if (!$property->active || !$property->published) {
             throw new ReservationCreationException(
                 "Propriedade não está disponível para reservas."
@@ -112,7 +112,7 @@ class ValidateReservationAction
         // Valida conflitos de datas
         $this->validateDateConflicts($data, $property);
 
-        // Valida políticas da propriedade
+        // Validate property policies
         $this->validatePropertyPolicies($data, $property);
     }
 
@@ -129,7 +129,7 @@ class ValidateReservationAction
             );
         }
 
-        // Valida mínimo de noites
+        // Validate minimum nights
         $nights = $data->check_in->diffInDays($data->check_out);
         if ($property->min_nights && $nights < $property->min_nights) {
             throw new ReservationCreationException(
@@ -168,14 +168,14 @@ class ValidateReservationAction
     {
         $nights = $data->check_in->diffInDays($data->check_out);
 
-        // Máximo de noites
+        // Maximum nights
         if ($property->max_nights && $nights > $property->max_nights) {
             throw new ReservationCreationException(
                 "Máximo de {$property->max_nights} noites permitido. Selecionado: {$nights} noites."
             );
         }
 
-        // Verifica se é possível reservar com 1 ano de antecedência
+        // Check if it's possible to book 1 year in advance
         $maxAdvance = now()->addYear();
         if ($data->check_in->gt($maxAdvance)) {
             throw new ReservationCreationException(

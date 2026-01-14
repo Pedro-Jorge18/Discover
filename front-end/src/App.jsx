@@ -15,7 +15,7 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsOpenAdmin, setSettingsOpenAdmin] = useState(false);
 
-  // Hook para verificar propriedades deletadas e processar devoluções
+  // Hook to check deleted properties and process refunds
   usePropertyDeletionCheck(user);
 
   useEffect(() => {

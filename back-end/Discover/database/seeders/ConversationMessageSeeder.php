@@ -28,7 +28,7 @@ class ConversationMessageSeeder extends Seeder
                 'read_at' => now(),
             ]);
 
-            // Mensagem do anfitrião
+            // Host message
             ConversationMessage::create([
                 'conversation_id' => $conversation->id,
                 'sender_id' => $conversation->host_id,

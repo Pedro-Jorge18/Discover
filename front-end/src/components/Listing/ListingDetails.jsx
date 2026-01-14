@@ -130,12 +130,12 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
     );
   };
 
-  // Guardar o pathname para redirecionar após login (apenas se não estiver autenticado)
+  // Save pathname to redirect after login (only if not authenticated)
   useEffect(() => {
     if (!user) {
       localStorage.setItem('propertyRedirect', window.location.pathname);
     } else {
-      // Limpar redirect se já está autenticado
+      // Clear redirect if already authenticated
       localStorage.removeItem('propertyRedirect');
     }
   }, [id, user]);
@@ -211,7 +211,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
 
     // Verificar se as datas foram selecionadas
     if (!startDate || !endDate) {
-      notify('Por favor, selecione as datas de check-in e check-out', 'error');
+      notify(t('errors.selectDates'), 'error');
       return;
     }
 
@@ -229,7 +229,7 @@ function ListingDetails({ user, setUser, onOpenLogin, onOpenSettings, onOpenSett
       });
 
       if (!response.data.available) {
-        notify('Datas indisponíveis', 'error');
+        notify(t('errors.dateUnavailable'), 'error');
         return;
       }
 

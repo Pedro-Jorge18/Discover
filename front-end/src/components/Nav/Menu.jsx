@@ -56,7 +56,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
             className="px-4 py-3 font-semibold text-red-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
           >
             <LogIn className="w-5 h-5" /> 
-            Terminar Sessão
+            {t('auth.logout')}
           </button>
         ) : (
           <Link 
@@ -64,7 +64,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
             className="px-4 py-3 font-semibold text-gray-900 hover:bg-gray-100 flex items-center gap-3 w-full text-left"
           >
             <LogIn className="w-5 h-5" /> 
-            Iniciar Sessão
+            {t('auth.login')}
           </Link>
         )}
 
@@ -80,7 +80,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
               className={itemClasses}
             >
               <Briefcase className="w-5 h-5 text-gray-500" />
-              As minhas viagens
+              {t('auth.myTrips')}
             </Link>
 
             <Link
@@ -89,7 +89,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
               className={itemClasses}
             >
               <MessageSquare className="w-5 h-5 text-gray-500" />
-              As minhas avaliações
+              {t('auth.myReviews')}
             </Link>          
             
             <button
@@ -97,7 +97,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
               className={itemClasses}
             >
               <Cog className="w-5 h-5 text-gray-500" />
-              Definições da conta
+              {t('auth.accountSettings')}
             </button>
           
             {/* Conditional role-based links */}
@@ -108,7 +108,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
                 className={itemClasses}
               >
                 <House className="w-5 h-5 text-gray-500" /> 
-                Modo Anfitrião
+                {t('auth.hostMode')}
               </Link>
             ) : user.role === "admin" && (
               <button 
@@ -116,7 +116,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
                 className={itemClasses}
               >
                 <UserStar className="w-5 h-5 text-gray-500" /> 
-                Painel de Administrador
+                {t('auth.adminPanel')}
               </button>
             )}
           </>
@@ -131,7 +131,7 @@ function Menu({ user, setUser, onOpenSettings, onOpenSettingsAdmin, onCloseMenu 
           className={itemClasses}
         >
           <HelpCircle className="w-5 h-5 text-gray-500" /> 
-          Centro de Ajuda
+          {t('auth.helpCenter')}
         </Link>
       </div>
     </div>

@@ -22,7 +22,7 @@ class StorePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //informações iniciais ( OBRIGATORIAS )
+            //initial information ( REQUIRED )
 
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:10000',
@@ -33,7 +33,7 @@ class StorePropertyRequest extends FormRequest
             'check_in_time' => 'required|date_format:Y-m-d H:i:s',
             'check_out_time' => 'required|date_format:Y-m-d H:i:s',
 
-            // LOCALIZAÇÃO
+            // LOCATION
             'address' => 'required|string|max:255',
             'neighborhood' => 'required|string|max:255',
             'postal_code' => 'required|string|max:25',
@@ -51,7 +51,7 @@ class StorePropertyRequest extends FormRequest
             'beds' => 'required|integer|min:1',
             'bathrooms' => 'required|integer|min:0',
 
-            //CONFIGURAÇÃO
+            //CONFIGURATION
             'cleaning_fee' => 'sometimes|nullable|numeric|min:0',
             'service_fee' => 'sometimes|nullable|numeric|min:0',
             'security_deposit' => 'sometimes|nullable|numeric|min:0',

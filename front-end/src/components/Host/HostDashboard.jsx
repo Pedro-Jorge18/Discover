@@ -61,7 +61,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
     };
     loadData();
     
-    // Event listener para atualizar quando propriedade é deletada
+    // Event listener to update when property is deleted
     const handlePropertyDeleted = () => {
       fetchPendingReservations();
     };
@@ -193,7 +193,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
       // Refresh reservations list
       fetchPendingReservations();
       
-      // Disparar evento para atualizar a página de reservas do utilizador
+      // Dispatch event to update user's reservations page
       window.dispatchEvent(new CustomEvent('reservationStatusChanged', { 
         detail: { reservationId, action } 
       }));
@@ -213,15 +213,15 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     
-    // Se não está editando, exigir exatamente 4 imagens
+    // If not editing, require exactly 4 images
     if (!editingProperty && files.length !== 4) {
-      notify('Selecione exatamente 4 imagens para criar a propriedade', 'error');
+      notify(t('errors.selectExactlyFourImages'), 'error');
       return;
     }
     
-    // Se está editando, permitir até 4 imagens adicionais
+    // If editing, allow up to 4 additional images
     if (editingProperty && files.length > 4) {
-      notify('Máximo de 4 imagens por vez', 'warning');
+      notify(t('errors.maxFourImagesPerTime'), 'warning');
       return;
     }
     
@@ -266,40 +266,40 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     
-    // Validar campos obrigatórios
+    // Validate required fields
     if (!formData.title || formData.title.trim() === '') {
-      notify('O título da propriedade é obrigatório', 'error');
+      notify(t('errors.propertyTitleRequired'), 'error');
       return;
     }
     
     if (!formData.price_per_night || parseFloat(formData.price_per_night) <= 0) {
-      notify('O preço por noite deve ser maior que zero', 'error');
+      notify(t('errors.priceGreaterThanZero'), 'error');
       return;
     }
     
     if (!formData.neighborhood || formData.neighborhood.trim() === '') {
-      notify('O bairro é obrigatório', 'error');
+      notify(t('errors.neighborhoodRequired'), 'error');
       return;
     }
     
     if (!formData.postal_code || formData.postal_code.trim() === '') {
-      notify('O código postal é obrigatório', 'error');
+      notify(t('errors.postalCodeRequired'), 'error');
       return;
     }
     
     if (!formData.beds || parseInt(formData.beds) <= 0) {
-      notify('O número de camas deve ser maior que zero', 'error');
+      notify(t('errors.bedsGreaterThanZero'), 'error');
       return;
     }
     
     if (!formData.city_name || formData.city_name.trim() === '') {
-      notify('A cidade é obrigatória', 'error');
+      notify(t('errors.cityRequired'), 'error');
       return;
     }
 
     // Validar que tenha exatamente 4 imagens ao criar propriedade
     if (!editingProperty && selectedImages.length !== 4) {
-      notify('É obrigatório adicionar exatamente 4 imagens para criar a propriedade', 'error');
+      notify(t('errors.selectExactlyFourImages'), 'error');
       return;
     }
 
@@ -599,7 +599,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
           </div>
         </div>
 
-        {/* Pending Reservations Section - SEMPRE VISÍVEL */}
+        {/* Pending Reservations Section - ALWAYS VISIBLE */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <Clock className="text-purple-600" size={28} />

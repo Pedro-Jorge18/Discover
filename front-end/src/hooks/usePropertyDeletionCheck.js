@@ -4,8 +4,17 @@ import { pushUserNotification } from '../utils/userNotifications';
 import notify from '../utils/notify';
 
 /**
- * Hook para verificar se propriedades foram deletadas e notificar utilizadores
- * Verifica reservas ativas e se a propriedade ainda existe
+ * usePropertyDeletionCheck - React hook to check for deleted properties and process refunds
+ * 
+ * This hook:
+ * 1. Fetches user's active reservations
+ * 2. Verifies if each property still exists
+ * 3. Notifies users if properties were deleted
+ * 4. Creates notifications for automatic refunds
+ * 
+ * Runs once per session when user is authenticated
+ * 
+ * @param {Object} user - Authenticated user object with id
  */
 export const usePropertyDeletionCheck = (user) => {
   const hasChecked = useRef(false);

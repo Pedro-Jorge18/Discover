@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('amenity_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100); // Ex: Segurança, Comodidades, etc
+            $table->string('name', 100); // Ex: Security, Amenities, etc
             $table->string('description')->nullable();
             $table->string('icon')->nullable();
             $table->integer('order')->default(0);

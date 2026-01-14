@@ -14,7 +14,7 @@ class PaymentMethodSeeder extends Seeder
         $users = User::take(2)->get();
 
         foreach ($users as $index => $user) {
-            // Cartão de crédito para o primeiro usuário
+            // Credit card for first user
             PaymentMethod::create([
                 'user_id' => $user->id,
                 'type' => 'credit_card',
@@ -30,7 +30,7 @@ class PaymentMethodSeeder extends Seeder
                 ]),
             ]);
 
-            // PIX para o mesmo usuário
+            // PIX for same user
             PaymentMethod::create([
                 'user_id' => $user->id,
                 'type' => 'pix',
@@ -45,7 +45,7 @@ class PaymentMethodSeeder extends Seeder
                 ]),
             ]);
 
-            // PayPal para o segundo usuário
+            // PayPal for second user
             if ($index === 1) {
                 PaymentMethod::create([
                     'user_id' => $user->id,

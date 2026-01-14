@@ -46,7 +46,7 @@ export default function EditProfile({ user, setUser }) {
       return;
     }
 
-    // Validar telefone (9 dígitos)
+    // Validate phone (9 digits)
     if (form.phone && form.phone.length !== 9) {
       notify(t('settings.invalidPhone') || "O contacto deve ter 9 dígitos", "error");
       return;

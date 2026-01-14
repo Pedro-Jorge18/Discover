@@ -12,61 +12,61 @@ return new class extends Migration
             $table->id();
 
             // RELACIONAMENTOS
-            $table->foreignId('host_id')->constrained('users')->onDelete('cascade'); // Anfitrião
+            $table->foreignId('host_id')->constrained('users')->onDelete('cascade'); // Host
             $table->foreignId('property_type_id')->constrained()->onDelete('cascade'); // Casa, Apt, Quarto
             $table->foreignId('listing_type_id')->constrained()->onDelete('cascade'); // Inteiro, Privado, Compartilhado
-            $table->foreignId('city_id')->constrained()->onDelete('cascade'); // Localização
+            $table->foreignId('city_id')->constrained()->onDelete('cascade'); // Location
 
-            // LOCALIZAÇÃO DETALHADA
-            $table->string('address'); // Endereço completo
+            // DETAILED LOCATION
+            $table->string('address'); // Full address
             $table->string('neighborhood')->nullable(); // Bairro
             $table->string('postal_code', 20)->nullable(); // CEP
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
 
-            //INFORMAÇÕES BÁSICAS
+            //BASIC INFORMATION
             $table->string('title');
             $table->text('description');
             $table->string('summary', 500)->nullable(); // Resumo curto
 
-            // PREÇOS
-            $table->decimal('price_per_night', 10, 2); // Preço por noite
+            // PRICES
+            $table->decimal('price_per_night', 10, 2); // Price per night
             $table->decimal('cleaning_fee', 10, 2)->default(0); // Taxa de limpeza
-            $table->decimal('service_fee', 10, 2)->default(0); // Taxa de serviço
-            $table->decimal('security_deposit', 10, 2)->default(0); // Depósito de segurança
+            $table->decimal('service_fee', 10, 2)->default(0); // Service fee
+            $table->decimal('security_deposit', 10, 2)->default(0); // Security deposit
 
             // CAPACIDADE
-            $table->integer('max_guests')->default(1); // Máximo de hóspedes
+            $table->integer('max_guests')->default(1); // Maximum guests
             $table->integer('bedrooms')->default(1); // Quartos
             $table->integer('beds')->default(1); // Camas
             $table->integer('bathrooms')->default(1); // Banheiros
 
-            // ESPAÇO
-            $table->integer('area')->nullable(); // Área do imovel
+            // SPACE
+            $table->integer('area')->nullable(); // Property area
             $table->integer('floor')->nullable(); // Andar (para apartamentos)
 
-            // CONFIGURAÇÕES
-            $table->time('check_in_time')->default('15:00'); // Horário check-in
-            $table->time('check_out_time')->default('11:00'); // Horário check-out
-            $table->integer('min_nights')->default(1); // Mínimo de noites
-            $table->integer('max_nights')->default(30); // Máximo de noites
+            // CONFIGURATION
+            $table->time('check_in_time')->default('15:00'); // Check-in time
+            $table->time('check_out_time')->default('11:00'); // Check-out time
+            $table->integer('min_nights')->default(1); // Minimum nights
+            $table->integer('max_nights')->default(30); // Maximum nights
 
             //  STATUS E VISIBILIDADE
-            $table->boolean('published')->default(false); // Se está publicado
-            $table->boolean('active')->default(true); // Se está ativo
-            $table->boolean('instant_book')->default(false); // Reserva instantânea
-            $table->integer('views')->default(0); // Contador de visualizações
+            $table->boolean('published')->default(false); // If published
+            $table->boolean('active')->default(true); // If active
+            $table->boolean('instant_book')->default(false); // Instant booking
+            $table->integer('views')->default(0); // Views counter
 
-            // MÉTRICAS
-            $table->decimal('rating', 3, 2)->default(0); // avaliação média
-            $table->integer('reviews_count')->default(0); // Total de avaliações
+            // METRICS
+            $table->decimal('rating', 3, 2)->default(0); // Average rating
+            $table->integer('reviews_count')->default(0); // Total reviews
 
             // DATAS
-            $table->timestamp('published_at')->nullable(); // Data de publicação
+            $table->timestamp('published_at')->nullable(); // Publication date
             $table->timestamps();
             $table->softDeletes();
 
-            // ÍNDICES
+            // INDEXES
             $table->index(['host_id', 'active']);
             $table->index(['city_id', 'published', 'active']);
             $table->index(['property_type_id', 'listing_type_id']);

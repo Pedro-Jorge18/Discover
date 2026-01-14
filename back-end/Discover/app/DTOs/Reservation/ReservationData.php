@@ -51,7 +51,7 @@ class ReservationData
             throw new InvalidArgumentException('Property, user and status IDs must be greater than 0');
         }
 
-        //  Quantidades básicas
+        //  Basic quantities
         if ($this->adults < 1) {
             throw new InvalidArgumentException('At least one adult is required');
         }
@@ -60,7 +60,7 @@ class ReservationData
             throw new InvalidArgumentException('Number of children and infants cannot be negative');
         }
 
-        //  Preços básicos
+        //  Basic prices
         if ($this->price_per_night < 0) {
             throw new InvalidArgumentException('Price per night cannot be negative');
         }
@@ -77,7 +77,7 @@ class ReservationData
     {
         // Calcular numero de noites
         $this->nights = $this->check_in->diffInDays($this->check_out);
-        // preço por noite
+        // price per night
         $this->subtotal = $this->price_per_night * $this->nights;
 
         //  Calcula total (subtotal + taxas)
@@ -163,13 +163,13 @@ class ReservationData
         return $this->confirmed_at !== null;
     }
 
-    // Verifica se os dados são para criação instantânea (já pago)
+    // Check if data is for instant creation (already paid)
     public function isInstantCreation(): bool
     {
         return $this->isPaid() || $this->isConfirmed();
     }
 
-    //Obtém o saldo pendente
+    //Get pending balance
     public function getPendingBalance(): float
     {
         return $this->total_amount - $this->amount_paid;

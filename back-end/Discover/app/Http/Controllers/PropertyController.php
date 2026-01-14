@@ -8,6 +8,18 @@ use App\Services\Property\PropertyService;
 use App\Http\Requests\UpdatePropertyRequest;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * PropertyController
+ * 
+ * Handles all property-related HTTP requests:
+ * - Listing properties (with filters, pagination, search)
+ * - Creating new properties with images and amenities
+ * - Retrieving property details
+ * - Updating existing properties
+ * - Soft deleting properties
+ * 
+ * Delegates business logic to PropertyService
+ */
 class PropertyController extends Controller
 {
 
@@ -16,9 +28,17 @@ class PropertyController extends Controller
     ){}
 
     /**
+     * List all properties with optional filters
+     * 
+     * Supports filtering by:
+     * - Location (city, country, neighborhood)
+     * - Price range
+     * - Guest capacity
+     * - Property type
+     * - Amenities
+     * 
+     * @return JsonResponse List of properties with pagination
      * @throws \Throwable
-     *
-     * GET /api/properties
      */
     public function index(): JsonResponse
     {
@@ -34,7 +54,16 @@ class PropertyController extends Controller
     }
 
     /**
-     * POST /api/properties
+     * Create a new property listing
+     * 
+     * Handles:
+     * - Property data validation
+     * - Image uploads (4 required)
+     * - Amenity assignment
+     * - Auto-publish on creation
+     * 
+     * @param StorePropertyRequest $request Validated property data
+     * @return JsonResponse Created property resource
      */
     public function store(StorePropertyRequest $request)
     {
@@ -43,7 +72,18 @@ class PropertyController extends Controller
 
 
     /**
-     * GET /api/properties/{id}
+     * Get detailed property information
+     * 
+     * Includes:
+     * - Full property details
+     * - Host information
+     * - Images
+     * - Amenities
+     * - Reviews and ratings
+     * - Availability calendar
+     * 
+     * @param int $id Property ID
+     * @return JsonResponse Property resource
      */
     public function show(int $id)
     {

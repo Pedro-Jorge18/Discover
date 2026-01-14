@@ -25,7 +25,7 @@ class AmenitySeeder extends Seeder
             ['amenity_category_id' => $essenciais->id, 'name' => 'Cozinha', 'icon' => 'kitchen', 'value_type' => 'boolean', 'order' => 4],
             ['amenity_category_id' => $essenciais->id, 'name' => 'Estacionamento gratuito', 'icon' => 'local_parking', 'value_type' => 'boolean', 'order' => 5],
 
-            // SEGURANÇA
+            // SECURITY
             ['amenity_category_id' => $seguranca->id, 'name' => 'Detector de fumaça', 'icon' => 'smoke_free', 'value_type' => 'boolean', 'order' => 1],
             ['amenity_category_id' => $seguranca->id, 'name' => 'Extintor de incêndio', 'icon' => 'fire_extinguisher', 'value_type' => 'boolean', 'order' => 2],
             ['amenity_category_id' => $seguranca->id, 'name' => 'Fechadura com senha', 'icon' => 'lock', 'value_type' => 'boolean', 'order' => 3],

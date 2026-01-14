@@ -11,14 +11,14 @@ class ReservationResource extends JsonResource
         return [
             'id' => $this->id,
             'reservation_code' => $this->reservation_code,
-            'property_id' => $this->property_id,  // Necessário para verificar se propriedade foi deletada
+            'property_id' => $this->property_id,  // Needed to check if property was deleted
 
-            // DATAS E PERÍODO
+            // DATES AND PERIOD
             'check_in' => $this->check_in->format('Y-m-d'),
             'check_out' => $this->check_out->format('Y-m-d'),
             'nights' => $this->nights,
 
-            // HÓSPED - Incluir user_id para notificações
+            // GUEST - Include user_id for notifications
             'user_id' => $this->user_id,
             'guests' => [
                 'adults' => $this->adults,
@@ -58,7 +58,7 @@ class ReservationResource extends JsonResource
             'confirmed_at' => $this->confirmed_at?->format('Y-m-d H:i:s'),
             'cancelled_at' => $this->cancelled_at?->format('Y-m-d H:i:s'),
             'cancellation_reason' => $this->cancellation_reason,
-            'total_amount' => (float) $this->total_amount,  // Também no nível principal para fácil acesso
+            'total_amount' => (float) $this->total_amount,  // Also at main level for easy access
 
             // RELACIONAMENTOS
             'property' => $this->whenLoaded('property', function () {
@@ -82,7 +82,7 @@ class ReservationResource extends JsonResource
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
 
-            // STATUS LÓGICO
+            // LOGICAL STATUS
             'is_upcoming' => $this->isUpcoming(),
             'is_current' => $this->isCurrent(),
             'is_past' => $this->isPast(),

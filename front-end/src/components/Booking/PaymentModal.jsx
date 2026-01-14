@@ -46,28 +46,28 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Validação: 16 dígitos do cartão
+        // Validation: 16 card digits
         const cardDigits = formData.cardNumber.replace(/\s/g, '');
         if (cardDigits.length !== 16) {
-            notify('O número do cartão deve ter 16 dígitos', 'error');
+            notify(t('errors.invalidCardNumber'), 'error');
             return;
         }
         
-        // Validação: 3 dígitos do CVC
+        // Validation: 3 CVC digits
         if (formData.cvc.length !== 3) {
-            notify('O CVC deve ter 3 dígitos', 'error');
+            notify(t('errors.invalidCVC'), 'error');
             return;
         }
         
-        // Validação: Validade no formato MM/YY
+        // Validation: Expiry in MM/YY format
         if (formData.expiry.length !== 5 || !formData.expiry.includes('/')) {
-            notify('A validade deve estar no formato MM/AA', 'error');
+            notify(t('errors.invalidExpiryFormat'), 'error');
             return;
         }
         
-        // Validação: 9 dígitos do contacto
+        // Validation: 9 contact digits
         if (formData.phone.length !== 9) {
-            notify('O contacto deve ter 9 dígitos', 'error');
+            notify(t('errors.invalidPhoneNumber'), 'error');
             return;
         }
         
@@ -95,7 +95,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.firstName')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <User size={18} className="text-gray-400" />
-                                <input type="text" placeholder="EX: JOÃO" className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="text" placeholder={t('payment.firstNamePlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, firstName: e.target.value})} />
                             </div>
                         </div>
@@ -103,7 +103,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.lastName')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <User size={18} className="text-gray-400" />
-                                <input type="text" placeholder="EX: SILVA" className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="text" placeholder={t('payment.lastNamePlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
                             </div>
                         </div>
@@ -114,7 +114,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.email')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Mail size={18} className="text-gray-400" />
-                                <input type="email" placeholder="EMAIL@EXEMPLO.COM" className="bg-transparent w-full outline-none font-bold text-sm" required 
+                                <input type="email" placeholder={t('payment.emailPlaceholder')} className="bg-transparent w-full outline-none font-bold text-sm" required 
                                     onChange={(e) => setFormData({...formData, email: e.target.value})} />
                             </div>
                         </div>
@@ -143,7 +143,7 @@ const PaymentModal = ({ onClose, onConfirm, totalPrice, bookingLoading }) => {
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('payment.expiry')}</label>
                             <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                 <Calendar size={18} className="text-gray-400" />
-                                <input type="text" placeholder="MM/AA" value={formData.expiry} onChange={handleExpiry} className="bg-transparent w-full outline-none font-bold text-sm" required />
+                                <input type="text" placeholder={t('payment.expiryPlaceholder')} value={formData.expiry} onChange={handleExpiry} className="bg-transparent w-full outline-none font-bold text-sm" required />
                             </div>
                         </div>
                         <div className="space-y-1">

@@ -82,13 +82,13 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
     window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   }, [user, storageKey, property.id, navigate]);
 
-  // Gerar um índice aleatório mas consistente baseado no ID da propriedade
+  // Generate a consistent random index based on property ID
   const randomImageIndex = useMemo(() => {
     if (!property.images || property.images.length === 0) return 0;
     if (property.images.length === 1) return 0;
     
-    // Usar combinação de ID + timestamp arredondado para gerar índice aleatório
-    // Arredonda para dia para manter consistência durante o dia, mas variar entre dias
+    // Use combination of ID + rounded timestamp to generate random index
+    // Round to day to maintain consistency during the day, but vary between days
     const dayTimestamp = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const seed = parseInt(property.id) * 31 + dayTimestamp;
     
@@ -109,7 +109,7 @@ const PropertyCard = memo(function PropertyCard({ property, user }) {
     return `${base}/storage/${raw.replace(/^\/storage\//, '')}`;
   }, [property.images, randomImageIndex]);
 
-  // Gerar URL de fallback aleatória baseada no ID da propriedade
+  // Generate random fallback URL based on property ID
   const fallbackImageUrl = useMemo(() => {
     const fallbackImages = [
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',

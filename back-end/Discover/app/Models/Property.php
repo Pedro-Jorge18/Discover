@@ -10,6 +10,51 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Property Model
+ * 
+ * Represents a rental property listing in the system.
+ * Includes location, pricing, amenities, availability and review management.
+ * Supports soft deletes for data integrity.
+ * 
+ * @property int $id
+ * @property int $host_id Foreign key to User (host)
+ * @property int $property_type_id Foreign key to PropertyType
+ * @property int $listing_type_id Foreign key to ListingType
+ * @property int $city_id Foreign key to City
+ * @property string $address Full address
+ * @property string $neighborhood Neighborhood name
+ * @property string $postal_code Postal/ZIP code
+ * @property float $latitude GPS latitude
+ * @property float $longitude GPS longitude
+ * @property string $title Property title
+ * @property string $description Detailed description
+ * @property string $summary Short summary
+ * @property float $price_per_night Nightly rate
+ * @property float $cleaning_fee One-time cleaning fee
+ * @property float $service_fee Platform service fee
+ * @property float $security_deposit Refundable security deposit
+ * @property int $max_guests Maximum guest capacity
+ * @property int $bedrooms Number of bedrooms
+ * @property int $beds Number of beds
+ * @property int $bathrooms Number of bathrooms
+ * @property int $area Area in square meters
+ * @property int $floor Floor number
+ * @property string $check_in_time Check-in time
+ * @property string $check_out_time Check-out time
+ * @property int $min_nights Minimum nights required
+ * @property int $max_nights Maximum nights allowed
+ * @property bool $published Publication status
+ * @property bool $active Active status
+ * @property bool $instant_book Allows instant booking
+ * @property int $views View counter
+ * @property float $rating Average rating (0-5)
+ * @property int $reviews_count Total review count
+ * @property \Carbon\Carbon $published_at Publication timestamp
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at Soft delete timestamp
+ */
 class Property extends Model
 {
     use HasFactory, SoftDeletes;
@@ -194,7 +239,7 @@ class Property extends Model
         return $query->where('max_guests', '>=', $guests);
     }
 
-    // MÉTODOS DE PREÇO
+    // PRICE METHODS
     public function getTotalPrice(int $nights): float
     {
         return ($this->price_per_night * $nights) + $this->cleaning_fee + $this->service_fee;
@@ -205,7 +250,7 @@ class Property extends Model
         return $this->price_per_night * $nights;
     }
 
-    // MÉTODOS DE AVALIAÇÃO
+    // RATING METHODS
     public function updateRating(): void
     {
         $this->update([
@@ -214,7 +259,7 @@ class Property extends Model
         ]);
     }
 
-    // MÉTODOS DE LOCALIZAÇÃO
+    // LOCATION METHODS
     public function getFullAddress(): string
     {
         $parts = [
@@ -228,7 +273,7 @@ class Property extends Model
         return implode(', ', array_filter($parts));
     }
 
-    // MÉTODOS DE STATUS
+    // STATUS METHODS
     public function publish(): void
     {
         $this->update([
@@ -247,11 +292,11 @@ class Property extends Model
 
     public function isAvailableForDates(string $checkIn,string $checkOut): bool
     {
-        // Lógica para verificar disponibilidade (será implementada depois)
+        // Logic to check availability (will be implemented later)
         return true;
     }
 
-    // MÉTRICAS
+    // METRICS
     public function incrementViews(): void
     {
         $this->increment('views');

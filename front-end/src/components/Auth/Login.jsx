@@ -69,7 +69,7 @@ export default function Login({ setUser }) {
       // Update user and navigate
       setUser(response.data.user);
       
-      // Se há um redirect pendente, faz o redirect
+      // If there is a pending redirect, do the redirect
       const redirectPath = localStorage.getItem('propertyRedirect');
       if (redirectPath) {
         localStorage.removeItem('propertyRedirect');
@@ -80,9 +80,9 @@ export default function Login({ setUser }) {
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        notify("Credenciais inválidas. Verifique o email e a palavra-passe.", 'error');
+        notify(t('errors.invalidCredentials'), 'error');
       } else {
-        notify("Erro no servidor. Tente novamente mais tarde.", 'error');
+        notify(t('errors.serverErrorTryLater'), 'error');
       }
     }
   };
@@ -117,7 +117,7 @@ export default function Login({ setUser }) {
       setUser(res.data.user);
       setShow2FAPopup(false);
       
-      // Se há um redirect pendente, faz o redirect
+      // If there is a pending redirect, do the redirect
       const redirectPath = localStorage.getItem('propertyRedirect');
       if (redirectPath) {
         localStorage.removeItem('propertyRedirect');
@@ -128,9 +128,9 @@ export default function Login({ setUser }) {
 
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 422) {
-        notify("Código inválido. Tente novamente.", 'error');
+        notify(t('errors.invalidCode'), 'error');
       } else {
-        notify("Erro no servidor. Tente novamente mais tarde.", 'error');
+        notify(t('errors.serverErrorTryLater'), 'error');
       }
     }
   };

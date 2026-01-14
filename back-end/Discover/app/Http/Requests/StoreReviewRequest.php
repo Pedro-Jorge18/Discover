@@ -62,7 +62,7 @@ class StoreReviewRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Verificar se o utilizador já avaliou esta propriedade
+            // Check if user has already reviewed this property
             $propertyId = $this->property_id;
             $userId = auth()->id();
             

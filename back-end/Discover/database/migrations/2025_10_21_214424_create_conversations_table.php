@@ -12,11 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Cliente
-            $table->foreignId('host_id')->constrained('users')->onDelete('cascade'); // Anfitrião
+            $table->foreignId('host_id')->constrained('users')->onDelete('cascade'); // Host
             $table->string('subject')->nullable(); // Assunto da conversa
             $table->timestamp('last_message_at')->nullable();
-            $table->integer('unread_count_user')->default(0); // Mensagens não lidas pelo usuário
-            $table->integer('unread_count_host')->default(0); // Mensagens não lidas pelo anfitrião
+            $table->integer('unread_count_user')->default(0); // Unread messages by user
+            $table->integer('unread_count_host')->default(0); // Unread messages by host
             $table->boolean('active')->default(true);
             $table->timestamps();
 
