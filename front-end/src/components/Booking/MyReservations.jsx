@@ -71,6 +71,26 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
                     detail: { reservationId: cancelTarget.id, action: 'cancel' } 
                 }));
                 
+                // Send refund notification
+                if (user?.id && cancelTarget) {
+                    const refundAmount = cancelTarget.total_amount || 0;
+                    pushUserNotification({
+                        userId: user.id,
+                        type: 'refund',
+                        title: '💰 Dinheiro Devolvido',
+                        message: `Cancelou a sua reserva em "${cancelTarget.property?.title || 'Propriedade'}". O valor de €${refundAmount} foi devolvido.`,
+                        reservationId: cancelTarget.id,
+                        meta: {
+                            amount: refundAmount,
+                            propertyTitle: cancelTarget.property?.title || 'Propriedade',
+                            reason: 'User cancellation'
+                        }
+                    });
+                    console.log('💰 Notificação de reembolso criada:', notif);
+                } else {
+                    console.warn('⚠️ user.id ou cancelTarget não encontrado!');
+                }
+                
                 notify(t('errors.reservationCancelledSuccess'), 'success');
             } catch (err) {
                 console.error('Erro a cancelar:', err);
@@ -134,6 +154,7 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
     const checkDeletedProperties = async (reservations) => {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       
+      // Verificar propriedades deletadas
       const reservationsToCheck = reservations.filter(r => {
         const status = r.status_name || r.status || '';
         const isCancelled = ['Cancelada', 'Cancelled'].includes(status);
@@ -146,6 +167,62 @@ const MyReservations = ({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) 
         const shouldCheck = cancelledAt && cancelledAt > thirtyDaysAgo;
         return shouldCheck;
       });
+
+      // Verificar reservas canceladas/rejeitadas para criar notificações de reembolso
+      const cancelledReservations = reservations.filter(r => {
+        const status = r.status_name || r.status || '';
+        const isCancelled = ['Cancelada', 'Cancelled'].includes(status);
+        const cancelledAt = r.cancelled_at ? new Date(r.cancelled_at) : null;
+        const isRecent = cancelledAt && cancelledAt > thirtyDaysAgo;
+        return isCancelled && isRecent;
+      });
+
+      console.log('💰 VERIFICANDO REEMBOLSOS:', {
+        totalReservations: reservations.length,
+        cancelledReservations: cancelledReservations.length,
+        cancelled: cancelledReservations
+      });
+
+      // Criar notificações de reembolso para reservas canceladas (se ainda não foi criada)
+      for (const reservation of cancelledReservations) {
+        const refundNotifKey = `refund_notified_${user.id}_${reservation.id}`;
+        const alreadyNotified = localStorage.getItem(refundNotifKey);
+        
+        console.log(`🔍 Reserva ${reservation.id}:`, {
+          status: reservation.status_name,
+          amount: reservation.total_amount,
+          alreadyNotified: !!alreadyNotified,
+          refundNotifKey
+        });
+        
+        if (alreadyNotified) {
+          console.log(`⏭️ Já notificado para reserva ${reservation.id}`);
+          continue; // Já criou notificação
+        }
+
+        const propertyTitle = reservation.property?.title || 'Propriedade';
+        const amount = reservation.total_amount || 0;
+        
+        console.log(`✅ CRIANDO notificação de reembolso para reserva ${reservation.id}`);
+        
+        // Criar notificação de reembolso
+        pushUserNotification({
+          userId: user.id,
+          title: '💰 Dinheiro Devolvido',
+          message: `A sua reserva em "${propertyTitle}" foi cancelada. O valor de €${amount} foi devolvido.`,
+          type: 'refund',
+          reservationId: reservation.id,
+          meta: {
+            amount: amount,
+            propertyTitle: propertyTitle,
+            reason: 'Reservation cancelled'
+          }
+        });
+        
+        // Marcar como notificado
+        localStorage.setItem(refundNotifKey, new Date().toISOString());
+        console.log(`💾 Marcado como notificado: ${refundNotifKey}`);
+      }
 
       for (const reservation of reservationsToCheck) {
         const storageKey = `notified_refund_${user.id}_${reservation.id}`;

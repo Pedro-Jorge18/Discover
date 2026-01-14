@@ -2,8 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.jsx';
 import { Bell, CheckCircle, Trash2, CheckCheck, Check } from 'lucide-react';
-import api from '../../api/axios';
 import { useTranslation } from '../../contexts/TranslationContext';
+import {
+  getUserNotifications,
+  markUserNotificationsRead,
+  markSingleUserNotificationRead,
+  removeUserNotification,
+  clearUserNotifications,
+  userNotificationEventName,
+} from '../../utils/userNotifications';
 
 const formatTimeAgo = (isoDate, language) => {
   if (!isoDate) return '';
@@ -22,6 +29,7 @@ const formatTimeAgo = (isoDate, language) => {
 const typeIcon = (type) => {
   if (type === 'reservation_accepted') return <CheckCircle className="w-5 h-5 text-green-600" />;
   if (type === 'reservation_rejected') return <CheckCircle className="w-5 h-5 text-red-600" />;
+  if (type === 'refund') return <span className="text-2xl">💰</span>;
   return <Bell className="w-5 h-5 text-gray-500" />;
 };
 
@@ -31,16 +39,10 @@ function UserNotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAd
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = () => {
     if (!user?.id) return;
-    try {
-      const response = await api.get('/notifications');
-      setNotifications(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    } finally {
-      setLoading(false);
-    }
+    setNotifications(getUserNotifications(user.id));
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -49,45 +51,48 @@ function UserNotificationsPage({ user, setUser, onOpenSettings, onOpenSettingsAd
       return;
     }
     fetchNotifications();
+
+    // Listen for notification updates
+    const handleUpdate = (event) => {
+      const targetId = event?.detail?.userId;
+      if (targetId && targetId !== user.id) return;
+      fetchNotifications();
+    };
+
+    window.addEventListener(userNotificationEventName, handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    return () => {
+      window.removeEventListener(userNotificationEventName, handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, [user]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const unreadLabel = `${t('userNotifications.unread')}: ${unreadCount}`;
 
-  const handleMarkAllRead = async () => {
-    try {
-      await api.post('/notifications/read-all');
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error marking all as read:', error);
-    }
+  const handleMarkAllRead = () => {
+    if (!user?.id) return;
+    markUserNotificationsRead(user.id);
+    fetchNotifications();
   };
 
-  const handleClearAll = async () => {
-    try {
-      await api.delete('/notifications');
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error clearing notifications:', error);
-    }
+  const handleClearAll = () => {
+    if (!user?.id) return;
+    clearUserNotifications(user.id);
+    fetchNotifications();
   };
 
-  const handleMarkSingle = async (id) => {
-    try {
-      await api.post(`/notifications/${id}/read`);
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error marking as read:', error);
-    }
+  const handleMarkSingle = (id) => {
+    if (!user?.id) return;
+    markSingleUserNotificationRead(user.id, id);
+    fetchNotifications();
   };
 
-  const handleRemoveSingle = async (id) => {
-    try {
-      await api.delete(`/notifications/${id}`);
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error removing notification:', error);
-    }
+  const handleRemoveSingle = (id) => {
+    if (!user?.id) return;
+    removeUserNotification(user.id, id);
+    fetchNotifications();
   };
 
   return (

@@ -26,6 +26,7 @@ const formatTimeAgo = (isoDate, language) => {
 const typeIcon = (type) => {
   if (type === 'reservation_accepted') return <CheckCircle className="w-4 h-4 text-green-600" />;
   if (type === 'reservation_rejected') return <CheckCircle className="w-4 h-4 text-red-600" />;
+  if (type === 'refund') return <span className="text-lg">💰</span>;
   return <Bell className="w-4 h-4 text-gray-500" />;
 };
 

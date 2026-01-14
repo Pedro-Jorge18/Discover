@@ -170,6 +170,7 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
         
         // Send notification to guest about rejection
         const guestId = reservation?.user_id || reservation?.user?.id;
+        
         if (guestId) {
           pushUserNotification({
             userId: guestId,
@@ -179,6 +180,21 @@ function HostDashboard({ user, setUser, onOpenSettings, onOpenSettingsAdmin }) {
             reservationId: reservation.id,
             meta: {
               propertyTitle: reservation.property?.title,
+            }
+          });
+
+          // Send refund notification
+          const refundAmount = reservation.total_amount || 0;
+          pushUserNotification({
+            userId: guestId,
+            type: 'refund',
+            title: '💰 Dinheiro Devolvido',
+            message: `A sua reserva em "${reservation.property?.title || 'Propriedade'}" foi recusada pelo anfitrião. O valor de €${refundAmount} foi devolvido.`,
+            reservationId: reservation.id,
+            meta: {
+              amount: refundAmount,
+              propertyTitle: reservation.property?.title || 'Propriedade',
+              reason: 'Host rejection'
             }
           });
         }
