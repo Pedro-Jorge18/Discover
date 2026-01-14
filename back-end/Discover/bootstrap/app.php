@@ -7,9 +7,15 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
+<<<<<<< HEAD
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
+=======
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+>>>>>>> d9f48908a5dc12b5997c564275660a9fd0e337c1
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {

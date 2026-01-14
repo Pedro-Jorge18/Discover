@@ -12,11 +12,16 @@
         "php": "^8.2",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
+<<<<<<< HEAD
         "laravel/sanctum": "^4.2",
         "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.10.1",
         "pragmarx/google2fa": "^9.0",
         "stripe/stripe-php": "^18.2"
+=======
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^2.10.1"
+>>>>>>> d9f48908a5dc12b5997c564275660a9fd0e337c1
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
